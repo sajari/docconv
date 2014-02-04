@@ -6,16 +6,23 @@ A Golang wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, etc to plain
 The compiled binary runs as a service on port 8888 by default. Documents can be sent as a multipart POST request and the plain text (body) and meta information are then returned as a JSON object
 
 ### Dependencies
-tidy, wv, popplerutils, unrtf
+tidy, wv, popplerutils, unrtf, github.com/JalfResi/justext
 
 Example install of dependencies (not all systems):
 
 ```sudo apt-get install poppler-utils wv unrtf tidy``` 
-
+```go get github.com/JalfResi/justext``` 
 
 ### Optional Flags
  - "addr" - the port to listen on, default is "8888"
  - "log-level" - can be 0, 1 or 2. Levels described below
+ - "readability-length-low" - Sets the readability length low if the ?readability=1 parameter is set
+ - "readability-length-high" - Sets the readability length high if the ?readability=1 parameter is set
+ - "readability-stopwords-low" - Sets the readability stopwords low if the ?readability=1 parameter is set
+ - "readability-stopwords-high" - Sets the readability stopwords high if the ?readability=1 parameter is set
+ - "readability-max-link-density" - Sets the readability max link density if the ?readability=1 parameter is set
+ - "readability-max-heading-distance" - Sets the readability max heading distance if the ?readability=1 parameter is set
+ - "readability-use-classes - Comma separated list of readability classes to use if the ?readability=1 parameter is set
 
 ##### Log levels
  - "0" - will only log errors & critical info

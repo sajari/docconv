@@ -18,11 +18,19 @@ type Response struct {
 	MSecs uint32            `json:"msecs"`
 }
 
+var (
+	listenAddr                    *string  = flag.String("addr", ":8888", "The address to listen on (e.g. 127.0.0.1:8888)")
+	logLevel                      *uint    = flag.Uint("log-level", 0, "The verbosity of the log")
+	readabilityLengthLow          *int     = flag.Int("readability-length-low", 70, "Sets the readability length low")
+	readabilityLengthHigh         *int     = flag.Int("readability-length-high", 200, "Sets the readability length high")
+	readabilityStopwordsLow       *float64 = flag.Float64("readability-stopwords-low", 0.2, "Sets the readability stopwords low")
+	readabilityStopwordsHigh      *float64 = flag.Float64("readability-stopwords-high", 0.3, "Sets the readability stopwords high")
+	readabilityMaxLinkDensity     *float64 = flag.Float64("readability-max-link-density", 0.2, "Sets the readability max link density")
+	readabilityMaxHeadingDistance *int     = flag.Int("readability-max-heading-distance", 200, "Sets the readability max heading distance")
+	readabilityUseClasses         *string  = flag.String("readability-use-classes", "good,neargood", "Comma separated list of readability classes to use")
+)
+
 func main() {
-	var listenAddr string
-	var logLevel uint
-	flag.StringVar(&listenAddr, "addr", ":8888", "The address to listen on (e.g. 127.0.0.1:8888)")
-	flag.UintVar(&logLevel, "log-level", 0, "The verbosity of the log")
 	flag.Parse()
 
 	// Accept requests at /convert
@@ -68,8 +76,17 @@ func main() {
 			}
 		}
 
-		if logLevel >= 1 {
+		if *logLevel >= 1 {
 			log.Println("Recieved file: "+info.Filename+" ("+mimeType+")")
+		}
+
+		// Readability flag. Currently only used for HTML
+		var readability bool = false
+		if request.FormValue("readability") == "1" {
+			readability = true
+			if *logLevel >= 2 {
+				log.Println("Readability is on")
+			}
 		}
 		
 		// Convert document
@@ -88,7 +105,7 @@ func main() {
 				response.Body, response.Meta = ConvertRtf(file)
 
 			case "text/html":
-				response.Body, response.Meta = ConvertHtml(file)
+				response.Body, response.Meta = ConvertHtml(file, readability)
 
 			case "text/xml", "application/xml":
 				response.Body, response.Meta = ConvertXml(file)
@@ -101,16 +118,16 @@ func main() {
 		// Return result
 		response.MSecs = uint32(time.Since(startClock).Nanoseconds() / 1000000)
 		jsonStr, _ := json.Marshal(response)
-		if logLevel >= 2 {
+		if *logLevel >= 2 {
 			log.Println(string(jsonStr))
 		}
 		fmt.Fprintf(writer, "%s", jsonStr)
 	})
 
 	// Start webserver
-	log.Println("Setting log level to", logLevel)
-	log.Println("Starting Sajari convert on", listenAddr)
-	if err := http.ListenAndServe(listenAddr, nil); err != nil {
+	log.Println("Setting log level to", *logLevel)
+	log.Println("Starting Sajari convert on", *listenAddr)
+	if err := http.ListenAndServe(*listenAddr, nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
