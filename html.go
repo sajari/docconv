@@ -6,19 +6,106 @@ import (
 	"bytes"
 	"strings"
 	"github.com/JalfResi/justext"
+	"code.google.com/p/go.net/html"
 )
 
 // Convert HTML
 func ConvertHtml(input io.Reader, readability bool) (string, map[string]string) {
 	meta := make(map[string]string)
-	cleanXml, err := Tidy(input, false)
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(input)
+
+	cleanXml, err := Tidy(bytes.NewReader(buf.Bytes()), false)
 	if err != nil {
 		log.Println("Tidy:", err)
+		// Tidy failed, so we now manually tokenize instead
+		clean := cleanHTML(buf, true)
+		cleanXml = []byte(clean)
+		log.Println("Cleaned HTML using Golang tokenizer")
 	}
+
 	if readability {
 		cleanXml = HtmlReadability(bytes.NewReader(cleanXml))
 	}
 	return Html2Text(bytes.NewReader(cleanXml)), meta
+}
+
+// Tests for known friendly HTML parameters that tidy is unlikely to choke on
+func acceptedHTML(str string) bool {
+    tags := []string{"div", "p", "br", "span", "body", "head", "html", "ul", "ol", "li", "dl", "dt", "dd", "a", "form", "article", "table", "tr", "td", "tbody", "thead", "th", "tfoot", "col", "colgroup", "caption", "form", "input", "title", "h1", "h2", "h3", "h4", "h5", "h6", "meta", "strong", "cite", "em", "address", "abbr", "acronym", "blockquote", "q", "pre", "samp", "select", "fieldset", "legend", "button", "option", "textarea", "label"}
+    for _, tag := range tags {
+        if tag == str {
+            return true
+        }
+    }
+    return false
+}
+
+// Removes scripts, comments, styles and parameters from HTML. 
+// Also removes made up tags, e.g. <fb:like>
+// Can keep head elements or not. Typically not much in there.
+func cleanHTML(r io.Reader, all bool) string {
+    d := html.NewTokenizer(r)
+
+    output := ""
+    if !all {
+        output = "<html><head></head>"
+    }
+    mainsection := false
+    junksection := false
+
+    for { 
+        // token type
+        tokenType := d.Next() 
+        if tokenType == html.ErrorToken {
+            return output  
+        }       
+        token := d.Token()
+
+        // type Token struct {
+        //     Type     TokenType
+        //     DataAtom atom.Atom
+        //     Data     string
+        //     Attr     []Attribute
+        // }
+        //
+        // type Attribute struct {
+        //     Namespace, Key, Val string
+        // }
+
+        switch tokenType {
+            case html.StartTagToken: // <tag>
+                if token.Data == "body" || (token.Data == "html" && all) {
+                    mainsection = true
+                }
+                if !acceptedHTML(token.Data) {
+                    junksection = true
+                }
+
+                if !junksection && mainsection {
+                    output += "<" + token.Data + ">"
+                }
+
+            case html.TextToken: // text between start and end tag
+                if !junksection && mainsection {
+                    output += token.Data
+                }
+
+            case html.EndTagToken: // </tag>
+                if !junksection && mainsection {
+                    output += "</" + token.Data + ">"
+                }
+                if !acceptedHTML(token.Data) {
+                    junksection = false
+                }
+
+            case html.SelfClosingTagToken: // <tag/>
+                if !junksection && mainsection {
+                    output += "<" + token.Data + " />"  // TODO: Can probably keep attributes from the meta tags
+                }
+        }
+    }
 }
 
 // Extract the readable text in an HTML document
