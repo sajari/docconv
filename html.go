@@ -33,7 +33,7 @@ func ConvertHtml(input io.Reader, readability bool) (string, map[string]string) 
 
 // Tests for known friendly HTML parameters that tidy is unlikely to choke on
 func acceptedHTML(str string) bool {
-    tags := []string{"div", "p", "br", "span", "body", "head", "html", "ul", "ol", "li", "dl", "dt", "dd", "a", "form", "article", "table", "tr", "td", "tbody", "thead", "th", "tfoot", "col", "colgroup", "caption", "form", "input", "title", "h1", "h2", "h3", "h4", "h5", "h6", "meta", "strong", "cite", "em", "address", "abbr", "acronym", "blockquote", "q", "pre", "samp", "select", "fieldset", "legend", "button", "option", "textarea", "label"}
+    tags := []string{"div", "p", "br", "span", "body", "head", "html", "ul", "ol", "li", "dl", "dt", "dd", "a", "form", "article", "section", "table", "tr", "td", "tbody", "thead", "th", "tfoot", "col", "colgroup", "caption", "form", "input", "title", "h1", "h2", "h3", "h4", "h5", "h6", "meta", "strong", "cite", "em", "address", "abbr", "acronym", "blockquote", "q", "pre", "samp", "select", "fieldset", "legend", "button", "option", "textarea", "label"}
     for _, tag := range tags {
         if tag == str {
             return true
