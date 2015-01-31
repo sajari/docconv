@@ -106,6 +106,9 @@ func main() {
 
 			case "text/html":
 				response.Body, response.Meta = ConvertHtml(file, readability)
+			
+			case "text/url":
+				response.Body, response.Meta = ConvertUrl(file, readability)			
 
 			case "text/xml", "application/xml":
 				response.Body, response.Meta = ConvertXml(file)
