@@ -1,14 +1,15 @@
 package main
 
 import (
-	"os/exec"
-	"strings"
+	"bytes"
 	"fmt"
-	"time"
-	"os"
-	"log"
 	"io"
 	"io/ioutil"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+	"time"
 )
 
 // Convert MS Word DOC
@@ -24,7 +25,7 @@ func ConvertDoc(input io.Reader) (string, map[string]string) {
 
 	// Meta data
 	mc := make(chan map[string]string, 1)
-	go func () {
+	go func() {
 		meta := make(map[string]string)
 		metaStr, err := exec.Command("wvSummary", inputFile.Name()).Output()
 		if err != nil {
@@ -56,7 +57,7 @@ func ConvertDoc(input io.Reader) (string, map[string]string) {
 
 	// Document body
 	bc := make(chan string, 1)
-	go func () {
+	go func() {
 
 		// Save output to a file
 		outputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
@@ -66,16 +67,23 @@ func ConvertDoc(input io.Reader) (string, map[string]string) {
 		}
 		defer os.Remove(outputFile.Name())
 
-		err = exec.Command("wvHtml", inputFile.Name(), outputFile.Name()).Run()
+		err = exec.Command("wvText", inputFile.Name(), outputFile.Name()).Run()
 		if err != nil {
-			log.Println("wvHtml:", err)
+			log.Println("wvText:", err)
 		}
-		
-		bc <- Html2Text(outputFile)
+
+		var buf bytes.Buffer
+		_, err = buf.ReadFrom(outputFile)
+		if err != nil {
+			log.Println("wvText:", err)
+		}
+
+		bc <- buf.String()
 	}()
-	
+
 	body := <-bc
 	meta := <-mc
+
 	if len(body) == 0 {
 		inputFile.Seek(0, 0)
 		return ConvertDocx(inputFile)
