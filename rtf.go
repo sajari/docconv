@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os/exec"
-	"strings"
 	"fmt"
-	"time"
-	"os"
 	"io"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/exec"
+	"strings"
+	"time"
 )
 
 // Convert RTF
@@ -35,7 +35,7 @@ func ConvertRtf(input io.Reader) (string, map[string]string) {
 			info[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
 		}
 		if len(line) > 4 && line[:4] != "### " {
-			output += line+"\n"
+			output += line + "\n"
 		}
 	}
 

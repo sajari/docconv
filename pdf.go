@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os/exec"
-	"strings"
 	"fmt"
-	"time"
-	"os"
-	"log"
 	"io"
 	"io/ioutil"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+	"time"
 )
 
 // Convert PDF
@@ -24,7 +24,7 @@ func ConvertPdf(input io.Reader) (string, map[string]string) {
 
 	// Meta data
 	mc := make(chan map[string]string, 1)
-	go func () {
+	go func() {
 		meta := make(map[string]string)
 		metaStr, err := exec.Command("pdfinfo", inputFile.Name()).Output()
 		if err != nil {
@@ -59,13 +59,13 @@ func ConvertPdf(input io.Reader) (string, map[string]string) {
 
 	// Document body
 	bc := make(chan string, 1)
-	go func () {
+	go func() {
 		body, err := exec.Command("pdftotext", "-q", "-nopgbrk", "-enc", "UTF-8", "-eol", "unix", inputFile.Name(), "-").Output()
 		if err != nil {
 			log.Println("pdftotext:", err)
 		}
 		bc <- string(body)
 	}()
-	
+
 	return <-bc, <-mc
 }

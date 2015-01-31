@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"time"
-	"log"
-	"io"
-	"io/ioutil"
 	"archive/zip"
 	"bytes"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
 	"regexp"
+	"time"
 )
 
 // Convert DOCX to text
@@ -53,17 +53,17 @@ func ConvertDocx(input io.Reader) (string, map[string]string) {
 		} else if reHeaderFile.MatchString(f.Name) {
 			rc, _ := f.Open()
 			defer rc.Close()
-			textHeader += DocxXml2Text(rc)+"\n"
+			textHeader += DocxXml2Text(rc) + "\n"
 		} else if reFooterFile.MatchString(f.Name) {
 			rc, _ := f.Open()
 			defer rc.Close()
-			textFooter += DocxXml2Text(rc)+"\n"
+			textFooter += DocxXml2Text(rc) + "\n"
 		}
 	}
 
-	return textHeader+"\n"+textBody+"\n"+textFooter, meta
+	return textHeader + "\n" + textBody + "\n" + textFooter, meta
 }
 
 func DocxXml2Text(input io.Reader) string {
-	return Xml2Text(input, []string{ "br", "p", "tab" }, []string{ "instrText", "script" }, true)
+	return Xml2Text(input, []string{"br", "p", "tab"}, []string{"instrText", "script"}, true)
 }

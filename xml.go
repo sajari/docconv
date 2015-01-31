@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/xml"
 	"io"
-	"bytes"
 	"log"
 )
 
@@ -26,30 +26,30 @@ func Xml2Text(input io.Reader, breaks []string, skip []string, strict bool) stri
 	x.Strict = strict
 	for d, err := x.Token(); d != nil && err == nil; d, err = x.Token() {
 		switch v := d.(type) {
-			case xml.CharData:
-				output += string(v)
-			case xml.StartElement:
-				for _, breakElement := range breaks {
-					if v.Name.Local == breakElement {
-						output += "\n"
-					}
+		case xml.CharData:
+			output += string(v)
+		case xml.StartElement:
+			for _, breakElement := range breaks {
+				if v.Name.Local == breakElement {
+					output += "\n"
 				}
-				for _, skipElement := range skip {
-					if v.Name.Local == skipElement {
-						depth = 1
-						for d, err := x.Token(); d != nil && err == nil; d, err = x.Token() {
-							switch d.(type) {
-								case xml.StartElement:
-									depth++
-								case xml.EndElement:
-									depth--
-							}
-							if depth == 0 {
-								break
-							}
+			}
+			for _, skipElement := range skip {
+				if v.Name.Local == skipElement {
+					depth = 1
+					for d, err := x.Token(); d != nil && err == nil; d, err = x.Token() {
+						switch d.(type) {
+						case xml.StartElement:
+							depth++
+						case xml.EndElement:
+							depth--
+						}
+						if depth == 0 {
+							break
 						}
 					}
 				}
+			}
 		}
 	}
 	return output
@@ -62,10 +62,10 @@ func Xml2Map(input io.Reader) map[string]string {
 	var tagName string
 	for d, err := x.Token(); d != nil && err == nil; d, err = x.Token() {
 		switch v := d.(type) {
-			case xml.StartElement:
-				tagName = string(v.Name.Local)
-			case xml.CharData:
-				output[tagName] = string(v)
+		case xml.StartElement:
+			tagName = string(v.Name.Local)
+		case xml.CharData:
+			output[tagName] = string(v)
 		}
 	}
 	return output

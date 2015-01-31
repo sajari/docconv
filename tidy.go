@@ -1,11 +1,11 @@
 package main
 
 import (
-	"os"
-	"os/exec"
 	"io"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/exec"
 )
 
 // Errors & warnings are deliberately suppressed as tidy throws warnings very easily
@@ -26,7 +26,7 @@ func Tidy(input io.Reader, xmlIn bool) ([]byte, error) {
 	} else {
 		output, err = exec.Command("tidy", "-numeric", "-asxml", "-quiet", "-utf8", inputFile.Name()).Output()
 	}
-	
+
 	if err != nil && err.Error() != "exit status 1" {
 		return nil, err
 	}
