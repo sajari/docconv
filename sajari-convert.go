@@ -39,11 +39,12 @@ func main() {
 
 		// Get uploaded file
 		file, info, err := request.FormFile("input")
-		defer file.Close()
 		if err != nil {
 			log.Println("File upload", err)
 			return
 		}
+
+		defer file.Close()
 
 		// Abort if file doesn't have a mime type
 		if len(info.Header["Content-Type"]) == 0 {
