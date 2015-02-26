@@ -1,0 +1,213 @@
+<html>
+<style>
+	@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300&subset=latin,cyrillic-ext,cyrillic,greek-ext,vietnamese,latin-ext);
+	
+	body
+	{
+		font-family: 'Open Sans', sans-serif;
+		font-weight: 300; 
+		margin-left: auto;
+		margin-right: auto;
+		width: 800px;
+	}
+
+	span.stopword {
+		text-decoration: underline;
+	}
+
+	p.good, p.heading, p.bad {
+	    width: 550px;
+	    text-align: justify;
+	    margin-top: 2px;
+	    margin-bottom: 2px;
+	    padding-left: 3px;
+	    padding-right: 3px;
+	}
+
+	p.good, p.heading {
+	    background-color: #cfc;
+	}
+
+	p.heading {
+		font-weight: 400; 
+		font-size: 1.3em;
+	}
+
+	p.bad {
+	    background-color: #fdd;
+	}
+
+	div.paragraph_details {
+	    width: 240px;
+	    float: right;
+	    display: none;
+	}
+
+	div.paragraph_details table {
+	    border-collapse: collapse;
+	}
+
+	div.paragraph_details table td {
+	    padding-left: 2px;
+	    padding-right: 2px;
+	    border: 1px solid #fff;
+	}
+
+	div.paragraph_details.good table,
+	div.paragraph_details.heading table {
+	    border: 1px solid #9f9;
+	}
+
+	div.paragraph_details.bad table {
+	    border: 1px solid #faa;
+	}
+
+	div.paragraph_details.good table tr,
+	div.paragraph_details.heading table tr {
+	    background-color: #9f9;
+	}
+
+	div.paragraph_details.bad table tr {
+	    background-color: #faa;
+	}
+
+	.eyeopen
+	{
+		float: left;
+		margin-left: -100;
+		margin-top: 3px;
+		display: block;
+		width: 31px;
+		height: 24px;
+		background-repeat: no-repeat;
+		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAARCAYAAAAlpHdJAAABJ0lEQVR42q2VXQ3DMAyExyAQCqEQAmEQCqEQCiEQBiEQCqEQCsEQMj9cJMtKbta2SN+D08TnXH76aK2F0bYoWTkcu5IxLkxEMCH5pbQAVdli4lz0UIQIMe5PRcyEMya3P3AqKSSubVPanxFlpeLaXiRBUZ7EkYrvNVqAFT6YdXYMYVVS1IGZ1YK+E/GBcYiH2HFXj5FHXO4F4x6L+1j7ASHiwsT9PLhRvZN+n+9uiUtSERfs+XNYACw18UbO1Nqrek1Wvpv+Bcjk0J2DLYS90HBFDatC8gyx5la/+r3H3ATEFOPfDLFujO64uKTFxoN3Ppn4sqtzC7qmV80mdSuTwbO5m2uVUaCQOaUXScSJC99xsr9d9I92/yzKxTmwuUweGkH/3k94hDd2yxrVeLlcNQAAAABJRU5ErkJggg==);
+	}
+
+	.eyeclosed
+	{
+		float: left;
+		margin-left: -100;
+		display: block;
+		width: 31px;
+		height: 24px;
+		background-repeat: no-repeat;
+		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAYCAYAAAACqyaBAAABbElEQVR42r2WDc3EIAyGzwESJmESkICESUACEpAwCUiYhEmYBCTsaxOa9N4A+/t2JG8uB1yflpZyn33f/1U0HGkvCr29b8AXBR9+BmeYAi9H+68at6RAimy8KJU5R5oVfLoFR6AYvaB8JpjuEUr+biiS3K2Co+GvwFDg+EoaD+E0zIkjzgfra4HjbxzCEbx2gI5kT0Q9kWJrrQVPnShjZw/uN6SNv8snyH7B0dOSr0HBAzSQlmbepzscw+BEs9QAtkOWV6exVeBZ5lFitGEr6LoQeISITaVVJnVCuZH7tdLlbKOmMu+ThRmrtXLlBslno+J9xZYpcyOARyy4AHnx2KvhOqIDpkAw/wEDa91zC0YXKLKkonEaVMAZnN+g65leh5PI0sF1msGpXv/fSO5qb7dY1R3jpuFk4LUnr9p0cL89C5wB6D04vnIeU1LmAwsfkMdwFFR0wvU34diU3K/hWXILa+/CaUz4t/iJ/gDZfl3m96cXMwAAAABJRU5ErkJggg==);
+	}
+</style>
+<script>
+	function show_advanced() {
+	    advanced_options = document.getElementById("advanced_options");
+	    advanced_options.style.display = "block";
+	    show_advanced_link = document.getElementById("show_advanced_link");
+	    show_advanced_link.style.display = "none";
+	    hide_advanced_link = document.getElementById("hide_advanced_link");
+	    hide_advanced_link.style.display = "";
+	}
+
+	function hide_advanced() {
+	    advanced_options = document.getElementById("advanced_options");
+	    advanced_options.style.display = "none";
+	    show_advanced_link = document.getElementById("show_advanced_link");
+	    show_advanced_link.style.display = "";
+	    hide_advanced_link = document.getElementById("hide_advanced_link");
+	    hide_advanced_link.style.display = "none";
+	}
+
+	function toggle_boilerplate_button() {
+		toggleBoilerplate = document.getElementById("toggleBoilerplate");
+		if (toggleBoilerplate.className.indexOf("eyeclosed") != -1) {
+			toggleBoilerplate.className = "eyeopen";
+			hide_boilerplate();
+		} else {
+			toggleBoilerplate.className = "eyeclosed";
+			show_boilerplate();
+		}
+	}
+
+	function hide_boilerplate() {
+	    paragraphs = document.getElementsByTagName("p");
+	    for (var i=0; i<paragraphs.length; i++) {
+	        var paragraph = paragraphs[i];
+	        if (paragraph.className.indexOf("bad") != -1) {
+	            paragraph.style.display = "none";
+	        }
+	    }
+	    hide_boilerplate_link = document.getElementById("hide_boilerplate_link");
+	    hide_boilerplate_link.style.display = "none";
+	    show_boilerplate_link = document.getElementById("show_boilerplate_link");
+	    show_boilerplate_link.style.display = "";
+	}
+
+	function show_boilerplate() {
+	    paragraphs = document.getElementsByTagName("p");
+	    for (var i=0; i<paragraphs.length; i++) {
+	        var paragraph = paragraphs[i];
+	        if (paragraph.className.indexOf("bad") != -1) {
+	            paragraph.style.display = "";
+	        }
+	    }
+	    show_boilerplate_link = document.getElementById("show_boilerplate_link");
+	    show_boilerplate_link.style.display = "none";
+	    hide_boilerplate_link = document.getElementById("hide_boilerplate_link");
+	    hide_boilerplate_link.style.display = "";
+	}
+
+	function show_paragraph_details(paragraph, pdid) {
+	    paragraph_details = document.getElementById(pdid);
+	    paragraph_details.style.display = "block"; 
+	    if (paragraph.className.indexOf("bad") != -1)
+	        paragraph.style.backgroundColor = "#faa";
+	    else
+	        paragraph.style.backgroundColor = "#9f9";
+	}
+
+	function hide_paragraph_details(paragraph, pdid) {
+	    paragraph_details = document.getElementById(pdid);
+	    paragraph_details.style.display = "none"; 
+	    if (paragraph.className.indexOf("bad") != -1)
+	        paragraph.style.backgroundColor = "#fdd";
+	    else
+	        paragraph.style.backgroundColor = "#cfc";
+	}
+</script>
+<body>
+	<div id="toggleBoilerplate" class="eyeclosed" onclick="toggle_boilerplate_button()"></div>
+{{range $index, $p := .Paragraphs}}
+	<div id="pd{{$index}}" class="paragraph_details {{if .Heading}}heading{{end}} {{.Class}}" style="display:none;">	
+		<table>
+			<tr>
+				<td>Final class: </td><td>{{.Class}}</td>
+			</tr>
+			<tr>
+				<td>Context-free class: </td><td>{{.CfClass}}</td>
+			</tr>
+			<tr>
+				<td>Heading: </td><td>{{.Heading}}</td>
+			</tr>
+			<tr>
+				<td>Length (in characters): </td><td>{{len .Text}}</td>
+			</tr>
+			<tr>
+				<td>Number of characters with links: </td><td>{{.LinkedCharCount}}</td>
+			</tr>
+			<tr>
+				<td>Link density: </td><td>{{.LinkDensity}}</td>
+			</tr>
+			<tr>
+				<td>Number of words: </td><td>{{.WordCount}}</td>
+			</tr>
+			<tr>
+				<td>Number of stop words: </td><td>{{.StopwordCount}}</td>
+			</tr>
+			<tr>
+				<td>Stop word density: </td><td>{{.StopwordDensity}}</td>
+			</tr>
+			<tr>
+				<td colspan="2">{{.DomPath}}</td>
+			</tr>
+		</table>
+	</div>	
+	<p class="{{if .Heading}}heading{{end}} {{.Class}}" onmouseover="show_paragraph_details(this, 'pd{{$index}}');" onmouseout="hide_paragraph_details(this, 'pd{{$index}}');">{{TrimSpace .Text | MarkStopwords}}</p>
+{{end}}
+</body>
+</html>

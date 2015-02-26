@@ -1,0 +1,18 @@
+<html>
+<body>
+{{$noBoilerplate := .NoBoilerplate}}
+{{range .Paragraphs}}
+	{{if IsGood .Class}}
+		{{if .Heading}}
+			<h>{{TrimSpace .Text}}</h>
+		{{else}}
+			<p>{{TrimSpace .Text}}</p>			
+		{{end}}
+	{{else}}
+		{{if not $noBoilerplate}}
+			<p class="boilerplate">{{TrimSpace .Text}}</p>
+		{{end}}
+	{{end}}
+{{end}}
+</body>
+</html>

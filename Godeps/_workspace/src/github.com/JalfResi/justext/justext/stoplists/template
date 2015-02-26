@@ -1,0 +1,5 @@
+package gojustext/stoplists/<language>
+
+func init() {
+	RegisterStoplist("<language>", <language>Stoplist)
+}

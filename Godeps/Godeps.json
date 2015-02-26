@@ -1,0 +1,55 @@
+{
+	"ImportPath": "github.com/quillcontent/sajari-convert",
+	"GoVersion": "go1.4",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/cascadia",
+			"Comment": "null-31",
+			"Rev": "5d796540e3cb93ea0556c897e6a3c7690f614d35"
+		},
+		{
+			"ImportPath": "code.google.com/p/go-charset/charset",
+			"Comment": "null-32",
+			"Rev": "ebbeafdc430eb6c7e44e9a730a38eaff4c56ba3a"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.net/html",
+			"Comment": "null-240",
+			"Rev": "937a34c9de13c766c814510f76bca091dee06028"
+		},
+		{
+			"ImportPath": "github.com/JalfResi/justext",
+			"Rev": "7746b0c4d07bfb72fd1c15eac2192810fdc60c48"
+		},
+		{
+			"ImportPath": "github.com/PuerkitoBio/goquery",
+			"Comment": "v0.3.2-69-g4cf64c5",
+			"Rev": "4cf64c51f7e80d56d9ae2ffe7d684d3dd5dbd5d0"
+		},
+		{
+			"ImportPath": "github.com/advancedlogic/GoOse",
+			"Rev": "2c2390575ca23982af38c4e7f364e7c281a726a5"
+		},
+		{
+			"ImportPath": "github.com/advancedlogic/gojs-config",
+			"Rev": "bff36193fca8bd2f6269e8c4e8c723991fd20565"
+		},
+		{
+			"ImportPath": "github.com/bjarneh/latinx",
+			"Rev": "4dfe9ba2a293f28a5e06fc7ffe56b1d71a47b8c8"
+		},
+		{
+			"ImportPath": "github.com/levigross/exp-html",
+			"Rev": "8df60c69a8f5b0fe4a72ff6ae3811d4b57154e39"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "1dfe7915deaf3f80b962c163b918868d8a6d8974"
+		},
+		{
+			"ImportPath": "gopkg.in/fatih/set.v0",
+			"Comment": "v0.1.0-3-g27c4092",
+			"Rev": "27c40922c40b43fe04554d8223a402af3ea333f3"
+		}
+	]
+}
