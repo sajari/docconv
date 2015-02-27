@@ -39,7 +39,9 @@ func main() {
 
 		// Get uploaded file
 		file, info, err := request.FormFile("input")
-		defer file.Close()
+		if file != nil {
+			defer file.Close()
+		}
 		if err != nil {
 			log.Println("File upload", err)
 			return
