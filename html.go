@@ -6,7 +6,6 @@ import (
 	"github.com/JalfResi/justext"
 	"io"
 	"log"
-	"strings"
 )
 
 // Convert HTML
@@ -116,12 +115,12 @@ func HtmlReadability(input io.Reader) []byte {
 
 	// Configure the reader
 	reader.Stoplist = readabilityStopList
-	reader.LengthLow = *readabilityLengthLow
-	reader.LengthHigh = *readabilityLengthHigh
-	reader.StopwordsLow = *readabilityStopwordsLow
-	reader.StopwordsHigh = *readabilityStopwordsHigh
-	reader.MaxLinkDensity = *readabilityMaxLinkDensity
-	reader.MaxHeadingDistance = *readabilityMaxHeadingDistance
+	reader.LengthLow = 70
+	reader.LengthHigh = 200
+	reader.StopwordsLow = 0.2
+	reader.StopwordsHigh = 0.3
+	reader.MaxLinkDensity = 0.2
+	reader.MaxHeadingDistance = 200
 
 	// Read from the reader to generate a paragraph set
 	paragraphSet, err := reader.ReadAll()
@@ -130,7 +129,7 @@ func HtmlReadability(input io.Reader) []byte {
 		return nil
 	}
 
-	useClasses := strings.SplitN(*readabilityUseClasses, ",", 10)
+	useClasses := []string{"good,neargood"}
 
 	var output string = ""
 	for _, paragraph := range paragraphSet {
