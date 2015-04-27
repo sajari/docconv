@@ -1,0 +1,445 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSSArchives.proto";
+package TSD;
+
+enum LineJoin {
+  MiterJoin = 0;
+  RoundJoin = 1;
+  BevelJoin = 2;
+}
+
+message EdgeInsetsArchive {
+  required float top = 1;
+  required float left = 2;
+  required float bottom = 3;
+  required float right = 4;
+}
+
+message GeometryArchive {
+  optional .TSP.Point position = 1;
+  optional .TSP.Size size = 2;
+  optional uint32 flags = 3;
+  optional float angle = 4;
+}
+
+message PointPathSourceArchive {
+  enum PointPathSourceType {
+    kTSDLeftSingleArrow = 0;
+    kTSDRightSingleArrow = 1;
+    kTSDDoubleArrow = 10;
+    kTSDStar = 100;
+    kTSDPlus = 200;
+  }
+  optional .TSD.PointPathSourceArchive.PointPathSourceType type = 1;
+  optional .TSP.Point point = 2;
+  optional .TSP.Size naturalSize = 3;
+}
+
+message ScalarPathSourceArchive {
+  enum ScalarPathSourceType {
+    kTSDRoundedRectangle = 0;
+    kTSDRegularPolygon = 1;
+    kTSDChevron = 2;
+  }
+  optional .TSD.ScalarPathSourceArchive.ScalarPathSourceType type = 1;
+  optional float scalar = 2;
+  optional .TSP.Size naturalSize = 3;
+}
+
+message BezierPathSourceArchive {
+  optional string path_string = 1 [deprecated = true];
+  optional .TSP.Size naturalSize = 2;
+  optional .TSP.Path path = 3;
+}
+
+message CalloutPathSourceArchive {
+  optional .TSP.Size natural_size = 1;
+  optional .TSP.Point tail_position = 2;
+  optional float tail_size = 3;
+  optional float corner_radius = 4;
+  optional bool center_tail = 5;
+}
+
+message ConnectionLinePathSourceArchive {
+  enum ConnectionLinePathSourceType {
+    kTSDConnectionLineTypeQuadratic = 0;
+    kTSDConnectionLineTypeOrthogonal = 1;
+  }
+  required .TSD.BezierPathSourceArchive super = 1;
+  optional .TSD.ConnectionLinePathSourceArchive.ConnectionLinePathSourceType type = 2;
+  optional float outset_from = 3;
+  optional float outset_to = 4;
+}
+
+message EditableBezierPathSourceArchive {
+  message Node {
+    required .TSP.Point inControlPoint = 1;
+    required .TSP.Point nodePoint = 2;
+    required .TSP.Point outControlPoint = 3;
+    required .TSD.EditableBezierPathSourceArchive.NodeType type = 4;
+  }
+  message Subpath {
+    repeated .TSD.EditableBezierPathSourceArchive.Node nodes = 1;
+    required bool closed = 2;
+  }
+  enum NodeType {
+    sharp = 1;
+    bezier = 2;
+    smooth = 3;
+  }
+  repeated .TSD.EditableBezierPathSourceArchive.Subpath subpaths = 1;
+  optional .TSP.Size naturalSize = 2;
+}
+
+message PathSourceArchive {
+  optional bool horizontalFlip = 1;
+  optional bool verticalFlip = 2;
+  optional .TSD.PointPathSourceArchive point_path_source = 3;
+  optional .TSD.ScalarPathSourceArchive scalar_path_source = 4;
+  optional .TSD.BezierPathSourceArchive bezier_path_source = 5;
+  optional .TSD.CalloutPathSourceArchive callout_path_source = 6;
+  optional .TSD.ConnectionLinePathSourceArchive connection_line_path_source = 7;
+  optional .TSD.EditableBezierPathSourceArchive editable_bezier_path_source = 8;
+}
+
+message AngleGradientArchive {
+  optional float gradientangle = 2;
+}
+
+message TransformGradientArchive {
+  optional .TSP.Point start = 1;
+  optional .TSP.Point end = 2;
+  optional .TSP.Size baseNaturalSize = 3;
+}
+
+message GradientArchive {
+  message GradientStop {
+    optional .TSP.Color color = 1;
+    optional float fraction = 2;
+    optional float inflection = 3;
+  }
+  enum GradientType {
+    Linear = 0;
+    Radial = 1;
+  }
+  optional .TSD.GradientArchive.GradientType type = 1;
+  repeated .TSD.GradientArchive.GradientStop stops = 2;
+  optional float opacity = 3;
+  optional bool advancedGradient = 4;
+  optional .TSD.AngleGradientArchive anglegradient = 5;
+  optional .TSD.TransformGradientArchive transformgradient = 6;
+}
+
+message ImageFillArchive {
+  enum ImageFillTechnique {
+    NaturalSize = 0;
+    Stretch = 1;
+    Tile = 2;
+    ScaleToFill = 3;
+    ScaleToFit = 4;
+  }
+  optional .TSP.DataReference imagedata = 6;
+  optional .TSD.ImageFillArchive.ImageFillTechnique technique = 2 [default = NaturalSize];
+  optional .TSP.Color tint = 3;
+  optional .TSP.Size fillsize = 4;
+  optional .TSP.DataReference originalimagedata = 7;
+  optional bool interpretsUntaggedImageDataAsGeneric = 8;
+  optional .TSP.Reference database_imagedata = 1;
+  optional .TSP.Reference database_originalimagedata = 5;
+}
+
+message FillArchive {
+  optional .TSP.Color color = 1;
+  optional .TSD.GradientArchive gradient = 2;
+  optional .TSD.ImageFillArchive image = 3;
+  extensions 100 to 536870911;
+}
+
+message StrokePatternArchive {
+  enum StrokePatternType {
+    TSDPattern = 0;
+    TSDSolidPattern = 1;
+    TSDEmptyPattern = 2;
+  }
+  optional .TSD.StrokePatternArchive.StrokePatternType type = 1;
+  optional float phase = 2;
+  optional uint32 count = 3;
+  repeated float pattern = 4;
+}
+
+message StrokeArchive {
+  enum LineCap {
+    ButtCap = 0;
+    RoundCap = 1;
+    SquareCap = 2;
+  }
+  optional .TSP.Color color = 1;
+  optional float width = 2;
+  optional .TSD.StrokeArchive.LineCap cap = 3;
+  optional .TSD.LineJoin join = 4;
+  optional float miterLimit = 5;
+  optional .TSD.StrokePatternArchive pattern = 6;
+  optional .TSD.SmartStrokeArchive smartStroke = 7;
+  optional .TSD.FrameArchive frame = 8;
+  optional .TSD.PatternedStrokeArchive patterned_stroke = 9;
+}
+
+message SmartStrokeArchive {
+  optional string strokeName = 2;
+  optional int32 randomSeed = 3;
+  optional .TSP.ReferenceDictionary parameterValues = 4;
+}
+
+message FrameArchive {
+  optional string frameName = 2;
+  optional float assetScale = 3;
+}
+
+message PatternedStrokeArchive {
+  optional string pattern_name = 2;
+}
+
+message LineEndArchive {
+  optional .TSP.Path path = 1;
+  optional .TSD.LineJoin line_join = 2 [default = MiterJoin];
+  optional .TSP.Point end_point = 3;
+  optional bool is_filled = 4;
+  optional string identifier = 5;
+}
+
+message ShadowArchive {
+  enum ShadowType {
+    TSDDropShadow = 0;
+    TSDContactShadow = 1;
+    TSDCurvedShadow = 2;
+  }
+  optional .TSP.Color color = 1;
+  optional float angle = 2 [default = 315];
+  optional float offset = 3 [default = 5];
+  optional int32 radius = 4 [default = 1];
+  optional float opacity = 5 [default = 1];
+  optional bool is_enabled = 6 [default = true];
+  optional .TSD.ShadowArchive.ShadowType type = 7 [default = TSDDropShadow];
+  optional .TSD.DropShadowArchive dropShadow = 8;
+  optional .TSD.ContactShadowArchive contactShadow = 9;
+  optional .TSD.CurvedShadowArchive curvedShadow = 10;
+}
+
+message DropShadowArchive {
+}
+
+message ContactShadowArchive {
+  optional float height = 2 [default = 0.2];
+  optional float offset = 4 [default = 0];
+}
+
+message CurvedShadowArchive {
+  optional float curve = 1 [default = 0.6];
+}
+
+message ReflectionArchive {
+  optional float opacity = 1 [default = 0.5];
+}
+
+message ImageAdjustmentsArchive {
+  optional float exposure = 1;
+  optional float saturation = 2;
+  optional float contrast = 3;
+  optional float highlights = 4;
+  optional float shadows = 5;
+  optional float sharpness = 6;
+  optional float denoise = 7;
+  optional float temperature = 8;
+  optional float tint = 9;
+  optional float bottom_level = 10;
+  optional float top_level = 11 [default = 1];
+  optional float gamma = 12;
+  optional bool enhance = 13 [default = false];
+  optional bool represents_sage_adjustments = 14 [default = false];
+}
+
+message ShapeStylePropertiesArchive {
+  optional .TSD.FillArchive fill = 1;
+  optional .TSD.StrokeArchive stroke = 2;
+  optional float opacity = 3;
+  optional .TSD.ShadowArchive shadow = 4;
+  optional .TSD.ReflectionArchive reflection = 5;
+}
+
+message ShapeStyleArchive {
+  required .TSS.StyleArchive super = 1;
+  optional uint32 override_count = 10 [default = 0];
+  optional .TSD.ShapeStylePropertiesArchive shape_properties = 11;
+}
+
+message MediaStylePropertiesArchive {
+  optional .TSD.StrokeArchive stroke = 1;
+  optional float opacity = 2;
+  optional .TSD.ShadowArchive shadow = 3;
+  optional .TSD.ReflectionArchive reflection = 4;
+}
+
+message MediaStyleArchive {
+  required .TSS.StyleArchive super = 1;
+  optional uint32 override_count = 10 [default = 0];
+  optional .TSD.MediaStylePropertiesArchive media_properties = 11;
+}
+
+message ThemePresetsArchive {
+  repeated .TSD.FillArchive gradient_fill_presets = 1;
+  repeated .TSD.FillArchive image_fill_presets = 2;
+  repeated .TSD.ShadowArchive shadow_presets = 3;
+  repeated .TSP.Reference line_style_presets = 4;
+  repeated .TSP.Reference shape_style_presets = 5;
+  repeated .TSP.Reference textbox_style_presets = 6;
+  repeated .TSP.Reference image_style_presets = 7;
+  repeated .TSP.Reference movie_style_presets = 8;
+  extend .TSS.ThemeArchive {
+    optional .TSD.ThemePresetsArchive extension = 100;
+  }
+}
+
+message ThemeReplaceFillPresetCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  required .TSD.FillArchive fill = 3;
+  required .TSD.FillArchive old_fill = 4;
+  required uint32 index = 5;
+}
+
+message DrawableArchive {
+  optional .TSD.GeometryArchive geometry = 1;
+  optional .TSP.Reference parent = 2;
+  optional .TSD.ExteriorTextWrapArchive exterior_text_wrap = 3;
+  optional string hyperlink_url = 4;
+  optional bool locked = 5;
+  optional .TSP.Reference comment = 6;
+  optional bool aspect_ratio_locked = 7;
+  optional string accessibility_description = 8;
+}
+
+message ContainerArchive {
+  optional .TSD.GeometryArchive geometry = 1;
+  optional .TSP.Reference parent = 2;
+  repeated .TSP.Reference children = 3;
+}
+
+message GroupArchive {
+  required .TSD.DrawableArchive super = 1;
+  repeated .TSP.Reference children = 2;
+}
+
+message ShapeArchive {
+  required .TSD.DrawableArchive super = 1;
+  optional .TSP.Reference style = 2;
+  optional .TSD.PathSourceArchive pathsource = 3;
+  optional .TSD.LineEndArchive head_line_end = 4;
+  optional .TSD.LineEndArchive tail_line_end = 5;
+}
+
+message ConnectionLineArchive {
+  required .TSD.ShapeArchive super = 1;
+  optional .TSP.Reference connected_from = 2;
+  optional .TSP.Reference connected_to = 3;
+}
+
+message ImageArchive {
+  required .TSD.DrawableArchive super = 1;
+  optional .TSP.DataReference data = 11;
+  optional .TSP.Reference style = 3;
+  optional .TSP.Size originalSize = 4;
+  optional .TSP.Reference mask = 5;
+  optional .TSP.DataReference thumbnailData = 12;
+  optional uint32 flags = 7;
+  optional .TSP.DataReference originalData = 13;
+  optional .TSP.Size naturalSize = 9;
+  optional .TSP.Path instantAlphaPath = 10;
+  optional .TSD.ImageAdjustmentsArchive imageAdjustments = 14;
+  optional .TSP.DataReference enhancedImageData = 17;
+  optional .TSP.DataReference adjustedImageData = 15;
+  optional .TSP.DataReference thumbnailAdjustedImageData = 16;
+  optional bool interpretsUntaggedImageDataAsGeneric = 18;
+  optional .TSP.Reference database_data = 2;
+  optional .TSP.Reference database_thumbnailData = 6;
+  optional .TSP.Reference database_originalData = 8;
+}
+
+message MaskArchive {
+  required .TSD.DrawableArchive super = 1;
+  optional .TSD.PathSourceArchive pathsource = 2;
+}
+
+message MovieArchive {
+  required .TSD.DrawableArchive super = 1;
+  optional .TSP.DataReference movieData = 14;
+  optional .TSP.DataReference importedAuxiliaryMovieData = 22;
+  optional string movieRemoteURL = 17;
+  optional float startTime = 3;
+  optional float endTime = 4;
+  optional float posterTime = 5;
+  optional uint32 loopOption = 6;
+  optional float volume = 7;
+  optional bool autoPlay = 8 [deprecated = true];
+  optional bool audioOnly = 9;
+  optional bool streaming = 18;
+  optional .TSP.DataReference posterImageData = 15;
+  optional .TSP.DataReference audioOnlyImageData = 16;
+  optional uint32 playableState = 12;
+  optional uint32 flags = 13;
+  optional .TSP.Reference database_movieData = 2;
+  optional .TSP.Reference database_posterImageData = 10;
+  optional .TSP.Reference database_audioOnlyImageData = 11;
+  optional .TSP.Reference style = 19;
+  optional .TSP.Size originalSize = 20;
+  optional .TSP.Size naturalSize = 21;
+}
+
+message ExteriorTextWrapArchive {
+  optional uint32 type = 1;
+  optional uint32 direction = 2;
+  optional uint32 fit_type = 3;
+  optional float margin = 4;
+  optional float alpha_threshold = 5;
+  optional bool is_html_wrap = 6;
+}
+
+message GuideArchive {
+  enum GuideType {
+    Horizontal = 0;
+    Vertical = 1;
+  }
+  optional .TSD.GuideArchive.GuideType type = 1;
+  optional float offset = 2;
+  optional float start = 3;
+  optional float end = 4;
+  optional bool dynamic = 5;
+  optional bool infinite = 6;
+}
+
+message UserDefinedGuideArchive {
+  enum GuideType {
+    Horizontal = 0;
+    Vertical = 1;
+  }
+  optional .TSD.UserDefinedGuideArchive.GuideType type = 1;
+  optional float position = 2;
+}
+
+message GuideStorageArchive {
+  repeated .TSD.UserDefinedGuideArchive userDefinedGuides = 1;
+}
+
+message CanvasSelectionArchive {
+  repeated .TSP.Reference infos = 1;
+  optional .TSP.Reference container = 2;
+}
+
+message CommentStorageArchive {
+  optional string text = 1;
+  optional .TSP.Date creation_date = 2;
+  optional .TSP.Reference author = 3;
+}
+

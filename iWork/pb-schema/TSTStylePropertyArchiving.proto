@@ -1,0 +1,122 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSDArchives.proto";
+import "TSKArchives.proto";
+import "TSSArchives.proto";
+import "TSWPArchives.proto";
+package TST;
+
+message Deprecated_TableStrokeArchive {
+  optional .TSD.StrokeArchive stroke = 1;
+  optional bool background = 2 [deprecated = true];
+  optional float opacity = 3 [deprecated = true];
+  optional bool empty = 4 [deprecated = true];
+}
+
+message CellStylePropertiesArchive {
+  optional .TSD.FillArchive cell_fill = 1;
+  optional bool text_wrap = 3;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_top_stroke = 4;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_right_stroke = 5;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_bottom_stroke = 6;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_left_stroke = 7;
+  optional int32 vertical_alignment = 8;
+  optional .TSWP.PaddingArchive padding = 9;
+  optional .TSD.StrokeArchive top_stroke = 10;
+  optional .TSD.StrokeArchive right_stroke = 11;
+  optional .TSD.StrokeArchive bottom_stroke = 12;
+  optional .TSD.StrokeArchive left_stroke = 13;
+}
+
+message Deprecated_StrokePresetDataArchive {
+  required .TST.Deprecated_TableStrokeArchive deprecated_horizontal_stroke = 2;
+  required .TST.Deprecated_TableStrokeArchive deprecated_vertical_stroke = 1;
+  required .TST.Deprecated_TableStrokeArchive deprecated_exterior_stroke = 3;
+  required int32 deprecated_visible_mask = 5;
+}
+
+message StrokePresetDataArchive {
+  optional .TSD.StrokeArchive horizontal_stroke = 1;
+  optional .TSD.StrokeArchive vertical_stroke = 2;
+  optional .TSD.StrokeArchive exterior_stroke = 3;
+  optional int32 visible_mask = 4;
+}
+
+message StrokePresetListArchive {
+  required int32 count = 1;
+  repeated .TST.Deprecated_StrokePresetDataArchive deprecated_preset = 2;
+  repeated .TST.StrokePresetDataArchive preset = 3;
+}
+
+message TableStylePropertiesArchive {
+  optional bool banded_rows = 1;
+  optional .TSD.FillArchive banded_fill = 2;
+  optional bool behaves_like_spreadsheet = 21;
+  optional bool auto_resize = 22;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_header_row_separator_stroke = 4;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_header_row_border_stroke = 5;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_header_row_horizontal_stroke = 23;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_header_row_vertical_stroke = 24;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_header_column_border_stroke = 7;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_header_column_separator_stroke = 8;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_header_column_horizontal_stroke = 25;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_header_column_vertical_stroke = 26;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_footer_row_separator_stroke = 10;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_footer_row_border_stroke = 11;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_footer_row_horizontal_stroke = 27;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_footer_row_vertical_stroke = 28;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_table_body_horizontal_border_stroke = 12;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_table_body_vertical_border_stroke = 29;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_table_body_horizontal_stroke = 30;
+  optional .TST.Deprecated_TableStrokeArchive deprecated_table_body_vertical_stroke = 31;
+  optional .TST.StrokePresetListArchive stroke_preset_list = 32;
+  optional bool v_strokes_visible = 33;
+  optional bool h_strokes_visible = 34;
+  optional bool hr_separator_visible = 35;
+  optional bool hc_separator_visible = 36;
+  optional bool footer_separator_visible = 37;
+  optional bool table_border_visible = 38;
+  optional bool table_header_border_visible = 39;
+  optional bool table_hc_divider_visible = 42;
+  optional bool table_hr_divider_visible = 43;
+  optional bool table_footer_divider_visible = 44;
+  optional int32 OBSOLETE_master_font_size = 40;
+  optional string master_font_family = 41;
+  optional .TSWP.WritingDirectionType writing_direction = 45;
+  optional .TSD.StrokeArchive header_row_separator_stroke = 46;
+  optional .TSD.StrokeArchive header_row_border_stroke = 47;
+  optional .TSD.StrokeArchive header_row_horizontal_stroke = 48;
+  optional .TSD.StrokeArchive header_row_vertical_stroke = 49;
+  optional .TSD.StrokeArchive header_column_border_stroke = 50;
+  optional .TSD.StrokeArchive header_column_separator_stroke = 51;
+  optional .TSD.StrokeArchive header_column_horizontal_stroke = 52;
+  optional .TSD.StrokeArchive header_column_vertical_stroke = 53;
+  optional .TSD.StrokeArchive footer_row_separator_stroke = 54;
+  optional .TSD.StrokeArchive footer_row_border_stroke = 55;
+  optional .TSD.StrokeArchive footer_row_horizontal_stroke = 56;
+  optional .TSD.StrokeArchive footer_row_vertical_stroke = 57;
+  optional .TSD.StrokeArchive table_body_horizontal_border_stroke = 58;
+  optional .TSD.StrokeArchive table_body_vertical_border_stroke = 59;
+  optional .TSD.StrokeArchive table_body_horizontal_stroke = 60;
+  optional .TSD.StrokeArchive table_body_vertical_stroke = 61;
+}
+
+message TableStylePresetArchive {
+  required int32 index = 1;
+  optional .TSP.Reference image = 2;
+  optional .TSP.Reference style_network = 3;
+}
+
+message TableStrokePresetArchive {
+  required int32 index = 1;
+}
+
+message ThemePresetsArchive {
+  repeated .TSP.Reference table_style_presets = 1;
+  repeated .TSP.Reference table_cell_stroke_presets = 2;
+  extend .TSS.ThemeArchive {
+    required .TST.ThemePresetsArchive extension = 200;
+  }
+}
+

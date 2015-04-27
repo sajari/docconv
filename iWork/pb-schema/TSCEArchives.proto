@@ -1,0 +1,526 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+package TSCE;
+
+message CFUUIDArchive {
+  optional bytes uuid_bytes = 1;
+  optional uint32 uuid_w0 = 2;
+  optional uint32 uuid_w1 = 3;
+  optional uint32 uuid_w2 = 4;
+  optional uint32 uuid_w3 = 5;
+}
+
+message CellReferenceArchive {
+  required uint32 column = 1;
+  required uint32 row = 2;
+  required .TSCE.CFUUIDArchive table_id = 3;
+}
+
+message InternalCellReferenceArchive {
+  required .TSCE.CellCoordinateArchive coordinate = 1;
+  required uint32 owner_id = 2;
+}
+
+message RangeReferenceArchive {
+  required .TSCE.CFUUIDArchive table_id = 1;
+  required uint32 top_left_column = 2;
+  required uint32 top_left_row = 3;
+  required uint32 bottom_right_column = 4;
+  required uint32 bottom_right_row = 5;
+}
+
+message InternalRangeReferenceArchive {
+  required uint32 owner_id = 1;
+  required .TSCE.RangeCoordinateArchive range = 2;
+}
+
+message ReferenceArchive {
+  enum ReferenceType {
+    CELL_REFERENCE = 1;
+    RANGE_REFERENCE = 2;
+    NAME_DEPENDENCY = 3;
+  }
+  required .TSCE.ReferenceArchive.ReferenceType reference_type = 1;
+  optional .TSCE.CellReferenceArchive cell_reference = 2;
+  optional .TSCE.RangeReferenceArchive range_reference = 3;
+}
+
+message EdgeArchive {
+  required uint32 column = 1;
+  required uint32 row = 2;
+  required bool is_precedent = 3;
+  optional .TSCE.CFUUIDArchive owner_id = 4;
+}
+
+message EdgesArchive {
+  repeated uint32 packed_edge_without_owner = 9;
+  repeated uint32 packed_edge_with_owner = 10;
+  repeated .TSCE.CFUUIDArchive owner_id_for_edge = 11;
+  repeated uint32 internal_owner_id_for_edge = 12;
+}
+
+message CellRecordArchive {
+  required uint32 column = 1;
+  required uint32 row = 2;
+  optional uint32 dirty_self_plus_precedents_count = 3 [default = 0];
+  optional bool is_in_a_cycle = 4 [default = false];
+  repeated .TSCE.EdgeArchive edge = 5 [deprecated = true];
+  optional bool contains_a_formula = 6 [default = true];
+  optional bool has_calculated_precedents = 7 [default = false];
+  optional bool calculate_precedents_on_next_recalc = 8 [default = false, deprecated = true];
+  optional bool translate_for_excel_import_on_next_recalc = 10 [default = false];
+  optional .TSCE.EdgesArchive edges = 9;
+}
+
+message CellDependenciesArchive {
+  repeated .TSCE.CellRecordArchive cell_record = 1;
+  optional uint32 num_dirty_cells = 2;
+}
+
+message VolatileDependenciesArchive {
+  repeated uint32 volatile_time_cell_column = 1;
+  repeated uint32 volatile_time_cell_row = 2;
+  repeated uint32 volatile_random_cell_column = 3;
+  repeated uint32 volatile_random_cell_row = 4;
+  repeated uint32 volatile_locale_cell_column = 15;
+  repeated uint32 volatile_locale_cell_row = 16;
+  repeated uint32 volatile_location_cell_column = 5;
+  repeated uint32 volatile_location_cell_row = 6;
+  repeated uint32 volatile_compass_cell_column = 7;
+  repeated uint32 volatile_compass_cell_row = 8;
+  repeated uint32 calculated_dependency_cell_column = 9;
+  repeated uint32 calculated_dependency_cell_row = 10;
+  repeated .TSCE.CellReferenceArchive volatile_geometry_cell_reference = 13;
+  repeated .TSCE.CellCoordinateArchive volatile_geometry_cell = 11;
+}
+
+message RangeBackDependencyArchive {
+  required uint32 cell_coord_row = 1;
+  required uint32 cell_coord_column = 2;
+  optional .TSCE.RangeReferenceArchive range_reference = 3;
+  optional .TSCE.InternalRangeReferenceArchive internal_range_reference = 4;
+}
+
+message RTreeInternalNodeContentsArchive {
+  repeated uint32 min = 1;
+  repeated uint32 max = 2;
+  required .TSCE.RTreeNodeArchive child = 3;
+}
+
+message RTreeLeafNodeContentsArchive {
+  repeated uint32 min = 1;
+  repeated uint32 max = 2;
+  required .TSCE.CellReferenceArchive cell_reference = 3;
+}
+
+message RTreeNodeArchive {
+  required uint32 level = 1;
+  required uint32 count = 2;
+  repeated .TSCE.RTreeInternalNodeContentsArchive internal_node_contents = 3;
+  repeated .TSCE.RTreeLeafNodeContentsArchive leaf_node_contents = 4;
+}
+
+message RTreeArchive {
+  required uint32 data_file_id = 1;
+  required uint32 data_size = 2;
+  required uint32 data_num_dims = 3;
+  required uint32 data_elem_size = 4;
+  required uint32 data_elem_real_size = 5;
+  required uint32 data_max_nodes = 6;
+  required uint32 data_min_nodes = 7;
+  required .TSCE.RTreeNodeArchive root = 8;
+}
+
+message RangeDependenciesArchive {
+  optional .TSCE.RTreeArchive r_tree = 1;
+  repeated .TSCE.RangeBackDependencyArchive back_dependency = 2;
+}
+
+message SpanningDependenciesArchive {
+  message ReferringColumnToLocalCells {
+    required uint32 column = 1;
+    required .TSCE.SpanningDependenciesArchive.RangeContext range_context = 2;
+    repeated .TSCE.CellCoordinateArchive cell_coordinate = 3;
+  }
+  message ReferringColumnToRemoteCells {
+    required uint32 column = 1;
+    required .TSCE.SpanningDependenciesArchive.RangeContext range_context = 2;
+    repeated .TSCE.InternalCellReferenceArchive internal_cell_reference = 3;
+  }
+  enum RangeContext {
+    DEFAULT = 0;
+    INCLUDE_HEADERS = 1;
+  }
+  repeated uint32 column = 1;
+  repeated .TSCE.SpanningDependenciesArchive.RangeContext range_context = 2;
+  repeated .TSCE.CellReferenceArchive cell = 3;
+  optional .TSCE.RangeCoordinateArchive total_range_for_deleted_table = 4;
+  optional .TSCE.RangeCoordinateArchive body_range_for_deleted_table = 5;
+  repeated .TSCE.SpanningDependenciesArchive.ReferringColumnToLocalCells referring_column_to_local_cells = 6;
+  repeated .TSCE.SpanningDependenciesArchive.ReferringColumnToRemoteCells referring_column_to_remote_cells = 7;
+}
+
+message WholeOwnerDependenciesArchive {
+  repeated .TSCE.InternalCellReferenceArchive dependent_cell = 1;
+}
+
+message FormulaOwnerInfoArchive {
+  required .TSCE.CFUUIDArchive formula_owner_id = 1;
+  optional .TSCE.CellDependenciesArchive cell_dependencies = 2;
+  optional .TSCE.RangeDependenciesArchive range_dependencies = 3;
+  optional .TSCE.VolatileDependenciesArchive volatile_dependencies = 4;
+  optional .TSCE.SpanningDependenciesArchive spanning_column_dependencies = 5;
+  optional .TSCE.SpanningDependenciesArchive spanning_row_dependencies = 6;
+  optional .TSCE.WholeOwnerDependenciesArchive whole_owner_dependencies = 8;
+  optional .TSP.Reference formula_owner = 7;
+}
+
+message OwnerIDMapArchive {
+  message OwnerIDMapArchiveEntry {
+    required uint32 internal_owner_id = 1;
+    required .TSCE.CFUUIDArchive owner_id = 2;
+  }
+  repeated .TSCE.OwnerIDMapArchive.OwnerIDMapArchiveEntry map_entry = 1;
+}
+
+message DependencyTrackerArchive {
+  repeated .TSCE.FormulaOwnerInfoArchive formula_owner_info = 1;
+  repeated .TSCE.CellReferenceArchive dirty_leaf = 2;
+  repeated .TSCE.InternalCellReferenceArchive internal_dirty_leaf = 4;
+  optional .TSCE.OwnerIDMapArchive owner_id_map = 3;
+}
+
+message NameTrackedReferencePair {
+  required string name = 1;
+  optional .TSP.Reference tracked_reference = 2;
+  optional uint32 tracked_reference_id = 3;
+}
+
+message NamesByTrackedReferenceArchive {
+  required .TSCE.CFUUIDArchive table_id = 1;
+  repeated .TSCE.NameTrackedReferencePair name_tracked_reference_pair = 2;
+}
+
+message NamedReferenceManagerArchive {
+  required .TSP.Reference reference_tracker = 1;
+  repeated .TSCE.NamesByTrackedReferenceArchive names_by_tracked_reference_by_table = 2 [deprecated = true];
+}
+
+message CalculationEngineArchive {
+  enum ExcelImportDateMode {
+    DATE_MODE_1900 = 1;
+    DATE_MODE_1900_LEGACY = 2;
+    DATE_MODE_1904_LEGACY = 3;
+  }
+  optional bool base_date_1904 = 1;
+  required .TSCE.DependencyTrackerArchive dependency_tracker = 2;
+  optional .TSP.Reference named_reference_manager = 3;
+  optional .TSCE.CalculationEngineArchive.ExcelImportDateMode excel_import_date_mode = 4 [default = DATE_MODE_1900];
+  optional string saved_locale_identifier = 5;
+}
+
+message ASTNodeArrayArchive {
+  message ASTLocalCellReferenceNodeArchive {
+    required uint32 row_handle = 1;
+    required uint32 column_handle = 2;
+    required uint32 row_is_sticky = 3;
+    required uint32 column_is_sticky = 4;
+  }
+  message ASTCrossTableCellReferenceNodeArchive {
+    required uint32 row_handle = 1;
+    required uint32 column_handle = 2;
+    required uint32 row_is_sticky = 3;
+    required uint32 column_is_sticky = 4;
+    required .TSCE.CFUUIDArchive table_id = 5;
+    optional string AST_reference_whitespace_after_sheet_name = 6;
+    optional string AST_reference_whitespace_before_table_name = 7;
+    optional string AST_reference_whitespace_after_table_name = 8;
+    optional string AST_reference_whitespace_before_cell_address = 9;
+  }
+  message ASTColumnCoordinateArchive {
+    required sint32 column = 1;
+    optional bool absolute = 2 [default = false];
+  }
+  message ASTRowCoordinateArchive {
+    required sint32 row = 1;
+    optional bool absolute = 2 [default = false];
+  }
+  message ASTCrossTableReferenceExtraInfoArchive {
+    required .TSCE.CFUUIDArchive table_id = 1;
+    optional string AST_reference_whitespace_after_sheet_name = 2;
+    optional string AST_reference_whitespace_before_table_name = 3;
+    optional string AST_reference_whitespace_after_table_name = 4;
+    optional string AST_reference_whitespace_before_cell_address = 5;
+  }
+  message ASTNodeArchive {
+    required .TSCE.ASTNodeArrayArchive.ASTNodeType AST_node_type = 1;
+    optional uint32 AST_function_node_index = 2;
+    optional uint32 AST_function_node_numArgs = 3;
+    optional double AST_number_node_number = 4;
+    optional bool AST_boolean_node_boolean = 5;
+    optional string AST_string_node_string = 6;
+    optional double AST_date_node_dateNum = 7;
+    optional bool AST_date_node_suppress_date_format = 19;
+    optional bool AST_date_node_suppress_time_format = 20;
+    optional string AST_date_node_date_time_format = 21;
+    optional double AST_duration_node_unitNum = 8;
+    optional int32 AST_duration_node_unit = 9;
+    optional uint32 AST_duration_node_style = 22;
+    optional uint32 AST_duration_node_duration_unit_largest = 23;
+    optional uint32 AST_duration_node_duration_unit_smallest = 24;
+    optional bool AST_duration_node_use_automatic_units = 29;
+    optional bool AST_token_node_boolean = 10;
+    optional uint32 AST_array_node_numCol = 11;
+    optional uint32 AST_array_node_numRow = 12;
+    optional uint32 AST_list_node_numArgs = 13;
+    optional .TSCE.ASTNodeArrayArchive AST_thunk_node_array = 14;
+    optional .TSCE.ASTNodeArrayArchive.ASTLocalCellReferenceNodeArchive AST_local_cell_reference_node_reference = 15;
+    optional .TSCE.ASTNodeArrayArchive.ASTCrossTableCellReferenceNodeArchive AST_cross_table_cell_reference_node_reference = 16;
+    optional string AST_unknown_function_node_string = 17;
+    optional uint32 AST_unknown_function_node_numArgs = 18;
+    optional string AST_whitespace = 25;
+    optional .TSCE.ASTNodeArrayArchive.ASTColumnCoordinateArchive AST_column = 26;
+    optional .TSCE.ASTNodeArrayArchive.ASTRowCoordinateArchive AST_row = 27;
+    optional .TSCE.ASTNodeArrayArchive.ASTCrossTableReferenceExtraInfoArchive AST_cross_table_reference_extra_info = 28;
+  }
+  enum ASTNodeType {
+    ADDITION_NODE = 1;
+    SUBTRACTION_NODE = 2;
+    MULTIPLICATION_NODE = 3;
+    DIVISION_NODE = 4;
+    POWER_NODE = 5;
+    CONCATENATION_NODE = 6;
+    GREATER_THAN_NODE = 7;
+    GREATER_THAN_OR_EQUAL_TO_NODE = 8;
+    LESS_THAN_NODE = 9;
+    LESS_THAN_OR_EQUAL_TO_NODE = 10;
+    EQUAL_TO_NODE = 11;
+    NOT_EQUAL_TO_NODE = 12;
+    NEGATION_NODE = 13;
+    PLUS_SIGN_NODE = 14;
+    PERCENT_NODE = 15;
+    FUNCTION_NODE = 16;
+    NUMBER_NODE = 17;
+    BOOLEAN_NODE = 18;
+    STRING_NODE = 19;
+    DATE_NODE = 20;
+    DURATION_NODE = 21;
+    EMPTY_ARGUMENT_NODE = 22;
+    TOKEN_NODE = 23;
+    ARRAY_NODE = 24;
+    LIST_NODE = 25;
+    THUNK_NODE = 26;
+    LOCAL_CELL_REFERENCE_NODE = 27;
+    CROSS_TABLE_CELL_REFERENCE_NODE = 28;
+    COLON_NODE = 29;
+    REFERENCE_ERROR_NODE = 30;
+    UNKNOWN_FUNCTION_NODE = 31;
+    APPEND_WHITESPACE_NODE = 32;
+    PREPEND_WHITESPACE_NODE = 33;
+    BEGIN_THUNK_NODE = 34;
+    END_THUNK_NODE = 35;
+    CELL_REFERENCE_NODE = 36;
+  }
+  repeated .TSCE.ASTNodeArrayArchive.ASTNodeArchive AST_node = 1;
+}
+
+message FormulaTranslationFlagsArchive {
+  optional bool excel_import_translation = 1 [default = false];
+  optional bool number_to_date_coercion_removal_translation = 2 [default = false];
+}
+
+message FormulaArchive {
+  required .TSCE.ASTNodeArrayArchive AST_node_array = 1;
+  optional uint32 host_column = 2;
+  optional uint32 host_row = 3;
+  optional bool host_column_is_negative = 4 [default = false];
+  optional bool host_row_is_negative = 5 [default = false];
+  optional .TSCE.FormulaTranslationFlagsArchive translation_flags = 6;
+}
+
+message FormatStructArchive {
+  required uint32 format_type = 1;
+  optional uint32 decimal_places = 2;
+  optional string currency_code = 3;
+  optional uint32 negative_style = 4;
+  optional bool show_thousands_separator = 5;
+  optional bool use_accounting_style = 6;
+  optional uint32 duration_style = 7;
+  optional uint32 base = 8;
+  optional uint32 base_places = 9;
+  optional bool base_use_minus_sign = 10;
+  optional uint32 fraction_accuracy = 11;
+  optional bool suppress_date_format = 12;
+  optional bool suppress_time_format = 13;
+  optional string date_time_format = 14;
+  optional uint32 duration_unit_largest = 15;
+  optional uint32 duration_unit_smallest = 16;
+}
+
+message RangeCoordinateArchive {
+  required uint32 top_left_column = 1;
+  required uint32 top_left_row = 2;
+  required uint32 bottom_right_column = 3;
+  required uint32 bottom_right_row = 4;
+}
+
+message TectonicShiftArchive {
+  required uint32 grid_coordinate_offset_x = 1;
+  required uint32 grid_coordinate_offset_y = 2;
+  required bool grid_coordinate_offset_x_is_negative = 3;
+  required bool grid_coordinate_offset_y_is_negative = 4;
+  optional .TSCE.RangeCoordinateArchive range_for_shift = 5;
+  optional .TSCE.RangeCoordinateArchive range_for_deletion = 6;
+  optional .TSCE.RangeCoordinateArchive inserted_range = 7;
+  required bool apply_to_absolute = 8;
+  required bool inserting_after = 9;
+  required bool ignore_sticky_bits = 10;
+  optional .TSCE.RangeCoordinateArchive table_range = 11;
+  optional .TSCE.CFUUIDArchive table_id = 12;
+}
+
+message RewriteSortMappingArchive {
+  required .TSCE.CFUUIDArchive table_id = 1;
+  required .TSK.ShuffleMappingArchive shuffle_mapping = 2;
+  required bool explode_ranges = 3;
+}
+
+message RangeMovedInfoArchive {
+  optional .TSCE.CFUUIDArchive table_id = 1;
+  optional .TSCE.RangeCoordinateArchive from_range = 2;
+  optional .TSCE.RangeCoordinateArchive to_range = 3;
+  optional .TSCE.RangeReferenceArchive from_range_reference = 4;
+  optional .TSCE.RangeReferenceArchive to_range_reference = 5;
+}
+
+message TableResizedInfoArchive {
+  required .TSCE.CFUUIDArchive table_id = 1;
+  required .TSCE.RangeCoordinateArchive new_table_size = 2;
+  optional .TSCE.RangeCoordinateArchive old_table_size = 3;
+}
+
+message CellMergeInfoArchive {
+  required .TSCE.CFUUIDArchive table_id = 1;
+  required .TSCE.RangeCoordinateArchive merged_range = 2;
+}
+
+message FormulaRewriteSpecArchive {
+  enum RewriteType {
+    TECTONIC_SHIFT = 1;
+    REMAP_WITH_SORT_MAPPING = 2;
+    MOVE_RANGE = 3;
+    DELETE_OWNER = 4;
+    TABLE_RESIZE = 5;
+    CELL_MERGE = 6;
+  }
+  required .TSCE.FormulaRewriteSpecArchive.RewriteType rewrite_type = 1;
+  optional .TSCE.TectonicShiftArchive tectonic_shift = 2;
+  optional .TSCE.RewriteSortMappingArchive sort_mapping = 3;
+  optional .TSCE.RangeMovedInfoArchive range_moved_info = 4;
+  optional .TSCE.CFUUIDArchive deleted_owner_id = 5;
+  optional .TSCE.TableResizedInfoArchive table_resized_info = 6;
+  optional .TSCE.CellMergeInfoArchive cell_merge_info = 7;
+}
+
+message CellCoordinateFormulaPairArchive {
+  required uint32 column = 1;
+  required uint32 row = 2;
+  optional .TSCE.FormulaArchive formula = 3;
+}
+
+message CellCoordinateArchive {
+  optional fixed32 packedData = 1;
+  optional uint32 column = 2;
+  optional uint32 row = 3;
+}
+
+message CellCoordinateVectorArchive {
+  repeated .TSCE.CellCoordinateArchive cell_coordinate = 1;
+}
+
+message CellCoordinateObjectPairArchive {
+  required .TSCE.CellCoordinateArchive cell_coordinate = 1;
+  required .TSP.Reference object = 2;
+}
+
+message CellCoordinateObjectMapArchive {
+  repeated .TSCE.CellCoordinateObjectPairArchive cell_coordinate_object_pair = 1;
+}
+
+message OwnerFormulaMapArchive {
+  repeated .TSCE.CellCoordinateFormulaPairArchive coordinate_formula_pair = 1;
+}
+
+message FormulaRewriteCommandArchive {
+  optional .TSP.Reference table_rewrite_command = 1;
+  optional .TSK.CommandArchive super = 2;
+}
+
+message NumberTrackedReferencePairArchive {
+  required uint32 number = 1;
+  optional .TSP.Reference tracked_reference = 2;
+}
+
+message NumberToTrackedReferenceMapArchive {
+  repeated .TSCE.NumberTrackedReferencePairArchive number_tracked_reference_pair = 1;
+}
+
+message TrackedReferencesRewriteCommandArchive {
+  optional .TSCE.NumberToTrackedReferenceMapArchive references_in_reference_tracker = 1 [deprecated = true];
+  optional .TSCE.NumberToTrackedReferenceMapArchive original_tracked_reference_copies = 2 [deprecated = true];
+  optional .TSCE.FormulaRewriteSpecArchive rewrite_spec = 3;
+  required .TSP.Reference reference_tracker = 4;
+  required .TSK.CommandArchive super = 5;
+}
+
+message TrackedReferenceArchive {
+  required .TSCE.ASTNodeArrayArchive ast = 1;
+  required uint32 formula_id = 2;
+}
+
+message ReferenceTrackerArchive {
+  required .TSCE.CFUUIDArchive uuid = 1;
+  repeated .TSP.Reference tracked_reference = 2 [deprecated = true];
+  repeated .TSCE.TrackedReferenceArchive contained_tracked_reference = 3;
+}
+
+message BooleanCellValueArchive {
+  required bool value = 1;
+}
+
+message DateCellValueArchive {
+  required double value = 1;
+  required .TSK.FormatStructArchive format = 2;
+  optional bool format_is_implicit = 3 [default = true];
+}
+
+message NumberCellValueArchive {
+  required double value = 1;
+  required int32 unit = 2;
+  required .TSK.FormatStructArchive format = 3;
+  optional bool format_is_implicit = 4 [default = true];
+}
+
+message StringCellValueArchive {
+  required string value = 1;
+  required .TSK.FormatStructArchive format = 2;
+  optional bool format_is_implicit = 3 [default = true];
+}
+
+message CellValueArchive {
+  enum CellValueType {
+    NIL_TYPE = 1;
+    BOOLEAN_TYPE = 2;
+    DATE_TYPE = 3;
+    NUMBER_TYPE = 4;
+    STRING_TYPE = 5;
+  }
+  required .TSCE.CellValueArchive.CellValueType cell_value_type = 1;
+  optional .TSCE.BooleanCellValueArchive boolean_value = 2;
+  optional .TSCE.DateCellValueArchive date_value = 3;
+  optional .TSCE.NumberCellValueArchive number_value = 4;
+  optional .TSCE.StringCellValueArchive string_value = 5;
+}
+

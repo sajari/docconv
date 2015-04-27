@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+package TSP;
+
+message DatabaseData {
+  required .TSP.DataReference data = 1;
+}
+
+message DatabaseDataArchive {
+  optional .TSP.Reference data = 1;
+  optional string app_relative_path = 2;
+  required string display_name = 3;
+  optional uint64 length = 4;
+  optional uint32 hash = 5;
+  required bool sharable = 6 [default = true];
+}
+
+message DatabaseImageDataArchive {
+  enum ImageType {
+    unknown = 0;
+    bitmap = 1;
+    pdf = 2;
+  }
+  required .TSP.DatabaseDataArchive super = 1;
+  required .TSP.DatabaseImageDataArchive.ImageType type = 2;
+}
+
