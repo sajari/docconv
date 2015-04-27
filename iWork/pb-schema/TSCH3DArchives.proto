@@ -1,0 +1,189 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSDArchives.proto";
+package TSCH;
+
+enum TextureTilingMode {
+  textureTilingModeNone = 0;
+  textureTilingModeTallest = 1;
+}
+
+enum TextureTilingFace {
+  textureTilingFaceAll = 0;
+  textureTilingFaceTopAndBottom = 1;
+  textureTilingFaceSide = 2;
+}
+
+enum TextureTilingWrap {
+  textureTilingWrapProjected = 0;
+  textureTilingWrapFaceWrap = 1;
+}
+
+enum TextureTilingXPosition {
+  textureTilingXPositionLeft = 0;
+  textureTilingXPositionCenter = 1;
+  textureTilingXPositionRight = 2;
+}
+
+enum TextureTilingYPosition {
+  textureTilingYPositionTop = 0;
+  textureTilingYPositionMiddle = 1;
+  textureTilingYPositionBottom = 2;
+}
+
+enum TextureTilingContinuity {
+  textureTilingContinuityNone = 0;
+  textureTilingContinuityGlobal = 1;
+  textureTilingContinuitySeries = 2;
+  textureTilingContinuityJittered = 3;
+}
+
+enum FillPropertyType {
+  fillPropertyTypeUndefined = 0;
+  fillPropertyTypeArea = 1;
+  fillPropertyTypeBar = 2;
+  fillPropertyTypeColumn = 3;
+  fillPropertyTypeLine = 4;
+  fillPropertyTypePie = 5;
+}
+
+message Chart3DEnvironmentPackageArchive {
+  repeated .TSCH.Chart3DEnvironmentMaterialArchive materials = 1;
+}
+
+message Chart3DFillArchive {
+  optional .TSCH.Chart3DLightingModelArchive lightingmodel = 1;
+  optional string textureset_id = 2;
+  optional .TSCH.FillPropertyType fill_type = 3;
+  optional uint32 series_index = 4;
+}
+
+message Chart3DPointLightArchive {
+  required .TSCH.Chart3DVectorArchive position = 1;
+}
+
+message Chart3DDirectionalLightArchive {
+  required .TSCH.Chart3DVectorArchive direction = 1;
+}
+
+message Chart3DSpotLightArchive {
+  required .TSCH.Chart3DVectorArchive position = 1;
+  required .TSCH.Chart3DVectorArchive direction = 2;
+  required float cutoff = 3;
+  required float dropoff = 4;
+}
+
+message Chart3DLightArchive {
+  required string name = 1;
+  required .TSCH.Chart3DVectorArchive ambient_color = 2;
+  required .TSCH.Chart3DVectorArchive diffuse_color = 3;
+  required .TSCH.Chart3DVectorArchive specular_color = 4;
+  required float intensity = 5;
+  required .TSCH.Chart3DVectorArchive attenuation = 6;
+  required uint32 coordinate_space = 7;
+  required bool enabled = 8;
+  optional .TSCH.Chart3DPointLightArchive point_light = 9;
+  optional .TSCH.Chart3DDirectionalLightArchive directional_light = 10;
+  optional .TSCH.Chart3DSpotLightArchive spot_light = 11;
+}
+
+message Chart3DLightingModelArchive {
+  optional .TSCH.Chart3DPhongLightingModelArchive phong = 1;
+  optional .TSCH.Chart3DFixedFunctionLightingModelArchive fixed_function = 2;
+  optional .TSCH.Chart3DEnvironmentPackageArchive environment = 3;
+}
+
+message Chart3DLightingPackageArchive {
+  required string name = 1;
+  repeated .TSCH.Chart3DLightArchive lights = 2;
+}
+
+message Chart3DTexturesMaterialArchive {
+  required .TSCH.Chart3DVectorArchive color = 1;
+  repeated .TSCH.Chart3DTSPImageDataTextureArchive textures = 2;
+}
+
+message Chart3DEmissiveMaterialArchive {
+  required .TSCH.Chart3DTexturesMaterialArchive super = 1;
+  repeated .TSCH.Chart3DImageTextureTilingArchive tilings = 2;
+}
+
+message Chart3DDiffuseMaterialArchive {
+  required .TSCH.Chart3DTexturesMaterialArchive super = 1;
+  repeated .TSCH.Chart3DImageTextureTilingArchive tilings = 2;
+}
+
+message Chart3DModulateMaterialArchive {
+  required .TSCH.Chart3DTexturesMaterialArchive super = 1;
+  repeated .TSCH.Chart3DImageTextureTilingArchive tilings = 2;
+}
+
+message Chart3DSpecularMaterialArchive {
+  required .TSCH.Chart3DTexturesMaterialArchive super = 1;
+  repeated .TSCH.Chart3DImageTextureTilingArchive tilings = 2;
+}
+
+message Chart3DShininessMaterialArchive {
+  required .TSCH.Chart3DTexturesMaterialArchive super = 1;
+  repeated .TSCH.Chart3DImageTextureTilingArchive tilings = 2;
+}
+
+message Chart3DEnvironmentMaterialArchive {
+  required .TSCH.Chart3DTexturesMaterialArchive super = 1;
+  repeated .TSCH.Chart3DBaseImageTextureTilingArchive OBSOLETE_tilings = 2;
+  optional bool decalMode = 3;
+  repeated .TSCH.Chart3DImageTextureTilingArchive tilings = 4;
+}
+
+message Chart3DFixedFunctionLightingModelArchive {
+  required .TSCH.Chart3DPhongMaterialPackageArchive materials = 1;
+}
+
+message Chart3DPhongLightingModelArchive {
+  required .TSCH.Chart3DPhongMaterialPackageArchive materials = 1;
+}
+
+message Chart3DPhongMaterialPackageArchive {
+  optional .TSCH.Chart3DEmissiveMaterialArchive emissive = 1;
+  optional .TSCH.Chart3DDiffuseMaterialArchive diffuse = 2;
+  optional .TSCH.Chart3DModulateMaterialArchive modulate = 3;
+  optional .TSCH.Chart3DSpecularMaterialArchive specular = 4;
+  optional .TSCH.Chart3DShininessMaterialArchive shininess = 5;
+}
+
+message Chart3DTSPImageDataTextureArchive {
+  optional .TSP.DataReference data = 3;
+  optional .TSP.DataReference mipmapdata = 4;
+  optional .TSP.Reference database_data = 1;
+  optional .TSP.Reference database_mipmapdata = 2;
+}
+
+message Chart3DBaseImageTextureTilingArchive {
+  optional .TSCH.Chart3DVectorArchive scale = 1;
+  optional float rotation = 2;
+}
+
+message Chart3DImageTextureTilingArchive {
+  required .TSCH.Chart3DBaseImageTextureTilingArchive super = 1;
+  optional .TSCH.TextureTilingMode mode = 2;
+  optional .TSCH.TextureTilingWrap wrap = 3;
+  optional .TSCH.TextureTilingFace face = 4;
+  optional .TSCH.TextureTilingXPosition xposition = 5;
+  optional .TSCH.TextureTilingYPosition yposition = 6;
+  optional .TSCH.TextureTilingContinuity scontinuity = 7;
+  optional .TSCH.TextureTilingContinuity tcontinuity = 8;
+  optional bool reveal = 9;
+}
+
+message Chart3DVectorArchive {
+  required float x = 1;
+  required float y = 2;
+  required float z = 3;
+  required float w = 4;
+}
+
+extend .TSD.FillArchive {
+  optional .TSCH.Chart3DFillArchive fill3d = 100;
+}
+

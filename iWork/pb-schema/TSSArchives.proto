@@ -1,0 +1,117 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+package TSS;
+
+message StyleArchive {
+  optional string name = 1;
+  optional string style_identifier = 2;
+  optional .TSP.Reference parent = 3;
+  optional bool is_variation = 4 [default = false];
+  optional .TSP.Reference stylesheet = 5;
+}
+
+message StylesheetArchive {
+  message IdentifiedStyleEntry {
+    required string identifier = 1;
+    required .TSP.Reference style = 2;
+  }
+  message StyleChildrenEntry {
+    required .TSP.Reference parent = 1;
+    repeated .TSP.Reference children = 2;
+  }
+  repeated .TSP.Reference styles = 1;
+  repeated .TSS.StylesheetArchive.IdentifiedStyleEntry identifier_to_style_map = 2;
+  optional .TSP.Reference parent = 3;
+  optional bool is_locked = 4 [default = true];
+  repeated .TSS.StylesheetArchive.StyleChildrenEntry parent_to_children_style_map = 5;
+  optional bool can_cull_styles = 6 [default = false];
+}
+
+message ThemeArchive {
+  optional .TSP.Reference stylesheet = 1;
+  optional string theme_identifier = 3;
+  repeated .TSP.Color color_presets = 10;
+  extensions 100 to 536870911;
+}
+
+message ApplyThemeCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  repeated .TSP.Reference commands = 2;
+  optional .TSP.Reference old_theme = 3;
+  optional .TSP.Reference new_theme = 4;
+}
+
+message ApplyThemeChildCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference parent = 2;
+}
+
+message ReapUnusedStyleCommandArchive {
+  message IdentifiedStyleEntry {
+    required string identifier = 1;
+    required .TSP.Reference style = 2;
+  }
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference stylesheet = 2;
+  repeated .TSP.Reference styles = 3;
+  repeated .TSS.ReapUnusedStyleCommandArchive.IdentifiedStyleEntry identified_styles = 4;
+}
+
+message StyleUpdatePropertyMapCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference current_style = 2;
+  required .TSP.Reference style_with_old_property_map = 3;
+  required .TSP.Reference style_with_new_property_map = 4;
+  optional bool notify_for_style_clients = 6 [default = true];
+}
+
+message ThemeReplacePresetCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  required .TSP.Reference preset = 3;
+  required .TSP.Reference oldPreset = 4;
+  required uint32 index = 5;
+}
+
+message ThemeReplaceColorPresetCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  required .TSP.Color color = 3;
+  required .TSP.Color old_color = 4;
+  required uint32 index = 5;
+}
+
+message ThemeAddStylePresetCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  required .TSP.Reference preset = 3;
+  required string preset_kind = 4;
+  optional string identifier = 5;
+  optional bool add_preset_to_stylesheet = 6;
+}
+
+message ThemeRemoveStylePresetCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  required .TSP.Reference preset = 3;
+  required uint32 preset_index = 4;
+  required string preset_kind = 5;
+  optional string identifier = 6;
+}
+
+message ThemeMovePresetCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  required .TSP.Reference preset = 3;
+  required uint32 new_index = 4;
+  required uint32 old_index = 5;
+}
+
+message ThemeReplaceStylePresetCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference preset = 3;
+  required .TSP.Reference old_preset = 4;
+}
+

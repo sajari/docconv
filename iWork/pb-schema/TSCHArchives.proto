@@ -1,0 +1,155 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSDArchives.proto";
+import "TSSArchives.proto";
+import "TSCHArchives.Common.proto";
+import "TSCHArchives.GEN.proto";
+import "TSCH3DArchives.proto";
+import "TSCHPreUFFArchives.proto";
+package TSCH;
+
+message ChartDrawableArchive {
+  optional .TSD.DrawableArchive super = 1;
+  extensions 10000 to 536870911;
+}
+
+message ChartArchive {
+  optional .TSCH.ChartType chart_type = 1;
+  optional .TSCH.ScatterFormat scatter_format = 2;
+  optional .TSCH.RectArchive legend_frame = 3;
+  optional .TSP.Reference preset = 4;
+  optional .TSCH.SeriesDirection series_direction = 5;
+  optional bool contains_default_data = 6;
+  optional .TSCH.ChartGridArchive grid = 7;
+  optional .TSP.Reference mediator = 8;
+  optional .TSP.Reference chart_style = 9;
+  optional .TSP.Reference chart_non_style = 10;
+  optional .TSP.Reference legend_style = 11;
+  optional .TSP.Reference legend_non_style = 12;
+  repeated .TSP.Reference value_axis_styles = 13;
+  repeated .TSP.Reference value_axis_nonstyles = 14;
+  repeated .TSP.Reference category_axis_styles = 15;
+  repeated .TSP.Reference category_axis_nonstyles = 16;
+  repeated .TSP.Reference series_theme_styles = 17;
+  optional .TSCH.SparseReferenceArrayArchive series_private_styles = 18;
+  optional .TSCH.SparseReferenceArrayArchive series_non_styles = 19;
+  repeated .TSP.Reference paragraph_styles = 20;
+  optional uint32 multidataset_index = 21;
+  optional bool needs_calc_engine_deferred_import_action = 22;
+  extensions 10000 to 536870911;
+  extend .TSCH.ChartDrawableArchive {
+    optional .TSCH.ChartArchive unity = 10000;
+  }
+}
+
+message ChartPasteboardAdditionsArchive {
+  extend .TSCH.ChartArchive {
+    optional uint32 preset_index_for_pasteboard = 10000;
+    optional bytes preset_uuid_for_pasteboard = 10001;
+  }
+}
+
+message ChartGridArchive {
+  message GridRow {
+    message GridValue {
+      optional double numeric_value = 1;
+      optional double date_value = 2;
+    }
+    repeated .TSCH.ChartGridArchive.GridRow.GridValue value = 1;
+  }
+  repeated string row_name = 1;
+  repeated string column_name = 2;
+  repeated .TSCH.ChartGridArchive.GridRow grid_row = 3;
+}
+
+message ChartMediatorArchive {
+  optional .TSP.Reference info = 1;
+  repeated uint32 local_series_indexes = 2;
+  repeated uint32 remote_series_indexes = 3;
+}
+
+message ChartStylePreset {
+  optional .TSP.Reference chart_style = 1;
+  optional .TSP.Reference legend_style = 2;
+  repeated .TSP.Reference value_axis_styles = 3;
+  repeated .TSP.Reference category_axis_styles = 4;
+  repeated .TSP.Reference series_styles = 5;
+  repeated .TSP.Reference paragraph_styles = 6;
+  optional bytes uuid = 7;
+}
+
+message ChartPresetsArchive {
+  repeated .TSP.Reference chart_presets = 1;
+  extend .TSS.ThemeArchive {
+    required .TSCH.ChartPresetsArchive extension = 120;
+  }
+}
+
+message PropertyValueStorageContainerArchive {
+  optional .TSP.Reference chart_style = 1;
+  optional .TSP.Reference chart_nonstyle = 2;
+  optional .TSP.Reference legend_style = 3;
+  optional .TSP.Reference legend_nonstyle = 4;
+  optional .TSCH.SparseReferenceArrayArchive value_axis_styles = 5;
+  optional .TSCH.SparseReferenceArrayArchive value_axis_nonstyles = 6;
+  optional .TSCH.SparseReferenceArrayArchive category_axis_styles = 7;
+  optional .TSCH.SparseReferenceArrayArchive category_axis_nonstyles = 8;
+  optional .TSCH.SparseReferenceArrayArchive series_theme_styles = 9;
+  optional .TSCH.SparseReferenceArrayArchive series_private_styles = 10;
+  optional .TSCH.SparseReferenceArrayArchive series_nonstyles = 11;
+  optional .TSCH.SparseReferenceArrayArchive paragraph_styles = 12;
+}
+
+message StylePasteboardDataArchive {
+  optional .TSS.StyleArchive super = 1;
+  optional .TSCH.PropertyValueStorageContainerArchive style_network = 2;
+  optional bool copied_from_entire_chart = 3;
+}
+
+message ChartSelectionPathTypeArchive {
+  optional string path_type = 1;
+  optional string path_name = 2;
+}
+
+message ChartAxisIDArchive {
+  optional .TSCH.AxisType axis_type = 1;
+  optional uint32 ordinal = 2;
+}
+
+message ChartSelectionPathArgumentArchive {
+  optional uint32 number = 1;
+  optional .TSCH.ChartAxisIDArchive axis_id = 2;
+}
+
+message ChartSelectionPathArchive {
+  optional .TSCH.ChartSelectionPathTypeArchive path_type = 1;
+  optional .TSCH.ChartSelectionPathArchive sub_selection = 2;
+  repeated .TSCH.ChartSelectionPathArgumentArchive arguments = 3;
+}
+
+message ChartSelectionArchive {
+  optional .TSP.Reference chart = 1;
+  repeated .TSCH.ChartSelectionPathArchive paths = 2;
+}
+
+message ChartUIState {
+  optional .TSP.Reference chart = 1;
+  optional int32 cde_last_row_selected = 2;
+  optional int32 cde_last_col_selected = 3;
+  optional int32 cde_last_row_count = 4;
+  optional int32 cde_last_col_count = 5;
+}
+
+message ChartFormatStructExtensions {
+  extend .TSK.FormatStructArchive {
+    optional string prefix = 10000;
+    optional string suffix = 10001;
+  }
+}
+
+extend .TSCH.ChartArchive {
+  optional bool scene3d_settings_constant_depth = 10002;
+}
+

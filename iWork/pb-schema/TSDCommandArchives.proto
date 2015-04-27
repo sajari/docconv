@@ -1,0 +1,301 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSSArchives.proto";
+import "TSDArchives.proto";
+package TSD;
+
+message ConnectionLineConnectCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference connection_line = 2;
+  optional .TSP.Reference connect_to = 3;
+  optional .TSP.Reference connect_from = 4;
+  optional .TSP.Reference old_connect_to = 5;
+  optional .TSP.Reference old_connect_from = 6;
+}
+
+message GroupDrawablesCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  repeated .TSP.Reference drawables = 2;
+  optional .TSP.Reference group = 3;
+}
+
+message UngroupGroupCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  repeated .TSP.Reference drawables = 2;
+  optional .TSP.Reference group = 3;
+}
+
+message ContainerRemoveChildrenCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference container = 2;
+  repeated .TSP.Reference children = 3;
+  optional .TSP.IndexSet children_indices = 4;
+}
+
+message ContainerInsertChildrenCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference container = 2;
+  repeated .TSP.Reference children = 3;
+  optional uint64 index = 4;
+}
+
+message ContainerReorderChildrenCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference container = 2;
+  repeated .TSP.Reference children = 3;
+  optional .TSP.IndexSet children_indices = 4;
+}
+
+message InfoGeometryCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSD.GeometryArchive newGeometry = 3;
+  optional .TSD.GeometryArchive oldGeometry = 4;
+  optional bool shouldClearObjectPlaceholderFlag = 5;
+  optional bool didMatchObjectPlaceholderGeometry = 6;
+}
+
+message DrawablePathSourceCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSD.PathSourceArchive oldpathsource = 3;
+  optional .TSD.PathSourceArchive newpathsource = 4;
+}
+
+message InstantAlphaCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference image = 2;
+  optional .TSP.Path oldpath = 3;
+  optional .TSP.Path newpath = 4;
+}
+
+message DrawableShadowCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSD.ShadowArchive oldshadow = 3;
+  optional .TSD.ShadowArchive newshadow = 4;
+}
+
+message DrawableApplyThemeCommandArchive {
+  required .TSS.ApplyThemeChildCommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSP.Reference style = 3;
+}
+
+message StyledInfoSetStyleCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSP.Reference style = 3;
+}
+
+message ShapePathSourceFlipCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional bool newHorizontalFlip = 3;
+  optional bool newVerticalFlip = 4;
+  optional bool oldHorizontalFlip = 5;
+  optional bool oldVerticalFlip = 6;
+}
+
+message ShapeStyleSetValueCommandArchive {
+  required .TSD.StyledInfoSetStyleCommandArchive super = 1;
+  optional .TSD.ShapeStylePropertiesArchive shape_properties = 4;
+}
+
+message ShapeApplyPresetCommandArchive {
+  required .TSD.StyledInfoSetStyleCommandArchive super = 1;
+  optional .TSP.Reference stylepreset = 10;
+  optional .TSP.Color colorpreset = 11;
+  optional .TSD.FillArchive fillpreset = 12;
+  optional .TSD.ShadowArchive shadowpreset = 13;
+}
+
+message ShapeSetLineEndCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference shape = 2;
+  optional .TSD.LineEndArchive line_end = 3;
+  optional bool is_head_line_end = 4;
+}
+
+message MovieSetValueCommandArchive {
+  message PropertyValue {
+    optional double starttime = 1;
+    optional double endtime = 2;
+    optional double postertime = 3;
+    optional .TSP.DataReference posterimagedata = 4;
+    optional bool autoplay = 5;
+    optional .TSD.MovieSetValueCommandArchive.LoopOption loopOption = 6;
+    optional float volume = 7;
+    optional .TSP.DataReference media = 8;
+    optional .TSP.DataReference importedauxiliarymedia = 9;
+  }
+  enum LoopOption {
+    None = 0;
+    Repeat = 1;
+    BackAndForth = 2;
+  }
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference movie = 2;
+  optional string deprecated_property = 3;
+  optional int32 property = 4;
+  optional .TSD.MovieSetValueCommandArchive.PropertyValue value = 5;
+}
+
+message MediaStyleSetValueCommandArchive {
+  required .TSD.StyledInfoSetStyleCommandArchive super = 1;
+  optional .TSD.MediaStylePropertiesArchive media_properties = 4;
+}
+
+message ImageMediaCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSP.DataReference newImageData = 8;
+  optional .TSP.DataReference oldImageData = 9;
+  optional .TSP.DataReference oldOriginalImageData = 10;
+  optional .TSP.Size oldNaturalSize = 6;
+  optional .TSP.DataReference newOriginalImageData = 11;
+  optional .TSD.ImageAdjustmentsArchive oldImageAdjustments = 12;
+  optional .TSP.DataReference oldAdjustedImageData = 13;
+  optional .TSP.DataReference oldEnhancedImageData = 14;
+  optional .TSP.Reference database_newImageData = 3;
+  optional .TSP.Reference database_oldImageData = 4;
+  optional .TSP.Reference database_oldOriginalImageData = 5;
+  optional .TSP.Reference database_newOriginalImageData = 7;
+}
+
+message MediaOriginalSizeCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSP.Size newOriginalSize = 3;
+  optional .TSP.Size oldOriginalSize = 4;
+}
+
+message ImageMaskCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSP.Reference newMaskInfo = 3;
+  optional .TSP.Reference oldMaskInfo = 4;
+}
+
+message MediaApplyPresetCommandArchive {
+  required .TSD.StyledInfoSetStyleCommandArchive super = 1;
+  optional .TSP.Reference stylepreset = 10;
+  optional .TSD.ShadowArchive shadowpreset = 11;
+}
+
+message ImageAdjustmentsCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSD.ImageAdjustmentsArchive old_image_adjustments = 2;
+  optional .TSD.ImageAdjustmentsArchive new_image_adjustments = 3;
+  optional .TSP.DataReference adjustedImageData = 4;
+  optional .TSP.DataReference replacedAdjustedImageData = 5;
+  optional .TSP.DataReference enhancedImageData = 6;
+  optional .TSP.DataReference replacedEnhancedImageData = 7;
+}
+
+message MediaFlagsCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional uint32 flags = 3;
+}
+
+message DrawablesCommandGroupArchive {
+  enum DrawablesCommandGroupType {
+    Constructive = 1;
+    Destructive = 2;
+    InPlace = 3;
+  }
+  required .TSK.CommandGroupArchive super = 1;
+  optional .TSD.CanvasSelectionArchive obsolete_selection = 2;
+  optional .TSP.Reference modelforselection = 3;
+  optional .TSD.DrawablesCommandGroupArchive.DrawablesCommandGroupType type = 4;
+  optional bool forDrag = 5;
+  optional .TSP.Reference archivedselection = 6;
+}
+
+message ExteriorTextWrapCommandArchive {
+  message InfoAndWrap {
+    optional .TSP.Reference info = 1;
+    optional .TSD.ExteriorTextWrapArchive exterior_text_wrap = 2;
+  }
+  required .TSK.CommandArchive super = 1;
+  repeated .TSD.ExteriorTextWrapCommandArchive.InfoAndWrap info_and_wrap = 2;
+}
+
+message DrawableHyperlinkCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional string oldhyperlink_url = 3;
+  optional string newhyperlink_url = 4;
+}
+
+message CommandSelectionBehaviorArchive {
+  enum CommandSelectionBehaviorType {
+    Constructive = 1;
+    Destructive = 2;
+    InPlace = 3;
+    Replace = 4;
+  }
+  optional .TSP.Reference model_for_selection = 2;
+  optional .TSD.CommandSelectionBehaviorArchive.CommandSelectionBehaviorType type = 3;
+  optional .TSP.Reference archived_selection = 4;
+  optional .TSP.Reference archived_new_selection = 5;
+}
+
+message ImageReplaceCommandArchive {
+  required .TSK.CommandArchive super = 1;
+}
+
+message DrawableLockCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional bool lock = 3;
+}
+
+message DrawableInfoCommentCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional .TSP.Reference old_comment = 3;
+  optional .TSP.Reference new_comment = 4;
+}
+
+message CommentStorageApplyCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference comment_storage = 2;
+  required string comment_string = 3;
+  required string old_comment_string = 4;
+}
+
+message GuideCommandArchive {
+  enum GuideCommandMode {
+    Add = 1;
+    Replace = 2;
+    Delete = 3;
+  }
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional .TSD.UserDefinedGuideArchive old_guide = 3;
+  optional .TSD.UserDefinedGuideArchive new_guide = 4;
+  optional .TSD.GuideCommandArchive.GuideCommandMode mode = 5;
+}
+
+message DrawableAspectRatioLockedCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional bool aspect_ratio_locked = 3;
+}
+
+message DrawableAccessibilityDescriptionCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference info = 2;
+  optional string accessibility_description = 3;
+}
+
+message PasteStyleCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference dest_info = 2;
+  optional .TSP.Reference shape_style = 3;
+}
+

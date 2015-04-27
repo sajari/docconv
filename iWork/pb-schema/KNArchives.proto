@@ -1,0 +1,456 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSSArchives.proto";
+import "TSDArchives.proto";
+import "TSWPArchives.proto";
+import "TSAArchives.proto";
+import "TSCHArchives.proto";
+package KN;
+
+message AnimationAttributesArchive {
+  optional string animationType = 1;
+  optional string effect = 2;
+  optional double duration = 3;
+  optional uint32 direction = 4;
+  optional double delay = 5;
+  optional bool isAutomatic = 6;
+  optional .TSP.Color color = 7;
+}
+
+message TransitionAttributesArchive {
+  enum TransitionCustomAttributesTimingCurveType {
+    TransitionCustomAttributesTimingCurveTypeLinear = 1;
+    TransitionCustomAttributesTimingCurveTypeEaseIn = 2;
+    TransitionCustomAttributesTimingCurveTypeEaseOut = 3;
+    TransitionCustomAttributesTimingCurveTypeEaseInEaseOut = 4;
+  }
+  enum TransitionCustomAttributesTextDeliveryType {
+    TransitionCustomAttributesTextDeliveryTypeByObject = 1;
+    TransitionCustomAttributesTextDeliveryTypeByWord = 2;
+    TransitionCustomAttributesTextDeliveryTypeByCharacter = 3;
+    TransitionCustomAttributesTextDeliveryTypeByLine = 4;
+  }
+  optional .KN.AnimationAttributesArchive animationAttributes = 8;
+  optional bool isAutomatic = 6;
+  optional float custom_twist = 9;
+  optional uint32 custom_mosaic_size = 10;
+  optional uint32 custom_mosaic_type = 11;
+  optional bool custom_bounce = 12;
+  optional bool custom_magic_move_fade_unmatched_objects = 13;
+  optional .KN.TransitionAttributesArchive.TransitionCustomAttributesTimingCurveType custom_timing_curve = 15;
+  optional .KN.TransitionAttributesArchive.TransitionCustomAttributesTextDeliveryType custom_text_delivery_type = 16;
+  optional string database_animationType = 1;
+  optional string database_effect = 2;
+  optional double database_duration = 3;
+  optional uint32 database_direction = 4;
+  optional float database_delay = 5;
+  optional .TSP.Color database_color = 7;
+}
+
+message TransitionArchive {
+  required .KN.TransitionAttributesArchive attributes = 2;
+}
+
+message BuildChunkArchive {
+  required .TSP.Reference build = 1;
+  required uint32 index = 2;
+  optional double delay = 3;
+  optional double duration = 4;
+  optional bool automatic = 5;
+  optional bool referent = 6;
+}
+
+message BuildAttributesArchive {
+  enum BuildAttributesAcceleration {
+    kNone = 0;
+    kEaseIn = 1;
+    kEaseOut = 2;
+    kEaseBoth = 3;
+  }
+  enum BuildAttributesRotationDirection {
+    kClockwise = 31;
+    kCounterclockwise = 32;
+  }
+  enum BuildAttributesCurveStyle {
+    kStraight = 0;
+    kCurved = 1;
+  }
+  enum BuildAttributesTextDelivery {
+    kTextDeliveryUndefined = 0;
+    kTextDeliveryByObject = 1;
+    kTextDeliveryByWord = 2;
+    kTextDeliveryByCharacter = 3;
+    kTextDeliveryByLine = 4;
+  }
+  enum BuildAttributesDeliveryOption {
+    kDeliveryOptionUndefined = 0;
+    kDeliveryOptionForward = 1;
+    kDeliveryOptionBackward = 2;
+    kDeliveryOptionFromCenter = 3;
+    kDeliveryOptionFromEdges = 4;
+    kDeliveryOptionRandom = 5;
+  }
+  enum ActionBuildAttributesJiggleIntensity {
+    kJiggleIntensitySmall = 0;
+    kJiggleIntensityMedium = 1;
+    kJiggleIntensityLarge = 2;
+  }
+  optional .KN.AnimationAttributesArchive animationAttributes = 18;
+  optional uint32 eventTrigger = 4;
+  optional double delayAutomaticAfter = 6;
+  optional double delayAutomaticWith = 7;
+  optional .KN.BuildAttributesArchive.BuildAttributesCurveStyle curveStyle = 14;
+  optional double ChartRotation3D = 17;
+  optional uint32 startOffset = 27;
+  optional uint32 endOffset = 28;
+  optional double action_rotationAngle = 9;
+  optional .KN.BuildAttributesArchive.BuildAttributesRotationDirection action_rotationDirection = 10;
+  optional double action_scaleSize = 11;
+  optional double action_colorAlpha = 12;
+  optional .KN.BuildAttributesArchive.BuildAttributesAcceleration action_acceleration = 13;
+  optional .TSD.PathSourceArchive action_motionPathSource = 22;
+  optional bool custom_bounce = 19;
+  optional .KN.BuildAttributesArchive.BuildAttributesTextDelivery custom_textDelivery = 20;
+  optional .KN.BuildAttributesArchive.BuildAttributesDeliveryOption custom_deliveryOption = 21;
+  optional bool custom_action_decay = 23;
+  optional uint32 custom_action_repeatCount = 24;
+  optional double custom_action_scale = 25;
+  optional .KN.BuildAttributesArchive.ActionBuildAttributesJiggleIntensity custom_action_jiggleIntensity = 26;
+  optional string database_animationType = 1;
+  optional string database_effect = 2;
+  optional uint32 database_direction = 3;
+  optional double database_delay = 5;
+  optional double database_duration = 8;
+  optional .TSP.Color database_color = 16;
+  optional string motionPathString = 15 [deprecated = true];
+}
+
+message BuildArchive {
+  required .TSP.Reference drawable = 1;
+  required string delivery = 2;
+  required double duration = 3;
+  required .KN.BuildAttributesArchive attributes = 4;
+}
+
+message PlaceholderArchive {
+  enum Kind {
+    kKindPlaceholder = 0;
+    kKindSlideNumberPlaceholder = 1;
+    kKindTitlePlaceholder = 2;
+    kKindBodyPlaceholder = 3;
+    kKindObjectPlaceholder = 4;
+  }
+  required .TSWP.ShapeInfoArchive super = 1;
+  optional .KN.PlaceholderArchive.Kind kind = 2 [default = kKindPlaceholder];
+}
+
+message NoteArchive {
+  required .TSP.Reference containedStorage = 1;
+}
+
+message ClassicStylesheetRecordArchive {
+  repeated .TSS.StylesheetArchive.IdentifiedStyleEntry identifier_to_style_map = 1;
+  optional .TSP.Reference theme = 2;
+}
+
+message ClassicThemeRecordArchive {
+  optional string uuid = 1;
+  optional .TSP.Reference stylesheetRecord = 2;
+  repeated .TSP.Reference masters = 3;
+}
+
+message SlideArchive {
+  message SageTagMapEntry {
+    required string tag = 1;
+    required .TSP.Reference info = 2;
+  }
+  required .TSP.Reference style = 1;
+  repeated .TSP.Reference builds = 2;
+  repeated .KN.BuildChunkArchive buildChunks = 3;
+  required .KN.TransitionArchive transition = 4;
+  optional .TSP.Reference titlePlaceholder = 5;
+  optional .TSP.Reference bodyPlaceholder = 6;
+  optional .TSP.Reference objectPlaceholder = 30;
+  optional .TSP.Reference slideNumberPlaceholder = 20;
+  repeated .TSP.Reference drawables = 7;
+  repeated .KN.SlideArchive.SageTagMapEntry sage_tag_to_info_map = 28;
+  optional string name = 10;
+  optional .TSD.GeometryArchive titlePlaceholderGeometry = 11;
+  optional uint32 titlePlaceholderShapeStyleIndex = 12;
+  optional uint32 titlePlaceholderTextStyleIndex = 13;
+  optional .TSWP.ShapeStylePropertiesArchive titleLayoutProperties = 24;
+  optional .TSD.GeometryArchive bodyPlaceholderGeometry = 14;
+  optional uint32 bodyPlaceholderShapeStyleIndex = 15;
+  optional uint32 bodyPlaceholderTextStyleIndex = 16;
+  optional .TSWP.ShapeStylePropertiesArchive bodyLayoutProperties = 25;
+  optional .TSD.GeometryArchive slideNumberPlaceholderGeometry = 21;
+  optional uint32 slideNumberPlaceholderShapeStyleIndex = 22;
+  optional uint32 slideNumberPlaceholderTextStyleIndex = 23;
+  optional .TSWP.ShapeStylePropertiesArchive slideNumberLayoutProperties = 26;
+  optional .TSP.Reference classicStylesheetRecord = 29;
+  repeated .TSP.Reference bodyParagraphStyles = 31;
+  repeated .TSP.Reference bodyListStyles = 35;
+  optional string thumbnailTextForTitlePlaceholder = 37;
+  optional string thumbnailTextForBodyPlaceholder = 38;
+  optional .TSP.Reference master = 17;
+  repeated .TSD.GuideArchive staticGuides = 18;
+  optional .TSP.Reference userDefinedGuideStorage = 36;
+  required bool inDocument = 19;
+  optional .TSP.Reference note = 27;
+  optional .TSP.Reference info_using_object_placeholder_geometry = 39;
+  optional bool info_using_object_placeholder_geometry_matches_object_placeholder_geometry = 40;
+  optional bool deprecated_objectPlaceholderVisibleForExport = 34;
+}
+
+message SlideNodeArchive {
+  repeated .TSP.Reference children = 1;
+  optional .TSP.Reference slide = 2;
+  repeated .TSP.DataReference thumbnails = 16;
+  repeated .TSP.Size thumbnailSizes = 10;
+  optional bool thumbnailsAreDirty = 14;
+  required bool isHidden = 4;
+  required bool isCollapsed = 5 [deprecated = true];
+  optional bool isCollapsedInOutlineView = 17;
+  optional bool hasBodyInOutlineView = 19;
+  required bool hasBuilds = 6;
+  required bool hasTransition = 7;
+  optional bool hasNote = 8;
+  optional bool isSlideNumberVisible = 18 [default = false];
+  optional string uniqueIdentifier = 11;
+  optional string copyFromSlideIdentifier = 12;
+  optional uint32 slideSpecificHyperlinkCount = 13;
+  optional uint32 eventCount = 15;
+  optional .TSP.Reference database_thumbnail = 3;
+  repeated .TSP.Reference database_thumbnails = 9;
+}
+
+message DesktopUILayoutArchive {
+  enum SidebarViewMode {
+    kSidebarViewModeNavigator = 0;
+    kSidebarViewModeOutline = 1;
+  }
+  enum InspectorPaneViewMode {
+    kInspectorPaneViewModeFormat = 0;
+    kInspectorPaneViewModeAnimate = 1;
+    kInspectorPaneViewModeSetup = 2;
+  }
+  optional bool sidebar_visible = 1;
+  optional .KN.DesktopUILayoutArchive.SidebarViewMode sidebar_view_mode = 2;
+  optional bool notes_visible = 3;
+  optional bool light_table_visible = 5;
+  optional bool inspector_pane_visible = 6 [default = true];
+  optional .KN.DesktopUILayoutArchive.InspectorPaneViewMode inspector_pane_view_mode = 7 [default = kInspectorPaneViewModeFormat];
+}
+
+message UIStateArchive {
+  optional .TSP.Reference slideNodeToEdit = 1;
+  optional .TSP.Reference deprecated_masterSlideNodeToApply = 2;
+  optional .TSP.Size deprecated_slideThumbnailSize = 3;
+  optional float canvasViewScale = 4;
+  optional .TSP.Point canvasOffset = 5;
+  repeated .TSP.Reference selectedSlideNodes = 6;
+  optional float iPhoneCanvasViewScale = 7;
+  optional .TSP.Point iPhoneCanvasOffset = 8;
+  optional float iPhone568CanvasViewScale = 9;
+  optional .TSP.Point iPhone568CanvasOffset = 10;
+  optional .TSP.Reference desktop_ui_layout = 11;
+  optional bool desktop_slide_view_content_fits_window = 12;
+  optional float desktop_canvas_view_scale = 13;
+  optional .TSP.Point desktop_canvas_offset = 21;
+  optional float light_table_zoom_scale = 14;
+  repeated .TSCH.ChartUIState chart_ui_state = 15;
+  optional bool show_slide_guides = 16;
+  optional bool show_master_guides = 17;
+  optional bool shows_comments = 18;
+  repeated .TSP.Reference collapsed_slide_nodes = 19;
+  optional bool shows_ruler = 20;
+  optional float desktop_navigator_view_width = 22;
+  optional float desktop_outline_view_width = 23;
+  optional .TSP.Size desktop_main_content_size = 24;
+}
+
+message CanvasSelectionArchive {
+  repeated .TSP.Reference infos = 1;
+  repeated .TSP.IndexSet action_ghost_indexes = 3;
+  repeated uint32 database_action_ghost_indexes = 2 [deprecated = true];
+}
+
+message ThemeArchive {
+  required .TSS.ThemeArchive super = 1;
+  repeated .TSP.Reference masters = 2;
+  optional string uuid = 3;
+  repeated .TSP.Reference classicThemeRecords = 4;
+  optional .TSP.Reference defaultMasterSlideNode = 5;
+}
+
+message SlideTreeArchive {
+  optional .TSP.Reference rootSlideNode = 1;
+}
+
+message ShowArchive {
+  enum KNShowMode {
+    kKNShowModeNormal = 0;
+    kKNShowModeAutoPlay = 1;
+    kKNShowModeHyperlinksOnly = 2;
+  }
+  optional .TSP.Reference uiState = 1;
+  required .TSP.Reference theme = 2;
+  required .KN.SlideTreeArchive slideTree = 3;
+  required .TSP.Size size = 4;
+  required .TSP.Reference stylesheet = 5;
+  optional bool slideNumbersVisible = 6;
+  optional .TSP.Reference recording = 7;
+  optional bool loop_presentation = 8;
+  optional .KN.ShowArchive.KNShowMode mode = 9 [default = kKNShowModeNormal];
+  optional double autoplay_transition_delay = 10 [default = 5];
+  optional double autoplay_build_delay = 11 [default = 2];
+  optional bool idle_timer_active = 15;
+  optional double idle_timer_delay = 16 [default = 900];
+  optional .TSP.Reference soundtrack = 17;
+  optional bool automatically_plays_upon_open = 18;
+}
+
+message DocumentArchive {
+  required .TSA.DocumentArchive super = 3;
+  required .TSP.Reference show = 2;
+  optional .TSP.Reference tables_custom_format_list = 4;
+}
+
+message SlideStylePropertiesArchive {
+  optional .TSD.FillArchive fill = 1;
+  optional .KN.TransitionAttributesArchive transition = 2;
+  optional bool transition_null = 3;
+  optional bool titlePlaceholderVisibility = 4;
+  optional bool bodyPlaceholderVisibility = 5;
+  optional bool objectPlaceholderVisibility = 7;
+  optional bool slideNumberPlaceholderVisibility = 6;
+}
+
+message SlideStyleArchive {
+  required .TSS.StyleArchive super = 1;
+  optional uint32 override_count = 10 [default = 0];
+  optional .KN.SlideStylePropertiesArchive slide_properties = 11;
+}
+
+message PasteboardNativeStorageArchive {
+  repeated .TSP.Reference drawables = 1;
+  repeated .TSP.Reference builds = 2;
+  repeated .KN.BuildChunkArchive buildChunks = 3;
+  repeated .TSP.Reference slideNodes = 4;
+  optional .TSP.Size originalShowSize = 5;
+  repeated .TSP.Range titleRanges = 6;
+}
+
+message MasterChangeBlobArchive {
+  optional .TSP.Reference slide = 1;
+  optional .TSP.Reference master = 2;
+  optional .TSP.Reference slide_style = 3;
+  optional .TSP.Reference title_placeholder = 4;
+  optional .TSP.Reference body_placeholder = 5;
+  optional .TSP.Reference object_placeholder = 7;
+  repeated .TSP.Reference drawables = 6;
+}
+
+message RecordingArchive {
+  enum RecordingSyncState {
+    kRecordingSyncStateInSyncWithShow = 0;
+    kRecordingSyncStateOutOfSyncWithShow = 1;
+  }
+  repeated .TSP.Reference event_tracks = 1;
+  optional .TSP.Reference movie_track = 2;
+  optional double duration = 3;
+  optional .KN.RecordingArchive.RecordingSyncState sync_state = 4 [default = kRecordingSyncStateInSyncWithShow];
+  optional .TSP.Date modification_date = 5;
+}
+
+message RecordingEventTrackArchive {
+  optional string type = 1;
+  repeated .KN.RecordingEventArchive events = 2;
+}
+
+message RecordingEventArchive {
+  optional double start_time = 1 [default = -1];
+  optional .KN.RecordingNavigationEventArchive navigation_event_archive = 1000;
+  optional .KN.RecordingLaserEventArchive laser_event_archive = 1001;
+  optional .KN.RecordingPauseEventArchive pause_event_archive = 1002;
+  optional .KN.RecordingMovieEventArchive movie_event_archive = 1003;
+}
+
+message RecordingNavigationEventArchive {
+  enum RecordingNavigationEventAnimationPhase {
+    kRecordingNavigationEventAnimationNone = 0;
+    kRecordingNavigationEventAnimationStart = 1;
+    kRecordingNavigationEventAnimationEnd = 2;
+  }
+  optional .TSP.Reference target_slide_node_reference = 1;
+  optional uint32 target_event_index = 2;
+  optional .KN.RecordingNavigationEventArchive.RecordingNavigationEventAnimationPhase animation_phase = 3 [default = kRecordingNavigationEventAnimationNone];
+}
+
+message RecordingLaserEventArchive {
+  optional .TSP.Point unscaled_location = 1;
+}
+
+message RecordingPauseEventArchive {
+  enum RecordingPauseEventType {
+    kRecordingPauseEventTypeResume = 0;
+    kRecordingPauseEventTypePause = 1;
+    kRecordingPauseEventTypeConcealWithBlack = 2;
+    kRecordingPauseEventTypeConcealWithWhite = 3;
+  }
+  optional .KN.RecordingPauseEventArchive.RecordingPauseEventType pause_event_type = 1 [default = kRecordingPauseEventTypeResume];
+}
+
+message RecordingMovieEventArchive {
+  enum RecordingMovieEventType {
+    kRecordingMovieEventNone = 0;
+    kRecordingMovieEventSeek = 1;
+    kRecordingMovieEventSetRate = 2;
+    kRecordingMovieEventStartPlayback = 3;
+    kRecordingMovieEventStopPlayback = 4;
+    kRecordingMovieEventBeginScrubbing = 5;
+    kRecordingMovieEventEndScrubbing = 6;
+  }
+  optional .TSP.Reference movie_info_reference = 1;
+  optional .KN.RecordingMovieEventArchive.RecordingMovieEventType movie_event_type = 2 [default = kRecordingMovieEventSeek];
+  optional double movie_event_value = 3;
+}
+
+message RecordingMovieTrackArchive {
+  repeated .KN.MovieSegmentArchive movie_segments = 1;
+}
+
+message MovieSegmentArchive {
+  optional .TSP.DataReference movie_data = 3;
+  optional double start_time = 2 [default = -1];
+  optional .TSP.Reference database_movie_data = 1;
+}
+
+message Soundtrack {
+  enum SoundtrackMode {
+    kKNSoundtrackModePlayOnce = 0;
+    kKNSoundtrackModeLoop = 1;
+    kKNSoundtrackModeDoNotPlay = 2;
+  }
+  optional double volume = 1;
+  optional .KN.Soundtrack.SoundtrackMode mode = 2 [default = kKNSoundtrackModePlayOnce];
+  repeated .TSP.DataReference movie_media = 3;
+}
+
+message SlideNumberAttachmentArchive {
+  required .TSWP.TextualAttachmentArchive super = 1;
+}
+
+message SlideCollectionSelectionArchive {
+  message OutlineSelection {
+    required .TSP.Reference slide_node = 1;
+    required .TSP.IndexSet selected_paragraph_indexes = 2;
+  }
+  repeated .TSP.Reference slide_nodes = 1;
+  optional .TSP.Reference slide_node_to_edit = 2;
+  repeated .KN.SlideCollectionSelectionArchive.OutlineSelection selected_paragraph_indexes_for_slide_nodes = 3;
+  optional .TSP.Range range_in_selected_paragraph = 4;
+}
+

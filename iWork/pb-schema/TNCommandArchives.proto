@@ -1,0 +1,189 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSCHArchives.proto";
+import "TSCHCommandArchives.proto";
+import "TSCEArchives.proto";
+import "TSSArchives.proto";
+import "TSDArchives.proto";
+import "TSWPArchives.proto";
+import "TSAArchives.proto";
+import "TSTArchives.proto";
+import "TNArchives.proto";
+package TN;
+
+message SheetCommandSelectionBehaviorArchive {
+  optional .TSP.Reference sheet_selection = 1;
+}
+
+message CommandFormChooseTargetTableArchive {
+  required .TSK.CommandArchive super = 1;
+  optional .TSCE.CFUUIDArchive table_id = 2;
+  optional .TSCE.CFUUIDArchive previous_table_id = 3;
+  optional string sheet_name = 4;
+  optional string previous_sheet_name = 5;
+  required .TSP.Reference sheet = 6;
+}
+
+message CommandSheetInsertDrawablesArchive {
+  required .TSP.Reference sheet = 1;
+  repeated .TSP.Reference drawables = 2;
+  optional .TSP.Reference provider_undo = 3;
+  required .TSK.CommandArchive super = 4;
+  optional bool forDrag = 5;
+  optional bool forPaste = 7;
+  optional int32 atIndex = 6;
+}
+
+message CommandSheetRemoveDrawablesArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference sheet = 2;
+  repeated .TSP.Reference sortedDrawables = 3;
+  required .TSP.IndexSet drawableIndices = 4;
+  repeated .TSP.Reference old_sheet_sidebar_order = 5;
+  optional .TSP.Reference formula_rewrite_command_for_undo = 6;
+}
+
+message CommandSheetMoveDrawableZOrderArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference sheet = 2;
+  repeated .TSP.Reference drawable_infos = 3;
+  required .TSP.IndexSet indexes = 4;
+}
+
+message CommandDocumentInsertSheetArchive {
+  required .TSP.Reference document = 1;
+  required .TSP.Reference sheet = 2;
+  required .TSK.CommandArchive super = 3;
+}
+
+message CommandDocumentRemoveSheetArchive {
+  required .TSP.Reference document = 1;
+  required .TSP.Reference sheet = 2;
+  required uint32 index = 3;
+  repeated .TSP.Reference old_sheet_sidebar_order = 4;
+  required .TSK.CommandArchive super = 5;
+  optional .TSP.Reference formula_rewrite_command_for_undo = 6;
+}
+
+message CommandDocumentReplaceLastSheetArchive {
+  required .TSP.Reference document = 1;
+  required .TSP.Reference last_sheet = 2;
+  required .TSP.Reference new_sheet = 3;
+  required .TSK.CommandArchive super = 4;
+  optional uint32 index = 5;
+}
+
+message CommandDocumentReorderSheetArchive {
+  required .TSP.Reference document = 1;
+  required .TSP.Reference sheet = 2;
+  required uint32 source_index = 3;
+  required uint32 dest_index = 4;
+  required .TSK.CommandArchive super = 5;
+}
+
+message CommandSetSheetNameArchive {
+  required string newname = 1;
+  required string oldname = 2;
+  required .TSP.Reference sheet = 3;
+  required .TSK.CommandArchive super = 4;
+}
+
+message CommandSetPageOrientationArchive {
+  required bool in_portrait_page_orientation = 1;
+  required .TSP.Reference sheet = 2;
+  required .TSK.CommandArchive super = 3;
+}
+
+message CommandSetShowPageNumbersValueArchive {
+  required bool show_page_numbers = 1;
+  required .TSP.Reference sheet = 2;
+  required .TSK.CommandArchive super = 3;
+}
+
+message CommandSetRepeatingHeadersValueArchive {
+  required bool show_repeating_headers = 1;
+  required .TSP.Reference sheet = 2;
+  required .TSK.CommandArchive super = 3;
+}
+
+message CommandSetContentScaleArchive {
+  required bool is_autofit_on = 1;
+  required float old_content_scale = 2;
+  optional float new_content_scale = 3;
+  required .TSP.Reference sheet = 4;
+  required .TSK.CommandArchive super = 5;
+}
+
+message CommandSetAutofitValueArchive {
+  required float old_content_scale = 1;
+  required .TSP.Reference sheet = 2;
+  required .TSK.CommandArchive super = 3;
+}
+
+message CommandSetDocumentPrinterOptions {
+  required string printer_id = 1;
+  required string paper_id = 2;
+  required .TSP.Size page_size = 3;
+  required .TSK.CommandArchive super = 4;
+}
+
+message CommandEnterPrintPreviewModeArchive {
+  required .TSK.CommandArchive super = 1;
+}
+
+message CommandExitPrintPreviewModeArchive {
+  required .TSK.CommandArchive super = 1;
+}
+
+message CommandPasteDrawablesArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference sheet = 2;
+  repeated .TSP.Reference drawables = 3;
+}
+
+message CommandPasteSheetArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference document = 2;
+  required .TSP.Reference sheet = 3;
+  optional .TN.SheetUIStateArchive sheet_uistate = 4;
+  required uint32 sheetIndex = 5;
+}
+
+message CommandReorderSidebarItemChildrenAchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference sheet = 2;
+  repeated .TSP.Reference old_children = 3;
+  repeated .TSP.Reference new_children = 4;
+}
+
+message CommandChartMediatorSetEditingState {
+  required .TSCH.ChartCommandArchive super = 1;
+  optional .TN.ChartMediatorFormulaStorage old_formulas = 3;
+  optional .TN.ChartMediatorFormulaStorage new_formulas = 4;
+  optional int32 old_direction = 5;
+  optional int32 new_direction = 6;
+  optional int32 old_scatter_format = 7;
+  optional int32 new_scatter_format = 8;
+}
+
+message CommandChartMediatorUpdateForEntityDelete {
+  required .TSCH.ChartCommandArchive super = 1;
+  optional .TSP.Reference cmd = 3;
+}
+
+message ChartCommandSetSeriesNameArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required .TSP.Reference mediator = 2;
+  required uint32 seriesindex = 3;
+  optional .TSCE.FormulaArchive old_formula = 4;
+  optional .TSCE.FormulaArchive new_formula = 5;
+}
+
+message ChartCommandSelectionBehaviorArchive {
+  required .TSP.Reference drawable_info = 1;
+  optional .TN.ChartSelectionArchive begin_selection = 2;
+  optional .TN.ChartSelectionArchive end_selection = 3;
+}
+
