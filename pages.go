@@ -25,6 +25,7 @@ func ConvertPages(input io.Reader) (string, map[string]string) {
 		log.Println("ioutil.ReadAll:", err)
 		return "", nil
 	}
+
 	r, err := zip.NewReader(bytes.NewReader(inputBytes), int64(len(inputBytes)))
 	if err != nil {
 		log.Println("zip.NewReader:", err)
@@ -32,6 +33,18 @@ func ConvertPages(input io.Reader) (string, map[string]string) {
 	}
 
 	for _, f := range r.File {
+		if strings.HasSuffix(f.Name, "Preview.pdf") {
+			// There is a preview PDF version we can use
+			if rc, err := f.Open(); err == nil {
+				return ConvertPdf(rc)
+			}
+		}
+		if f.Name == "index.xml" {
+			// There's an XML version we can use
+			if rc, err := f.Open(); err == nil {
+				return ConvertXml(rc)
+			}
+		}
 		if f.Name == "Index/Document.iwa" {
 			rc, _ := f.Open()
 			defer rc.Close()
