@@ -2,17 +2,17 @@ package main
 
 import (
 	"archive/zip"
+	"bufio"
 	"bytes"
-	"strings"	
+	"encoding/binary"
 	"fmt"
+	"github.com/golang/protobuf/proto"
+	"github.com/sajari/sajari-convert/iWork"
+	"github.com/sajari/sajari-convert/snappy"
 	"io"
 	"io/ioutil"
 	"log"
-	"code.google.com/p/snappy-go/snappy"
-	"github.com/golang/protobuf/proto"
-	"encoding/binary"
-	"bufio"
-	"./iWork"
+	"strings"
 )
 
 // Convert PAGES to text
@@ -36,7 +36,7 @@ func ConvertPages(input io.Reader) (string, map[string]string) {
 			rc, _ := f.Open()
 			defer rc.Close()
 			bReader := bufio.NewReader(snappy.NewReader(io.MultiReader(strings.NewReader("\xff\x06\x00\x00sNaPpY"), rc)))
-			archiveLength,err := binary.ReadVarint(bReader)
+			archiveLength, err := binary.ReadVarint(bReader)
 			archiveInfoData, err := ioutil.ReadAll(io.LimitReader(bReader, archiveLength))
 			archiveInfo := &TSP.ArchiveInfo{}
 			err = proto.Unmarshal(archiveInfoData, archiveInfo)
