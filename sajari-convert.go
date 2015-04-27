@@ -42,6 +42,8 @@ func mimeTypeByExtension(filename string) string {
 				return "application/msword"
 			case "docx":
 				return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+			case "pages":
+				return "application/vnd.apple.pages"
 			case "pdf":
 				return "application/pdf"
 			case "rtf":
@@ -68,6 +70,9 @@ func convert(input io.Reader, mimeType string, readability bool) *Response {
 
 		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
 			response.Body, response.Meta = ConvertDocx(input)
+
+		case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
+			response.Body, response.Meta = ConvertPages(input)
 
 		case "application/pdf":
 			response.Body, response.Meta = ConvertPdf(input)
@@ -102,6 +107,7 @@ func main() {
 	}
 }
 
+// Convert a file given a path
 func convertPath(path string) []byte {
 	mimeType := mimeTypeByExtension(path)
 	if *logLevel >= 1 {
