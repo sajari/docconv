@@ -54,10 +54,6 @@ func ConvertPages(input io.Reader) (string, map[string]string) {
 			archiveInfo := &TSP.ArchiveInfo{}
 			err = proto.Unmarshal(archiveInfoData, archiveInfo)
 			fmt.Println("archiveInfo:", archiveInfo, err)
-		} else if f.Name == "QuickLook/Preview.pdf" {
-			rc, _ := f.Open()
-			defer rc.Close()
-			return ConvertPdf(rc)
 		}
 	}
 
