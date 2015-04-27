@@ -204,17 +204,20 @@ func (r *Reader) Read(p []byte) (int, error) {
 		switch chunkType {
 		case chunkTypeCompressedData:
 			// Section 4.2. Compressed data (chunk type 0x00).
-			if chunkLen < checksumSize {
-				r.err = ErrCorrupt
-				return 0, r.err
-			}
+			/*
+				if chunkLen < checksumSize {
+					r.err = ErrCorrupt
+					return 0, r.err
+				}
+			*/
 			buf := r.buf[:chunkLen]
 			if !r.readFull(buf) {
 				return 0, r.err
 			}
-			checksum := uint32(buf[0]) | uint32(buf[1])<<8 | uint32(buf[2])<<16 | uint32(buf[3])<<24
-			buf = buf[checksumSize:]
-
+			/*
+				checksum := uint32(buf[0]) | uint32(buf[1])<<8 | uint32(buf[2])<<16 | uint32(buf[3])<<24
+				buf = buf[checksumSize:]
+			*/
 			n, err := DecodedLen(buf)
 			if err != nil {
 				r.err = err
@@ -228,10 +231,12 @@ func (r *Reader) Read(p []byte) (int, error) {
 				r.err = err
 				return 0, r.err
 			}
-			if crc(r.decoded[:n]) != checksum {
-				r.err = ErrCorrupt
-				return 0, r.err
-			}
+			/*
+				if crc(r.decoded[:n]) != checksum {
+					r.err = ErrCorrupt
+					return 0, r.err
+				}
+			*/
 			r.i, r.j = 0, n
 			continue
 
