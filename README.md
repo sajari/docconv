@@ -1,9 +1,15 @@
 sajari-convert
 ==============
 
-A Golang wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, etc to plain text
+A Golang wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, PAGES, etc to plain text
 
-The compiled binary runs as a service on port 8888 by default. Documents can be sent as a multipart POST request and the plain text (body) and meta information are then returned as a JSON object
+The compiled binary runs as either 
+a) a service on port 8888 (by default)
+Documents can be sent as a multipart POST request and the plain text (body) and meta information are then returned as a JSON object
+
+b) via the command line. 
+Documents can be sent as an argument, e.g. 
+```./sajari-convert -input=document.pdf```
 
 ### Dependencies
 tidy, wv, popplerutils, unrtf, github.com/JalfResi/justext
@@ -40,7 +46,7 @@ Example install of dependencies (not all systems):
 Compile the binary. Check the binary is executable and then launch as per above with relevant flag settings.
 
 ### Why run as a service?
-You don't have to. However, if you have a large memory footprint (tens of GB) you may have trouble with forking caused by underlying Go functions when accessing the above mentioned dependencies. 
+You don't have to, you can import the pkg directly. However, if you have a large memory footprint (many GB) you may have trouble with memory forking caused by underlying Go functions when accessing the above mentioned dependencies. 
 
 ### How to ensure the service stays running?
 This is an operating system question, but we use "upstart"
