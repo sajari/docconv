@@ -5,10 +5,13 @@ A Golang wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, PAGES, 
 
 The compiled binary runs as either 
 a) a service on port 8888 (by default)
+
 Documents can be sent as a multipart POST request and the plain text (body) and meta information are then returned as a JSON object
 
 b) via the command line. 
+
 Documents can be sent as an argument, e.g. 
+
 ```./sajari-convert -input=document.pdf```
 
 ### Dependencies
