@@ -1,0 +1,389 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSSArchives.proto";
+import "TSDArchives.proto";
+import "TSWPArchives.proto";
+import "TSAArchives.proto";
+import "KNArchives.proto";
+package KN;
+
+message UIStateCommandGroupArchive {
+  required .TSK.CommandGroupArchive super = 1;
+  required .TSP.Reference uiState = 2;
+  required string property = 3;
+  repeated .TSP.Reference slideNodesToEdit = 4;
+  repeated .TSP.Reference masterSlideNodesToApply = 5;
+  repeated .TSP.Size thumbnailSizes = 6;
+  repeated .TSP.Reference selectedSlideNodes = 7;
+  repeated .TSP.Reference restoreSelectedSlideNodes = 8;
+}
+
+message CommandSlideInsertDrawablesArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slideNode = 2;
+  repeated .TSP.Reference drawables = 3;
+  optional bool forDrag = 4;
+  optional int32 atIndex = 5;
+  required bool use_object_placeholder_geometry = 6;
+}
+
+message CommandSlideSetPlaceholdersForTagsArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slide = 2;
+  repeated .TSP.Reference infos = 3;
+  repeated string tags = 4;
+  repeated .TSP.Reference old_infos = 6;
+  repeated string old_tags = 5;
+}
+
+message CommandSlideRemoveDrawableArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slideNode = 2;
+  repeated .TSP.Reference sortedDrawables = 3;
+  required .TSP.IndexSet drawableIndices = 4;
+  repeated string placeholderTags = 5;
+  optional .TSP.Reference info_using_object_placeholder_geometry = 6;
+  optional bool did_match_object_placeholder_geometry = 7;
+}
+
+message CommandSlideMoveDrawableZOrderArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slideNode = 2;
+  repeated .TSP.Reference infos = 3;
+  repeated .TSP.Reference old_ordered_infos = 4;
+  required .TSP.IndexSet indexes = 5;
+}
+
+message CommandSlidePasteDrawablesArchive {
+  required .TSK.CommandArchive super = 1;
+  repeated .TSP.Reference commands = 2;
+  required .TSP.Reference slide = 3;
+  repeated .TSP.Reference drawables = 4;
+  optional bool has_builds = 5 [default = false];
+}
+
+message CommandSlideNodeSetPropertyArchive {
+  message PropertyValue {
+    optional bool boolValue = 1;
+    optional .TSP.DataReference image = 3;
+    optional .TSP.Reference database_image = 2;
+  }
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slideNode = 2;
+  required string property = 3;
+  required .KN.CommandSlideNodeSetPropertyArchive.PropertyValue oldValue = 4;
+  required .KN.CommandSlideNodeSetPropertyArchive.PropertyValue newValue = 5;
+}
+
+message CommandSlideSetValueArchive {
+  message PropertyValue {
+    optional bool boolValue = 1;
+    optional .TSP.Reference objectValue = 2;
+    optional .TSD.FillArchive fill = 3;
+  }
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slide = 2;
+  required string property = 3;
+  required .KN.CommandSlideSetValueArchive.PropertyValue oldValue = 4;
+  required .KN.CommandSlideSetValueArchive.PropertyValue newValue = 5;
+  required .TSP.Reference oldSlideStyle = 6;
+}
+
+message CommandSlideSetStyleArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slide = 2;
+  required .TSP.Reference slide_style = 3;
+  required .TSP.Reference old_slide_style = 4;
+}
+
+message CommandShowMarkOutOfSyncRecordingArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  optional .TSP.Reference old_recording = 3;
+}
+
+message CommandShowRemoveRecordingArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  optional .TSP.Reference old_recording = 3;
+}
+
+message CommandShowReplaceRecordingArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  required .TSP.Reference replacement_recording = 3;
+  required double replacement_start_time = 4;
+  optional .TSP.Reference old_recording = 5;
+}
+
+message CommandShowSetValueArchive {
+  message PropertyValue {
+    optional bool bool_value = 1;
+    optional double double_value = 2;
+    optional .KN.ShowArchive.KNShowMode show_mode_value = 3;
+    optional .TSP.Size size_value = 4;
+  }
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  required string property = 3;
+  required .KN.CommandShowSetValueArchive.PropertyValue old_value = 4;
+  required .KN.CommandShowSetValueArchive.PropertyValue new_value = 5;
+}
+
+message CommandShowInsertSlideArchive {
+  enum Kind {
+    kKindInsertSlide = 0;
+    kKindInsertSlideForPaste = 1;
+    kKindInsertSlideForDuplicate = 2;
+  }
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  required .TSP.Reference slideNode = 3;
+  required uint32 childIndex = 4;
+  required .TSP.Reference parentSlideNode = 5;
+  optional .KN.CommandShowInsertSlideArchive.Kind kind = 6 [default = kKindInsertSlide];
+}
+
+message CommandShowMoveSlideArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  required .TSP.Reference slideNode = 3;
+  repeated .TSP.Reference parentSlideNodes = 4;
+  repeated uint32 childIndices = 5;
+}
+
+message CommandShowRemoveSlideArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  required .TSP.Reference slideNode = 3;
+  required .TSP.Reference parentSlideNode = 4;
+  required uint32 childIndex = 5;
+}
+
+message CommandShowChangeThemeArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  required .TSP.Reference theme = 3;
+  required .TSP.Reference old_theme = 4;
+  optional string template_identifier = 5;
+  optional string old_template_identifier = 6;
+}
+
+message CommandMoveMastersArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  repeated .TSP.Reference master_slides = 3;
+  repeated .TSP.Reference previous_indexes_keys = 4;
+  repeated uint32 previous_indexes_values = 5;
+  repeated .TSP.Reference final_master_arrangement = 6;
+}
+
+message CommandInsertMasterArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  required .TSP.Reference master_slide_node = 3;
+  required uint32 insertion_index = 4;
+  required bool was_inserted_with_drop = 5;
+}
+
+message CommandRemoveMasterArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  required .TSP.Reference master_slide_node = 3;
+  required uint32 previous_index = 4;
+  optional .TSP.Reference master_change_commands = 5;
+}
+
+message CommandRenameMasterArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference master_slide = 2;
+  required string master_name = 3;
+  required string old_master_name = 4;
+}
+
+message CommandSlideInsertBuildArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slideNode = 2;
+  required .TSP.Reference build = 3;
+  required uint32 index = 4;
+  optional bool shouldCreateChunks = 5;
+}
+
+message CommandSlideRemoveBuildArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slideNode = 2;
+  required .TSP.Reference build = 3;
+  required uint32 index = 4;
+}
+
+message CommandSlideMoveBuildWithoutMovingChunksArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slideNode = 2;
+  required uint32 index = 3;
+  required uint32 oldIndex = 4;
+}
+
+message CommandSlideMoveBuildsArchive {
+  required .TSK.CommandArchive super = 1;
+  repeated .TSP.Reference builds = 2;
+  optional uint32 toIndex = 3;
+}
+
+message CommandSlideInsertBuildChunkArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slide = 2;
+  required .KN.BuildChunkArchive buildChunk = 3;
+  required uint32 index = 4;
+}
+
+message CommandSlideRemoveBuildChunkArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slide = 2;
+  required .KN.BuildChunkArchive buildChunk = 3;
+  required uint32 index = 4;
+}
+
+message CommandSlideMoveBuildChunkArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slide = 2;
+  required uint32 index = 3;
+  required uint32 oldIndex = 4;
+}
+
+message CommandSlideMoveBuildChunksArchive {
+  required .TSK.CommandArchive super = 1;
+  repeated .KN.BuildChunkArchive buildChunks = 2;
+  optional uint32 toIndex = 3;
+}
+
+message CommandBuildSetValueArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference build = 2;
+  required string property = 3;
+  repeated string effects = 4;
+  repeated string types = 5;
+  repeated string deliveries = 6;
+  repeated uint32 directions = 7;
+  repeated double durations = 8;
+  repeated double delays = 9;
+  repeated double delayAutomaticAfters = 10;
+  repeated double delayAutomaticWiths = 11;
+  repeated bool eventTriggers = 12;
+}
+
+message CommandBuildChunkSetValueArchive {
+  required .TSK.CommandArchive super = 1;
+  required .KN.BuildChunkArchive buildChunk = 2;
+  required string property = 3;
+  repeated uint32 referents = 4;
+  repeated bool automatics = 5;
+  repeated double durations = 6;
+  repeated double delays = 7;
+  optional bool oldOwnsValue = 8;
+}
+
+message CommandTransitionSetValueArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slideNode = 2;
+  required string property = 3;
+  repeated string effects = 4;
+  repeated string unused = 5;
+  repeated string unused2 = 6;
+  repeated string unused3 = 7;
+  repeated double durations = 8;
+  repeated uint32 directions = 9;
+  repeated bool isAutomatics = 10;
+  repeated double delays = 11;
+}
+
+message CommandShowSetSlideNumberVisibilityArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference show = 2;
+  required bool slideNumbersVisible = 3;
+  optional .TSP.Reference providerUndo = 4;
+}
+
+message CommandMasterRescaleArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference master = 2;
+}
+
+message CommandMasterSetThumbnailTextArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference master = 2;
+  required bool is_body = 3;
+  optional string new_text = 4;
+  optional string old_text = 5;
+}
+
+message CommandMasterSetBodyStylesArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference master = 2;
+  repeated .TSP.Reference new_paragraph_styles = 3;
+  repeated .TSP.Reference new_list_styles = 4;
+  repeated .TSP.Reference old_paragraph_styles = 5;
+  repeated .TSP.Reference old_list_styles = 6;
+}
+
+message CommandSlideApplyThemeArchive {
+  required .TSS.ApplyThemeChildCommandArchive super = 1;
+  required .KN.MasterChangeBlobArchive blob = 2;
+}
+
+message CommandChangeMasterSlideArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slide = 2;
+  required .TSP.Reference master = 3;
+  required .TSP.Reference placeholder_commands = 4;
+}
+
+message CommandSlidePrimitiveSetMasterArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference slide = 2;
+  required .TSP.Reference master = 3;
+  required .TSP.Reference old_master = 4;
+}
+
+message CommandSlideReapplyMasterArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference reapply_accumulated_command = 2;
+}
+
+message CommandShowSetSoundtrack {
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference show = 2;
+  optional .TSP.Reference soundtrack = 3;
+  optional .TSP.Reference old_soundtrack = 4;
+}
+
+message CommandSoundtrackSetValue {
+  message PropertyValue {
+    optional double double_value = 1;
+    optional .KN.Soundtrack.SoundtrackMode mode_value = 2;
+    repeated .TSP.DataReference media_reference_values = 3;
+  }
+  required .TSK.CommandArchive super = 1;
+  optional .TSP.Reference soundtrack = 2;
+  optional string property = 3;
+  optional .KN.CommandSoundtrackSetValue.PropertyValue old_value = 4;
+  optional .KN.CommandSoundtrackSetValue.PropertyValue new_value = 5;
+}
+
+message SlideCollectionCommandSelectionBehaviorArchive {
+  enum Type {
+    kKindSlideSelectionBehaviorTypeGeneral = 0;
+    kKindSlideSelectionBehaviorTypeInsertion = 1;
+    kKindSlideSelectionBehaviorTypeDeletion = 2;
+    kKindSlideSelectionBehaviorTypeMove = 3;
+  }
+  optional .TSP.Reference archived_new_selection = 1;
+  optional .TSP.Reference archived_old_selection = 2;
+  optional .KN.SlideCollectionCommandSelectionBehaviorArchive.Type type = 3 [default = kKindSlideSelectionBehaviorTypeGeneral];
+}
+
+message ChartInfoGeometryCommandArchive {
+  required .TSK.CommandArchive super = 1;
+}
+

@@ -1,0 +1,773 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSDArchives.proto";
+import "TSKArchives.proto";
+import "TSSArchives.proto";
+import "TSCEArchives.proto";
+import "TSWPArchives.proto";
+import "TSTArchives.proto";
+package TST;
+
+enum CommandDirectionArchive {
+  directionRow = 0;
+  directionColumn = 1;
+}
+
+enum CommandRegionArchive {
+  bodyRegion = 0;
+  headerRowRegion = 1;
+  headerColumnRegion = 2;
+  footerRowRegion = 3;
+}
+
+message TableCommandArchive {
+  required .TSP.Reference tableInfo = 1;
+  optional string commandname = 2;
+  required .TSK.CommandArchive super = 3;
+  optional uint32 editing_mode_at_start = 4;
+}
+
+message CommandChangeFreezeHeaderStateArchive {
+  required .TST.CommandDirectionArchive direction = 1;
+  required bool new_freeze_state = 2;
+  required .TST.TableCommandArchive super = 3;
+}
+
+message CommandDeleteCellsArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.TableCommandArchive super = 3;
+  required .TST.CellMapArchive redo_map = 4;
+  required bool invalidate_comments = 5;
+}
+
+message CommandDeleteCellContentsArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.TableCommandArchive super = 3;
+  required .TST.CellMapArchive redo_map = 4;
+  required bool invalidate_comments = 5;
+}
+
+message CommandSetMultipleCellsArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.CellMapArchive redo_map = 3;
+  optional .TST.Cell source_cell = 4;
+  optional bool only_if_format_differs = 6;
+  required .TST.TableCommandArchive super = 7;
+}
+
+message CommandSetMultipleCellsCustomArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.CellMapArchive redo_map = 3;
+  required .TSK.FormatStructArchive cell_format = 4;
+  required .TST.TableCommandArchive super = 7;
+}
+
+message CommandSetMultipleCellsMultipleChoiceListArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.CellMapArchive redo_map = 3;
+  required .TST.TableCommandArchive super = 5;
+}
+
+message CommandCoerceMultipleCellsArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.CellMapArchive redo_map = 3;
+  required int32 desired_format = 4;
+  required .TST.TableCommandArchive super = 6;
+}
+
+message CommandSetControlCellsDisplayNumberFormatArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.CellMapArchive redo_map = 3;
+  required .TST.TableCommandArchive super = 6;
+}
+
+message CommandSetAutomaticFormatArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.CellMapArchive redo_map = 3;
+  required .TST.TableCommandArchive super = 6;
+}
+
+message CommandSetAutomaticDurationUnitsArchive {
+  required .TST.SelectionArchive selection = 1;
+  required .TST.CellMapArchive undo_map = 2;
+  required .TST.CellMapArchive redo_map = 3;
+  optional bool automatic_units = 4;
+  required .TST.TableCommandArchive super = 6;
+}
+
+message CommandInsertColumnsOrRowsArchive {
+  message StyleIndexPair {
+    required .TSP.Reference style = 1;
+    required uint32 index = 2;
+  }
+  required .TST.CommandDirectionArchive direction = 1;
+  required uint32 index = 2;
+  required uint32 count = 3;
+  required float size = 4;
+  required bool before = 5;
+  required uint32 header_count = 11;
+  required uint32 headers_added = 12;
+  required uint32 footer_count = 13;
+  required uint32 footers_added = 14;
+  optional .TSP.Reference row_column_style = 8;
+  optional .TST.CellMapArchive cell_style_redo = 9;
+  required .TST.TableCommandArchive super = 10;
+  optional .TSP.Reference formula_rewrite_command = 15;
+  required float width_factor = 16;
+  required float height_factor = 17;
+  optional bool allow_horizontal_autosize = 18;
+  optional bool inherit_styles = 19;
+  optional bool inherit_formats = 20;
+  optional bool inherit_formulas = 24;
+  repeated .TST.CommandInsertColumnsOrRowsArchive.StyleIndexPair cell_style_index_pairs = 21;
+  repeated .TST.CommandInsertColumnsOrRowsArchive.StyleIndexPair text_style_index_pairs = 22;
+  repeated double sizes = 23;
+}
+
+message CommandPasteArchive {
+  required .TST.SelectionArchive user_selection = 1;
+  required .TST.SelectionArchive final_selection = 2;
+  required .TST.CellMapArchive undo_cell_map = 3;
+  required .TST.CellMapArchive redo_cell_map = 4;
+  optional .TSP.Reference command_undo = 6;
+  required bool invalidate_comments = 7;
+  required .TST.TableCommandArchive super = 11;
+  repeated .TSP.Reference formula_rewrite_commands = 15;
+}
+
+message CommandRemoveColumnsOrRowsArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.CommandDirectionArchive direction = 2;
+  required .TSP.IndexSet indices_to_remove = 3;
+  optional .TST.CellMapArchive cellMap = 4;
+  required .TSD.GeometryArchive oldgeom = 5;
+  required .TSD.GeometryArchive newgeom = 6;
+  repeated float subsizes = 7;
+  optional .TSP.Reference formula_rewrite_command = 8;
+  required float width_factor = 9;
+  required float height_factor = 10;
+  optional bool allow_horizontal_autosize = 11;
+  optional .TSP.Reference undo_merge_map = 12;
+  optional .TSP.Reference redo_merge_map = 13;
+  repeated uint32 hiding_actions = 14;
+  optional .TSP.Reference orig_filter_set = 15;
+  repeated .TSP.Reference undo_command_collector = 16;
+}
+
+message CommandResizeColumnOrRowArchive {
+  required .TST.CommandDirectionArchive direction = 1;
+  required uint32 index = 2;
+  required uint32 count = 3;
+  required float newsize = 4;
+  optional .TSD.GeometryArchive oldgeom = 5;
+  optional .TSD.GeometryArchive newgeom = 6;
+  repeated float subsizes = 7;
+  optional float old_default = 8;
+  optional bool uniformsizes = 9;
+  optional uint32 resizemode = 10;
+  required .TST.TableCommandArchive super = 11;
+}
+
+message CommandSetCellArchive {
+  required .TST.CellID cellID = 1;
+  optional .TST.Cell newcell = 2;
+  optional .TST.Cell oldcell = 3;
+  required .TST.TableCommandArchive super = 5;
+  optional bool post_undo_redo_selection = 6;
+}
+
+message CommandTextPreflightInsertCellArchive {
+  required .TST.CellID editing_cellID = 1;
+  required .TST.TableCommandArchive super = 3;
+  optional .TSP.Reference coalesced_textcommand = 6;
+  optional .TSP.Reference postflightcommand = 8;
+  optional bool grouped_with_postflight = 9;
+  required .TST.Cell editing_cell = 10;
+  required .TSP.Reference editing_storage = 11;
+  optional uint32 last_column_hit_by_tap = 12;
+}
+
+message CommandPostflightSetCellArchive {
+  required .TST.CellID cellID = 1;
+  required .TST.TableCommandArchive super = 3;
+  optional .TSP.Reference childcommandundo = 4;
+  required .TST.Cell editing_cell = 6;
+  required .TST.Cell new_cell = 7;
+  required .TSP.Reference editing_storage = 8;
+  optional uint32 last_column_hit_by_tap = 9;
+}
+
+message CommandSetNumberOfHeadersOrFootersArchive {
+  required .TST.CommandRegionArchive region = 1;
+  required uint32 count = 2;
+  required uint32 oldcount = 3;
+  required .TST.TableCommandArchive super = 6;
+}
+
+message CommandFixWPStylesInRowsOrColumnsArchive {
+  required .TST.CommandDirectionArchive direction = 1;
+  required uint32 index = 2;
+  required .TST.CellMapArchive undo_cell_map = 3;
+  required .TST.CellMapArchive redo_cell_map = 4;
+  required .TST.TableCommandArchive super = 6;
+  required uint32 reference_index = 7;
+  required bool inherit_styles = 8;
+  optional uint32 count = 9;
+}
+
+message CommandFixStylesInHeadersOrFootersArchive {
+  required .TST.CommandRegionArchive region = 1;
+  required uint32 old_number = 2;
+  required uint32 new_number = 3;
+  required .TST.CellMapArchive redo_cell_map = 4;
+  required .TST.CellMapArchive undo_cell_map = 5;
+  required .TST.TableCommandArchive super = 6;
+  optional .TSP.Reference textundo = 7;
+}
+
+message CommandSetTableNameArchive {
+  required string newtablename = 1;
+  required string oldtablename = 2;
+  optional .TSP.Reference newstyle = 3;
+  optional .TSP.Reference oldstyle = 4;
+  required .TST.TableCommandArchive super = 5;
+  optional .TSP.Reference old_shape_style = 6;
+  optional .TSP.Reference new_shape_style = 7;
+  optional bool old_table_name_border_enabled = 8;
+  optional bool new_table_name_border_enabled = 9;
+}
+
+message CommandSetTableNameEnabledArchive {
+  required bool table_name_enabled = 1;
+  required .TST.TableCommandArchive super = 3;
+}
+
+message CommandSetTableFontSizeArchive {
+  required .TST.TableCommandArchive super = 1;
+  required float scale_factor = 9;
+  optional .TST.CellMapArchive undo_cell_map = 5;
+  optional .TST.CellMapArchive redo_cell_map = 6;
+  optional bool resize_default_cells = 7;
+  optional .TSP.Reference text_undo = 8;
+}
+
+message CommandSetTableFontNameArchive {
+  required .TST.TableCommandArchive super = 1;
+  required string font_name = 2;
+  required string old_font_name = 3;
+  optional bool preserve_face = 5;
+  optional .TST.CellMapArchive undo_cell_map = 6;
+  optional .TST.CellMapArchive redo_cell_map = 7;
+  optional .TSP.Reference text_undo = 8;
+}
+
+message CommandSetTableNameHeightArchive {
+  required .TST.TableCommandArchive super = 1;
+  required double old_table_name_height = 2;
+  required double new_table_name_height = 3;
+}
+
+message CommandStyleCellsArchive {
+  required .TST.TableCommandArchive super = 1;
+  optional .TSP.ReferenceDictionary format_properties = 2;
+  required .TST.SelectionArchive selection = 3;
+  required .TST.CellMapArchive undo_cell_map = 4;
+  required .TST.CellMapArchive redo_cell_map = 5;
+  optional .TSP.Reference text_undo = 6;
+}
+
+message CommandStyleTableArchive {
+  required .TST.TableCommandArchive super = 1;
+  optional .TSP.ReferenceDictionary format_properties = 2;
+  optional .TSP.Reference old_style = 3;
+  optional .TSP.Reference new_style = 4;
+}
+
+message CommandFillCellsArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.SelectionArchive sourceselection = 2;
+  required .TST.CellRange sourcecellrange = 3;
+  required .TST.CellRange targetcellrange = 4;
+  required .TST.CellMapArchive undo_cell_map = 5;
+  required .TST.FillDirectionArchive fillDirection = 6;
+  required .TST.SelectionArchive targetselection = 7;
+  required .TST.CellMapArchive redo_cell_map = 8;
+}
+
+message CommandReplaceTextArchive {
+  required .TST.CellID cellID = 1;
+  required .TST.Cell newcell = 2;
+  required .TST.Cell oldcell = 3;
+  required .TST.TableCommandArchive super = 4;
+  optional .TSP.Reference child_command_undo = 5;
+}
+
+message CommandReplaceAllTextArchive {
+  required .TSP.Reference tableInfo = 1;
+  required .TST.CellMapArchive undo_cell_map = 2;
+  required .TST.CellMapArchive redo_cell_map = 3;
+}
+
+message CommandSetRepeatingHeaderEnabledArchive {
+  required bool repeating_header_enabled = 1;
+  required .TST.CommandDirectionArchive direction = 2;
+  required .TST.TableCommandArchive super = 3;
+}
+
+message CommandSetFiltersEnabledArchive {
+  required bool enable_filters = 1;
+  required .TST.TableCommandArchive super = 2;
+}
+
+message CommandAddQuickFilterRulesArchive {
+  required .TST.TableCommandArchive super = 1;
+  repeated .TST.FilterRuleArchive rules = 2;
+  required uint32 filter_index = 3;
+  repeated uint32 rule_indices = 4;
+  required bool filter_set_enabled = 5;
+}
+
+message CommandDeleteFilterRulesArchive {
+  required .TST.TableCommandArchive super = 1;
+  repeated .TST.FilterRuleArchive undo_rules = 2;
+  repeated uint32 rule_indices = 3;
+  required bool filter_removed = 4;
+  required uint32 filter_index = 5;
+  required bool filter_set_enabled = 6;
+}
+
+message CommandModifyFilterRuleArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.FilterRuleArchive undo_rule = 2;
+  required .TST.FilterRuleArchive redo_rule = 3;
+  required uint32 rule_index = 4;
+  required uint32 filter_index = 5;
+}
+
+message CommandApplyStrokePresetArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.CellMapArchive undo_cell_map = 2;
+  required .TST.CellMapArchive redo_cell_map = 4;
+  required .TST.SelectionArchive selection = 3;
+  optional .TST.SelectionArchive expanded_selection = 6;
+  required int32 preset_index = 5;
+}
+
+message CommandApplyTableStylePresetArchive {
+  message StyleIndexTuple {
+    required uint32 index = 1;
+    optional .TSP.Reference cell_style = 5;
+    optional .TSP.Reference text_style = 6;
+  }
+  required .TST.TableCommandArchive super = 1;
+  required .TST.CellMapArchive undo_cell_map = 2;
+  required .TST.CellMapArchive redo_cell_map = 4;
+  required int32 preset_index = 5;
+  required .TST.TableStyleNetworkArchive old_table_styles = 7;
+  required .TST.TableStyleNetworkArchive new_table_styles = 8;
+  optional bool apply_clears_all = 10;
+  optional .TSP.Reference font_size_command = 11;
+  optional .TSP.Reference set_style_apply_clears_all_flag_command = 12;
+  repeated .TST.CommandApplyTableStylePresetArchive.StyleIndexTuple row_style_index_tuples = 13;
+  repeated .TST.CommandApplyTableStylePresetArchive.StyleIndexTuple col_style_index_tuples = 14;
+}
+
+message CommandSetStyleApplyClearsAllFlagArchive {
+  required .TST.TableCommandArchive super = 1;
+  required bool apply_clears_all = 2;
+}
+
+message CommandApplyThemeToTableArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.CellMapArchive undo_cell_map = 2;
+  required .TST.CellMapArchive redo_cell_map = 4;
+  required .TST.TableStyleNetworkArchive old_table_styles = 7;
+  required .TST.TableStyleNetworkArchive new_table_styles = 8;
+}
+
+message CommandApplyThemeChildForTableArchive {
+  required .TSS.ApplyThemeChildCommandArchive super = 1;
+  required .TSP.Reference apply_command = 2;
+}
+
+message CommandToggleTextPropertyArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.SelectionArchive selection = 2;
+  required uint32 property = 3;
+  required .TST.CellMapArchive undo_cell_map = 4;
+  required .TST.CellMapArchive redo_cell_map = 5;
+  required .TST.Cell default_body_cell = 6;
+  required .TST.Cell default_hr_cell = 7;
+  required .TST.Cell default_hc_cell = 8;
+  required .TST.Cell default_fr_cell = 9;
+  optional .TSP.Reference text_undo = 10;
+}
+
+message CommandResetFillPropertyToDefault {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.SelectionArchive selection = 2;
+  required .TST.CellMapArchive undo_cell_map = 4;
+  required .TST.CellMapArchive redo_cell_map = 5;
+}
+
+message CommandSetSingleNumberFormatParameterArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.SelectionArchive selection = 2;
+  required .TST.CellMapArchive undo_cell_map = 3;
+  required .TST.CellMapArchive redo_cell_map = 4;
+}
+
+message CommandSetBaseArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required uint32 base = 2;
+}
+
+message CommandSetBasePlacesArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required uint32 base_places = 2;
+}
+
+message CommandSetBaseUseMinusSignArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required bool base_use_minus_sign = 2;
+}
+
+message CommandSetControlMinimumArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required double minimum = 2;
+  required uint32 format_type = 3;
+}
+
+message CommandSetControlMaximumArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required double maximum = 2;
+  required uint32 format_type = 3;
+}
+
+message CommandSetControlIncrementArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required double increment = 2;
+  required uint32 format_type = 3;
+}
+
+message CommandSetCurrencyCodeArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required string currency_code = 2;
+}
+
+message CommandSetFractionAccuracyArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required uint32 fraction_accuracy = 2;
+}
+
+message CommandSetMultipleChoiceListFormatForEditedItemArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+}
+
+message CommandSetMultipleChoiceListFormatForDeleteItemArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+}
+
+message CommandSetMultipleChoiceListFormatForReorderItemArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+}
+
+message CommandSetMultipleChoiceListFormatForInitialValueArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+}
+
+message CommandSetNegativeNumberStyleArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required uint32 negative_number_style = 2;
+}
+
+message CommandSetExplicitFormatArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.SelectionArchive selection = 2;
+  required .TSK.FormatStructArchive cell_format = 3;
+  required .TST.CellMapArchive undo_cell_map = 4;
+  required .TST.CellMapArchive redo_cell_map = 5;
+}
+
+message CommandSetNumberOfDecimalPlacesArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required uint32 decimal_places = 2;
+}
+
+message CommandSetDateTimeFormatArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+}
+
+message CommandSetShowThousandsSeparatorArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required bool show_thousands_separator = 2;
+}
+
+message CommandSetUseAccountingStyleArchive {
+  required .TST.CommandSetSingleNumberFormatParameterArchive super = 1;
+  required bool use_accounting_style = 2;
+}
+
+message CommandMoveRowsArchive {
+  required .TST.TableCommandArchive super = 1;
+  optional .TST.SelectionArchive selection = 2;
+  required uint32 start_row_index = 3;
+  required uint32 dest_row_index = 4;
+  required uint32 number_of_rows = 5;
+  optional .TSP.Reference formula_rewrite_command = 7;
+  optional .TSP.Reference show_command = 8;
+  optional .TSP.Reference unmerge_invalid_ranges_command = 9;
+}
+
+message CommandMoveColumnsArchive {
+  required .TST.TableCommandArchive super = 1;
+  optional .TST.SelectionArchive selection = 2;
+  required uint32 start_column_index = 3;
+  required uint32 dest_column_index = 4;
+  required uint32 number_of_columns = 5;
+  optional .TSP.Reference formula_rewrite_command = 7;
+  optional .TSP.Reference show_command = 8;
+}
+
+message CommandSortArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSK.ShuffleMappingArchive mapping = 5;
+  optional .TSP.Reference formula_rewrite_command = 7;
+}
+
+message CommandRewriteFormulasForSortArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSCE.OwnerFormulaMapArchive formula_map = 2;
+  required .TSK.ShuffleMappingArchive sort_mapping = 3;
+  required .TSCE.CFUUIDArchive sorted_table_id = 4;
+  required bool explode_ranges = 5;
+}
+
+message CommandRewriteFormulasForTectonicShiftArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSCE.OwnerFormulaMapArchive formula_map = 2;
+  required .TSCE.TectonicShiftArchive tectonic_shift = 3;
+}
+
+message CommandRewriteFormulasForMoveArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSCE.OwnerFormulaMapArchive formula_map = 2;
+  required .TSCE.RangeReferenceArchive from_reference = 6;
+  required .TSCE.RangeReferenceArchive to_reference = 7;
+}
+
+message CommandRewriteFormulasForCellMergeArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSCE.OwnerFormulaMapArchive formula_map = 2;
+  required .TSCE.RangeCoordinateArchive merged_range = 3;
+  required .TSCE.CFUUIDArchive table_id = 4;
+}
+
+message CommandRewriteFilterFormulasForTableResizeArchive {
+  required .TST.TableCommandArchive super = 1;
+}
+
+message CommandRewriteFilterFormulasForTectonicShiftArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSP.Reference filter_set = 2;
+  required .TSCE.TectonicShiftArchive tectonic_shift = 3;
+}
+
+message CommandRewriteFilterFormulasForSortArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSP.Reference filter_set = 2;
+  required .TSK.ShuffleMappingArchive sort_mapping = 3;
+  required .TSCE.CFUUIDArchive sorted_table_id = 4;
+}
+
+message CommandRewriteConditionalStylesForTectonicShiftArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSCE.TectonicShiftArchive tectonic_shift = 2;
+  optional .TSCE.CellCoordinateVectorArchive cells_to_rewrite = 3;
+  optional .TSCE.CellCoordinateObjectMapArchive conditional_style_sets = 4;
+}
+
+message CommandRewriteConditionalStylesForSortArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSK.ShuffleMappingArchive sort_mapping = 2;
+  required .TSCE.CFUUIDArchive sorted_table_id = 3;
+  optional .TSCE.CellCoordinateVectorArchive cells_to_rewrite = 4;
+  optional .TSCE.CellCoordinateObjectMapArchive conditional_style_sets = 5;
+}
+
+message CommandRewriteConditionalStylesForRangeMoveArchive {
+  required .TST.TableCommandArchive super = 1;
+  optional .TSCE.RangeReferenceArchive from_range_reference = 7;
+  optional .TSCE.RangeReferenceArchive to_range_reference = 8;
+  optional .TSCE.CellCoordinateVectorArchive cells_to_rewrite = 5;
+  optional .TSCE.CellCoordinateObjectMapArchive conditional_style_sets = 6;
+}
+
+message CommandRewriteConditionalStylesForCellMergeArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TSCE.CFUUIDArchive merged_table_id = 2;
+  required .TSCE.RangeCoordinateArchive merged_range = 3;
+  optional .TSCE.CellCoordinateVectorArchive cells_to_rewrite = 4;
+  optional .TSCE.CellCoordinateObjectMapArchive conditional_style_sets = 5;
+}
+
+message CommandMergeUnmergeArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.MergeActionArchive merge_action = 2;
+  required .TST.SelectionArchive selection = 3;
+  required .TST.CellMapArchive undo_cell_map = 4;
+  required .TST.CellMapArchive redo_cell_map = 5;
+  optional .TSP.Reference old_merge_ranges = 8;
+  optional .TSP.Reference undo_formula_rewrite_command = 9;
+}
+
+message CommandHideShowArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.CommandDirectionArchive direction = 2;
+  required .TST.HideShowActionArchive hide_show_action = 3;
+  required uint32 hiding_action = 4;
+  required .TSP.IndexSet elements_affected = 5;
+  repeated uint32 old_hiding_states = 7;
+}
+
+message TableInfoGeometryCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Size scale_factor = 2;
+  optional .TSP.Reference table_info = 3;
+  optional .TSD.GeometryArchive new_geometry = 4;
+  optional .TSD.GeometryArchive old_geometry = 5;
+  optional bool turn_off_auto_resize = 6;
+  optional bool should_clear_object_placeholder_flag = 7;
+  optional bool did_match_object_placeholder_geometry = 8;
+}
+
+message FormulaEditingCommandGroupArchive {
+  required .TSK.ProgressiveCommandGroupArchive super = 1;
+  required bool undoSelectionValid = 2;
+  required uint32 undoSelectionStart = 3;
+  required uint32 undoSelectionLength = 4;
+  required uint32 undoActiveToken = 5;
+  required bool redoSelectionValid = 6;
+  required uint32 redoSelectionStart = 7;
+  required uint32 redoSelectionLength = 8;
+  required uint32 redoActiveToken = 9;
+}
+
+message FormulaEditingCommandSelectionBehaviorArchive {
+  optional bool undoSelectionValid = 2;
+  optional uint32 undoSelectionStart = 3;
+  optional uint32 undoSelectionLength = 4;
+  optional uint32 undoActiveToken = 5;
+  optional bool redoSelectionValid = 6;
+  optional uint32 redoSelectionStart = 7;
+  optional uint32 redoSelectionLength = 8;
+  optional uint32 redoActiveToken = 9;
+  optional .TSP.Reference storage = 10;
+}
+
+message UndoRedoStateCommandSelectionBehaviorArchive {
+  optional .TSP.Reference before_undo_redo_state = 1 [deprecated = true];
+  optional .TSP.Reference after_undo_redo_state = 2 [deprecated = true];
+  optional .TSP.Reference table_info = 3;
+  optional .TST.SelectionArchive before_table_selection = 4;
+  optional .TST.SelectionArchive after_table_selection = 6;
+}
+
+message TableCommandSelectionBehaviorArchive {
+  optional .TST.SelectionArchive before_table_selection = 1;
+  optional .TST.SelectionArchive after_table_selection = 2;
+  optional .TSP.Reference table_info = 3;
+  optional uint32 last_column_hit_by_tap = 4;
+}
+
+message DisableTableNameSelectionBehaviorArchive {
+  required .TST.TableCommandSelectionBehaviorArchive super = 1;
+}
+
+message CommandApplyCellCommentArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.CellID cell_id = 2;
+  optional .TSP.Reference old_comment_storage = 3;
+  optional .TSP.Reference new_comment_storage = 4;
+}
+
+message CommandApplyConditionalStyleSetArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.SelectionArchive selection = 2;
+  required .TST.CellMapArchive undo_cell_map = 3;
+  required .TST.CellMapArchive redo_cell_map = 4;
+}
+
+message CommandSetFormulaTokenizationArchive {
+  required .TSK.CommandArchive super = 1;
+  required bool tokenization = 2;
+}
+
+message CommandSetFilterEnabledArchive {
+  required .TST.TableCommandArchive super = 1;
+  required uint32 filter_index = 2;
+  required bool enabled = 4;
+}
+
+message CommandSetFilterRuleEnabledArchive {
+  required .TST.TableCommandArchive super = 1;
+  required uint32 filter_index = 2;
+  required uint32 rule_index = 3;
+  required bool enabled = 4;
+}
+
+message CommandSetFilterSetTypeArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.FilterSetArchive.FilterSetType old_filter_set_type = 2;
+  required .TST.FilterSetArchive.FilterSetType new_filter_set_type = 3;
+}
+
+message CommandSetStyleNetworkArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.TableStyleNetworkArchive old_style_network = 2;
+  required .TST.TableStyleNetworkArchive new_style_network = 3;
+}
+
+message CommandMutateCellsArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.CellMapArchive undo_cell_map = 2;
+  required .TST.CellMapArchive redo_cell_map = 3;
+  optional .TST.SelectionArchive selection = 4;
+}
+
+message CommandDisableFilterRulesForColumnArchive {
+  required .TST.TableCommandArchive super = 1;
+  required uint32 column_index = 2;
+  repeated uint32 rule_indices = 3;
+}
+
+message CommandSetTextStyleArchive {
+  required .TST.TableCommandArchive super = 1;
+  required .TST.CellRegion region = 2;
+  optional .TST.CellMapArchive undo_cell_map = 3;
+  optional .TST.CellMapArchive redo_cell_map = 4;
+  optional .TSP.Reference subcommands = 5;
+}
+
+message CommandNotifyForTransformingArchive {
+  required .TST.TableCommandArchive super = 1;
+}
+
+message CommandSetStorageLanguageArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference storage = 2;
+  required string language = 3;
+  required uint32 range_location = 4;
+  required uint32 range_length = 5;
+  optional .TSWP.UndoTransaction undo_transaction = 6;
+}
+

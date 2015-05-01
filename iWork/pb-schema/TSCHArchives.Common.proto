@@ -1,0 +1,158 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSDArchives.proto";
+import "TSSArchives.proto";
+import "TSCH3DArchives.proto";
+package TSCH;
+
+enum ChartType {
+  undefinedChartType = 0;
+  columnChartType2D = 1;
+  barChartType2D = 2;
+  lineChartType2D = 3;
+  areaChartType2D = 4;
+  pieChartType2D = 5;
+  stackedColumnChartType2D = 6;
+  stackedBarChartType2D = 7;
+  stackedAreaChartType2D = 8;
+  scatterChartType2D = 9;
+  mixedChartType2D = 10;
+  twoAxisChartType2D = 11;
+  columnChartType3D = 12;
+  barChartType3D = 13;
+  lineChartType3D = 14;
+  areaChartType3D = 15;
+  pieChartType3D = 16;
+  stackedColumnChartType3D = 17;
+  stackedBarChartType3D = 18;
+  stackedAreaChartType3D = 19;
+  multiDataColumnChartType2D = 20;
+  multiDataBarChartType2D = 21;
+  bubbleChartType2D = 22;
+  multiDataScatterChartType2D = 23;
+  multiDataBubbleChartType2D = 24;
+}
+
+enum AxisType {
+  axis_type_unknown = 0;
+  axis_type_x = 1;
+  axis_type_y = 2;
+  axis_type_pie = 3;
+  axis_type_size = 4;
+}
+
+enum ScatterFormat {
+  scatter_format_unknown = 0;
+  scatter_format_separate_x = 1;
+  scatter_format_shared_x = 2;
+}
+
+enum SeriesDirection {
+  series_direction_unknown = 0;
+  series_direction_by_row = 1;
+  series_direction_by_column = 2;
+}
+
+enum NumberValueType {
+  numberValueTypeDecimal = 0;
+  numberValueTypeCurrency = 1;
+  numberValueTypePercentage = 2;
+  numberValueTypeScientific = 3;
+  numberValueTypeFraction = 4;
+  numberValueTypeBase = 5;
+  numberValueTypeUnknown = -999;
+}
+
+enum NegativeNumberStyle {
+  negativeNumberStyleMinus = 0;
+  negativeNumberStyleRed = 1;
+  negativeNumberStyleParentheses = 2;
+  negativeNumberStyleRedAndParentheses = 3;
+  negativeNumberStyleNone = 4;
+}
+
+enum FractionAccuracy {
+  fractionAccuracyConflicting = 0;
+  fractionAccuracyUpToOneDigit = -1;
+  fractionAccuracyUpToTwoDigits = -2;
+  fractionAccuracyUpToThreeDigits = -3;
+  fractionAccuracyHalves = 2;
+  fractionAccuracyQuarters = 4;
+  fractionAccuracyEighths = 8;
+  fractionAccuracySixteenths = 16;
+  fractionAccuracyTenths = 10;
+  fractionAccuracyHundredths = 100;
+}
+
+message SparseReferenceArrayArchive {
+  message Entry {
+    required uint32 index = 1;
+    required .TSP.Reference value = 2;
+  }
+  required uint32 num_entries = 1;
+  repeated .TSCH.SparseReferenceArrayArchive.Entry entries = 2;
+}
+
+message RectArchive {
+  required .TSP.Point origin = 1;
+  required .TSP.Size size = 2;
+}
+
+message ChartsNSNumberDoubleArchive {
+  optional double number_archive = 1;
+}
+
+message ChartsNSArrayOfNSNumberDoubleArchive {
+  repeated double numbers = 1;
+}
+
+message DEPRECATEDChart3DFillArchive {
+  optional .TSD.FillArchive fill = 1;
+  optional .TSCH.Chart3DLightingModelArchive lightingmodel = 2;
+  optional string textureset_id = 3;
+  optional .TSCH.FillPropertyType fill_type = 4;
+  optional uint32 series_index = 5;
+}
+
+message ChartStyleArchive {
+  optional .TSS.StyleArchive super = 1;
+  extensions 10000 to 536870911;
+}
+
+message ChartNonStyleArchive {
+  optional .TSS.StyleArchive super = 1;
+  extensions 10000 to 536870911;
+}
+
+message LegendStyleArchive {
+  optional .TSS.StyleArchive super = 1;
+  extensions 10000 to 536870911;
+}
+
+message LegendNonStyleArchive {
+  optional .TSS.StyleArchive super = 1;
+  extensions 10000 to 536870911;
+}
+
+message ChartAxisStyleArchive {
+  optional .TSS.StyleArchive super = 1;
+  extensions 10000 to 536870911;
+}
+
+message ChartAxisNonStyleArchive {
+  optional .TSS.StyleArchive super = 1;
+  extensions 10000 to 536870911;
+}
+
+message ChartSeriesStyleArchive {
+  optional .TSS.StyleArchive super = 1;
+  extensions 10000 to 536870911;
+}
+
+message ChartSeriesNonStyleArchive {
+  optional .TSS.StyleArchive super = 1;
+  extensions 10000 to 536870911;
+}
+

@@ -1,0 +1,266 @@
+syntax = "proto2";
+
+import "TSDArchives.proto";
+import "TSKArchives.proto";
+import "TSPMessages.proto";
+import "TSWPArchives.proto";
+import "TSSArchives.proto";
+import "TSAArchives.proto";
+import "TSCHArchives.proto";
+package TP;
+
+enum ViewScaleMode {
+  ViewScaleMode_UserDefined = 0;
+  ViewScaleMode_FitWidth = 1;
+  ViewScaleMode_FirPage = 2;
+}
+
+message DocumentArchive {
+  required .TSA.DocumentArchive super = 15;
+  optional .TSP.Reference stylesheet = 2;
+  optional .TSP.Reference floating_drawables = 3;
+  optional .TSP.Reference body_storage = 4;
+  optional .TSP.Reference section = 5;
+  optional .TSP.Reference theme = 6;
+  optional .TSP.Reference settings = 7;
+  optional .TSP.Reference deprecated_layout_state = 11;
+  optional .TSP.Reference deprecated_view_state = 12;
+  repeated .TSP.Reference citation_records = 13;
+  repeated .TSP.Reference toc_styles = 14;
+  repeated .TSP.Reference change_sessions = 16;
+  optional .TSP.Reference drawables_zorder = 20;
+  optional bool uses_single_header_footer = 21;
+  optional float page_width = 30;
+  optional float page_height = 31;
+  optional float left_margin = 32;
+  optional float right_margin = 33;
+  optional float top_margin = 34;
+  optional float bottom_margin = 35;
+  optional float header_margin = 36;
+  optional float footer_margin = 37;
+  optional float page_scale = 38;
+  optional bool layout_body_vertically = 39;
+  optional bool change_tracking_enabled = 40;
+  optional .TSP.Reference tables_custom_format_list = 41;
+  optional uint32 orientation = 42 [default = 0];
+  optional string printer_id = 43;
+  optional string paper_id = 44;
+  optional bool change_tracking_paused = 45;
+}
+
+message ThemeArchive {
+  required .TSS.ThemeArchive super = 1;
+}
+
+message SettingsArchive {
+  enum FootnoteKind {
+    kFootnoteKindFootnotes = 0;
+    kFootnoteKindDocumentEndnotes = 1;
+    kFootnoteKindSectionEndnotes = 2;
+  }
+  enum FootnoteFormat {
+    kFootnoteFormatNumeric = 0;
+    kFootnoteFormatRoman = 1;
+    kFootnoteFormatSymbolic = 2;
+    kFootnoteFormatJapaneseNumeric = 3;
+    kFootnoteFormatJapaneseIdeographic = 4;
+  }
+  enum FootnoteNumbering {
+    kFootnoteNumberingContinuous = 0;
+    kFootnoteNumberingRestartEachPage = 1;
+    kFootnoteNumberingRestartEachSection = 2;
+  }
+  optional bool body = 1 [default = true];
+  optional bool headers = 2 [default = true];
+  optional bool footers = 3 [default = true];
+  optional bool preview = 4 [default = true];
+  optional bool copy_movies = 5 [default = true];
+  optional bool copy_assets = 6 [default = true];
+  optional bool placeholder_authoring = 7 [default = false];
+  optional bool links_enabled = 8 [default = true];
+  optional bool hyphenation = 9 [default = false];
+  optional bool use_ligatures = 10 [default = false];
+  optional bool toc_links_enabled = 11 [default = false];
+  optional bool show_ct_markup = 12 [default = true];
+  optional bool show_ct_deletions = 13 [default = true];
+  optional int32 ct_bubbles_visibility = 14;
+  optional bool change_bars_visible = 15 [default = true];
+  optional bool format_changes_visible = 16 [default = true];
+  optional bool annotations_visible = 17 [default = true];
+  optional bool document_is_rtl = 18 [default = false];
+  optional string decimal_tab = 20;
+  optional string language = 21;
+  optional string hyphenation_language = 22;
+  optional string creation_locale = 23;
+  optional string last_locale = 24;
+  optional string orig_template = 25;
+  optional string creation_date = 26;
+  optional string bibliography_format = 27;
+  optional .TP.SettingsArchive.FootnoteKind footnote_kind = 30;
+  optional .TP.SettingsArchive.FootnoteFormat footnote_format = 31;
+  optional .TP.SettingsArchive.FootnoteNumbering footnote_numbering = 32;
+  optional int32 footnote_gap = 33;
+  optional bool section_authoring = 40 [default = false];
+}
+
+message PlaceholderArchive {
+  required .TSWP.ShapeInfoArchive super = 1;
+}
+
+message FloatingDrawablesArchive {
+  message DrawableEntry {
+    optional .TSP.Reference drawable = 1;
+  }
+  message PageGroup {
+    required uint32 page_index = 1;
+    repeated .TP.FloatingDrawablesArchive.DrawableEntry background_drawables = 2;
+    repeated .TP.FloatingDrawablesArchive.DrawableEntry foreground_drawables = 3;
+    repeated .TP.FloatingDrawablesArchive.DrawableEntry drawables = 4;
+  }
+  repeated .TP.FloatingDrawablesArchive.PageGroup page_groups = 1;
+}
+
+message DrawablesZOrderArchive {
+  repeated .TSP.Reference drawables = 1;
+}
+
+message PageMasterArchive {
+  repeated .TSP.Reference headers = 1;
+  repeated .TSP.Reference footers = 2;
+  repeated .TSP.Reference master_drawables = 3;
+}
+
+message SectionArchive {
+  optional bool OBSOLETE_shows_header = 1;
+  optional bool OBSOLETE_shows_footer = 2;
+  repeated .TSP.Reference OBSOLETE_headers = 3;
+  repeated .TSP.Reference OBSOLETE_footers = 4;
+  optional float OBSOLETE_left_margin = 5;
+  optional float OBSOLETE_right_margin = 6;
+  optional float OBSOLETE_top_margin = 7;
+  optional float OBSOLETE_bottom_margin = 8;
+  optional float OBSOLETE_header_padding = 9;
+  optional float OBSOLETE_footer_padding = 10;
+  optional float OBSOLETE_paper_width = 11;
+  optional float OBSOLETE_paper_height = 12;
+  optional bool OBSOLETE_landscape_mode = 13;
+  repeated .TSP.Reference OBSOLETE_master_drawables = 14;
+  optional float OBSOLETE_header_margin = 15;
+  optional float OBSOLETE_footer_margin = 16;
+  optional bool inherit_previous_header_footer = 17;
+  optional bool page_master_first_page_different = 18;
+  optional bool page_master_even_odd_pages_different = 19;
+  optional uint32 section_start_kind = 20;
+  optional uint32 section_page_number_kind = 21;
+  optional uint32 section_page_number_start = 22;
+  optional .TSP.Reference first_page_master = 23;
+  optional .TSP.Reference even_page_master = 24;
+  optional .TSP.Reference odd_page_master = 25;
+  optional string name = 26;
+  optional bool page_master_first_page_hides_header_footer = 28;
+}
+
+message AnchorPosArchive {
+  optional .TSP.Reference attachment = 1;
+  optional .TSP.Point position = 2;
+}
+
+message TargetHintArchive {
+  optional .TSP.Point frame_origin = 1;
+  optional .TSP.Size frame_size = 2;
+  optional .TSP.Range range = 3;
+  optional int32 next_widow_pulls_down_from_char_index = 4;
+  optional .TSP.Range anchored_range = 5;
+  optional int32 column_count = 6;
+}
+
+message PageHintArchive {
+  enum PageKind {
+    kPageKindNone = 0;
+    kPageKindText = 1;
+    kPageKindFiller = 2;
+    kPageKindOrphan = 3;
+    kPageKindEndnote = 4;
+    kPageKindDirty = 5;
+    kTPPageKindPageLayout = 6;
+  }
+  optional .TP.PageHintArchive.PageKind page_kind = 1;
+  repeated .TP.TargetHintArchive target_hints = 2;
+  optional .TSP.Range footnote_auto_number_range = 3;
+  optional .TSP.Range footnote_layout_range = 4;
+  optional .TSP.Reference first_child_hint = 6;
+  optional .TSP.Reference last_child_hint = 7;
+  repeated .TP.AnchorPosArchive anchored_attachments_map = 8;
+  optional .TP.TopicNumberHintsArchive topic_numbers = 9;
+  optional uint32 version_number = 10;
+  optional uint32 platform_id = 11;
+}
+
+message SectionHintArchive {
+  repeated .TP.PageHintArchive page_hints = 1;
+  optional uint32 start_page_index = 2;
+}
+
+message TextboxHintArchive {
+  required .TSP.Range range = 1;
+  required .TSP.Size size = 2;
+}
+
+message TopicNumberEntryArchive {
+  required .TSP.Reference list_style = 1;
+  repeated uint32 topic_number = 2;
+  repeated uint32 character_index = 3;
+}
+
+message TopicNumberHintsArchive {
+  optional uint32 charIndex = 1;
+  repeated .TP.TopicNumberEntryArchive topic_numbers_map = 2;
+  optional uint32 valid_through_char_index = 3;
+}
+
+message LayoutStateArchive {
+  optional uint32 section_index = 1;
+  optional uint32 section_page_index = 2;
+  optional uint32 document_page_index = 3;
+  optional uint32 last_page_count = 4;
+  repeated .TP.SectionHintArchive section_hints = 5;
+}
+
+message CanvasSelectionArchive {
+  required .TSWP.SelectionType type = 1;
+  required .TSP.Range range = 2;
+  required .TSWP.StyleInsertionBehavior style_insertion_behavior = 3;
+  required .TSWP.CaretAffinity caret_affinity = 4;
+  repeated .TSP.Reference infos = 5;
+  repeated .TSP.Reference excluded_infos = 6;
+  repeated .TSP.Reference additional_infos = 7;
+  optional .TSP.Reference container = 8;
+}
+
+message ViewStateArchive {
+  optional float OBSOLETE_view_scale = 1;
+  optional .TSP.Point visible_rect_origin = 2;
+  optional bool OBSOLETE_landscape = 3;
+  optional .TSP.Reference selection = 4;
+  optional .TSP.Reference selection_model = 5;
+  optional bool master_drawables_selectable = 6;
+  optional .TSP.Size visible_rect_size = 7;
+  repeated .TSCH.ChartUIState chart_ui_state = 8;
+  optional bool ruler_visible = 9 [default = true];
+  optional bool layout_borders_visible = 10 [default = false];
+  optional bool word_count_hud_visible = 11 [default = false];
+  optional bool shows_comments = 12 [default = true];
+  optional bool shows_page_navigator = 13 [default = false];
+  optional .TP.ViewScaleMode view_scale_mode = 14 [default = ViewScaleMode_UserDefined];
+  optional float view_scale = 15 [default = 1.25];
+  optional .TSP.Point window_frame_origin = 16;
+  optional .TSP.Size window_frame_size = 17;
+  optional string selected_inspector_switch_segment_identifier = 18;
+  optional bool inspector_hidden = 19;
+}
+
+message UIStateArchive {
+  optional .TSP.Reference layout_state = 1;
+  optional .TSP.Reference view_state = 2;
+}
+

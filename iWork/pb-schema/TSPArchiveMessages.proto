@@ -1,0 +1,96 @@
+syntax = "proto2";
+
+package TSP;
+
+message ArchiveInfo {
+  optional uint64 identifier = 1;
+  repeated .TSP.MessageInfo message_infos = 2;
+}
+
+message MessageInfo {
+  required uint32 type = 1;
+  repeated uint32 version = 2 [packed = true];
+  required uint32 length = 3;
+  repeated .TSP.FieldInfo field_infos = 4;
+  repeated uint64 object_references = 5 [packed = true];
+  repeated uint64 data_references = 6 [packed = true];
+}
+
+message FieldInfo {
+  enum Type {
+    Value = 0;
+    ObjectReference = 1;
+    DataReference = 2;
+    Message = 3;
+  }
+  enum Rule {
+    IgnoreAndDrop = 0;
+    IgnoreAndPreserve = 1;
+    MustUnderstand = 2;
+    NotSupported = -1;
+  }
+  required .TSP.FieldPath path = 1;
+  optional .TSP.FieldInfo.Type type = 2 [default = Value];
+  optional .TSP.FieldInfo.Rule rule = 3 [default = IgnoreAndDrop];
+  repeated uint64 object_references = 4 [packed = true];
+  repeated uint64 data_references = 5 [packed = true];
+}
+
+message FieldPath {
+  repeated uint32 path = 1 [packed = true];
+}
+
+message ComponentInfo {
+  required uint64 identifier = 1;
+  required string preferred_locator = 2;
+  optional string locator = 3;
+  repeated uint32 read_version = 4 [packed = true];
+  repeated uint32 write_version = 5 [packed = true];
+  repeated .TSP.ComponentExternalReference external_references = 6;
+  repeated .TSP.ComponentDataReference data_references = 7;
+  optional bool allows_duplicates_outside_of_document_package = 8 [default = false];
+  optional bool dirties_document_package = 9 [default = true];
+  optional bool is_stored_outside_object_archive = 10 [default = false];
+}
+
+message ComponentExternalReference {
+  required uint64 component_identifier = 1;
+  optional uint64 object_identifier = 2;
+  optional bool is_weak = 3;
+}
+
+message ComponentDataReference {
+  required uint64 data_identifier = 1;
+}
+
+message PackageMetadata {
+  required uint64 last_object_identifier = 1;
+  repeated .TSP.ComponentInfo components = 3;
+  repeated .TSP.DataInfo datas = 4;
+  repeated uint32 read_version = 5 [packed = true];
+  repeated uint32 write_version = 6 [packed = true];
+}
+
+message PasteboardMetadata {
+  repeated uint32 version = 1 [packed = true];
+  required string app_name = 2;
+  repeated .TSP.DataInfo datas = 3;
+  optional string source_document_uuid = 4;
+}
+
+message DataInfo {
+  required uint64 identifier = 1;
+  required bytes digest = 2;
+  required string preferred_file_name = 3;
+  optional string file_name = 4;
+  optional string document_resource_locator = 5;
+  optional bytes source_bookmark_data = 6;
+  optional string pasteboard_external_file_path = 99;
+}
+
+message ViewStateMetadata {
+  repeated uint32 version = 1 [packed = true];
+  required string document_version_uuid = 2;
+  required .TSP.ComponentInfo component = 3;
+}
+

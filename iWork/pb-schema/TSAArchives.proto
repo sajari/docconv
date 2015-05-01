@@ -1,0 +1,36 @@
+syntax = "proto2";
+
+import "TSKArchives.proto";
+import "TSPMessages.proto";
+import "TSWPArchives.proto";
+import "TSSArchives.proto";
+package TSA;
+
+message DocumentArchive {
+  required .TSK.DocumentArchive super = 1;
+  repeated .TSWP.TextPresetDisplayItemArchive text_preset_display_items = 2;
+  optional string creation_language = 3;
+  optional .TSP.Reference calculation_engine = 4;
+  optional .TSP.Reference view_state = 5;
+  optional .TSP.Reference function_browser_state = 6;
+  optional .TSP.Reference tables_custom_format_list = 7;
+  optional bool needs_movie_compatibility_upgrade = 8;
+  optional string template_identifier = 9;
+}
+
+message FunctionBrowserStateArchive {
+  repeated uint32 recent_functions = 1;
+  repeated uint32 back_functions = 2;
+  repeated uint32 forward_functions = 3;
+  optional uint32 current_function = 4;
+}
+
+message TestDocumentArchive {
+  required .TSA.DocumentArchive super = 1;
+  optional string value = 2;
+}
+
+message PropagatePresetCommandArchive {
+  required .TSK.CommandArchive super = 1;
+}
+

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"io"
 	"os"
 	"regexp"
 	"time"
@@ -38,23 +38,25 @@ func mimeTypeByExtension(filename string) string {
 	reExtension, _ := regexp.Compile(".([a-z]+)$")
 	if matches := reExtension.FindAllStringSubmatch(filename, -1); len(matches) > 0 && len(matches[0]) > 1 {
 		switch matches[0][1] {
-			case "doc":
-				return "application/msword"
-			case "docx":
-				return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-			case "odt":
-				return "application/vnd.oasis.opendocument.text"
-			case "pdf":
-				return "application/pdf"
-			case "rtf":
-				return "application/rtf"
-			case "xml":
-				return "text/xml"
-			case "xhtml":
-			case "html":
-				return "text/html"
-			case "txt":
-				return "text/plain"
+		case "doc":
+			return "application/msword"
+		case "docx":
+			return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+		case "odt":
+			return "application/vnd.oasis.opendocument.text"
+		case "pages":
+			return "application/vnd.apple.pages"
+		case "pdf":
+			return "application/pdf"
+		case "rtf":
+			return "application/rtf"
+		case "xml":
+			return "text/xml"
+		case "xhtml":
+		case "html":
+			return "text/html"
+		case "txt":
+			return "text/plain"
 		}
 	}
 	return "application/octet-stream"
@@ -65,33 +67,36 @@ func convert(input io.Reader, mimeType string, readability bool) *Response {
 	startClock := time.Now()
 	response := new(Response)
 	switch mimeType {
-		case "application/msword", "application/vnd.ms-word":
-			response.Body, response.Meta = ConvertDoc(input)
+	case "application/msword", "application/vnd.ms-word":
+		response.Body, response.Meta = ConvertDoc(input)
 
-		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-			response.Body, response.Meta = ConvertDocx(input)
+	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+		response.Body, response.Meta = ConvertDocx(input)
 
-		case "application/vnd.oasis.opendocument.text":
-			response.Body, response.Meta = ConvertOdt(input)
+	case "application/vnd.oasis.opendocument.text":
+		response.Body, response.Meta = ConvertOdt(input)
 
-		case "application/pdf":
-			response.Body, response.Meta = ConvertPdf(input)
+	case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
+		response.Body, response.Meta = ConvertPages(input)
 
-		case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
-			response.Body, response.Meta = ConvertRtf(input)
+	case "application/pdf":
+		response.Body, response.Meta = ConvertPdf(input)
 
-		case "text/html":
-			response.Body, response.Meta = ConvertHtml(input, readability)
+	case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
+		response.Body, response.Meta = ConvertRtf(input)
 
-		case "text/url":
-			response.Body, response.Meta = ConvertUrl(input, readability)
+	case "text/html":
+		response.Body, response.Meta = ConvertHtml(input, readability)
 
-		case "text/xml", "application/xml":
-			response.Body, response.Meta = ConvertXml(input)
+	case "text/url":
+		response.Body, response.Meta = ConvertUrl(input, readability)
 
-		case "text/plain":
-			body, _ := ioutil.ReadAll(input)
-			response.Body = string(body)
+	case "text/xml", "application/xml":
+		response.Body, response.Meta = ConvertXml(input)
+
+	case "text/plain":
+		body, _ := ioutil.ReadAll(input)
+		response.Body = string(body)
 	}
 	response.MSecs = uint32(time.Since(startClock).Nanoseconds() / 1000000)
 	return response
@@ -99,7 +104,7 @@ func convert(input io.Reader, mimeType string, readability bool) *Response {
 
 func main() {
 	flag.Parse()
-	
+
 	if *inputPath != "" {
 		fmt.Print(string(convertPath(*inputPath)))
 	} else {
@@ -107,19 +112,20 @@ func main() {
 	}
 }
 
+// Convert a file given a path
 func convertPath(path string) []byte {
 	mimeType := mimeTypeByExtension(path)
 	if *logLevel >= 1 {
 		log.Println("Converting file: " + path + " (" + mimeType + ")")
 	}
-	
+
 	// Open file
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal("Cannot open file: ", err)
 	}
 	defer file.Close()
-	
+
 	jsonStr, _ := json.Marshal(convert(file, mimeType, false))
 	if *logLevel >= 2 {
 		log.Println(string(jsonStr))

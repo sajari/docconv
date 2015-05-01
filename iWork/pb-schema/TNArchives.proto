@@ -1,0 +1,144 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSCHArchives.proto";
+import "TSCEArchives.proto";
+import "TSSArchives.proto";
+import "TSDArchives.proto";
+import "TSWPArchives.proto";
+import "TSAArchives.proto";
+import "TSTArchives.proto";
+package TN;
+
+enum SheetPageOrder {
+  SheetPageOrderTopToBottom = 0;
+  SheetPageOrderLeftToRight = 1;
+}
+
+message SheetUIStateArchive {
+  required float view_scale = 1;
+  required .TSP.Point scroll_position = 2;
+  optional float previous_view_scale = 3;
+  optional bool scroll_position_is_unscaled = 4;
+  optional .TSP.Point previous_scroll_position = 5;
+  optional bool scroll_position_valid = 6;
+  optional bool previous_scroll_position_valid = 7;
+  optional .TSP.Size visible_size = 8;
+  optional .TSP.Size previous_visible_size = 9;
+  optional uint32 device_idiom = 10;
+  optional uint32 form_focused_record_index = 11;
+  optional uint32 form_focused_field_index = 12;
+}
+
+message SheetUIStateDictionaryEntryArchive {
+  required .TSP.Reference sheet = 1;
+  required .TN.SheetUIStateArchive sheet_uistate = 2;
+}
+
+message UIStateArchive {
+  enum InspectorPaneViewMode {
+    kInspectorPaneViewModeFormat = 0;
+    kInspectorPaneViewModeFilter = 1;
+  }
+  required uint32 active_sheet_index = 1 [deprecated = true];
+  repeated .TSP.Reference selected_info = 2;
+  repeated .TN.SheetUIStateDictionaryEntryArchive sheet_uistate_dictionary_entry = 3;
+  optional .TST.SelectionArchive table_selection = 4;
+  optional uint32 editing_sheet_index = 5 [deprecated = true];
+  optional int32 document_mode = 6;
+  repeated .TN.SheetUIStateDictionaryEntryArchive edit_mode_sheet_uistate_dictionary_entry = 7;
+  optional int32 table_editing_mode = 8;
+  optional uint32 form_focused_record_index = 9 [deprecated = true];
+  optional uint32 form_focused_field_index = 10 [deprecated = true];
+  optional bool in_chart_mode = 11;
+  optional .TN.ChartSelectionArchive chart_selection = 12;
+  optional .TSP.Reference sheet_selection = 13;
+  optional bool inspector_pane_visible = 14 [default = true];
+  optional .TN.UIStateArchive.InspectorPaneViewMode inspector_pane_view_mode = 15 [default = kInspectorPaneViewModeFormat];
+  repeated uint32 selected_quick_calc_functions = 16;
+  optional bool removed_all_quick_calc_functions = 17;
+  optional bool show_canvas_guides = 18;
+  optional bool shows_comments = 19;
+}
+
+message SheetSelectionArchive {
+  optional .TSP.Reference sheet = 1;
+  optional bool paginated = 2;
+}
+
+message UndoRedoStateArchive {
+  required .TN.UIStateArchive ui_state = 1;
+}
+
+message DocumentArchive {
+  repeated .TSP.Reference sheets = 1;
+  required .TSA.DocumentArchive super = 8;
+  optional .TSP.Reference calculation_engine = 3 [deprecated = true];
+  required .TSP.Reference stylesheet = 4;
+  required .TSP.Reference sidebar_order = 5;
+  required .TSP.Reference theme = 6;
+  optional .TN.UIStateArchive uistate = 7;
+  optional .TSP.Reference custom_format_list = 9;
+  optional string printer_id = 10;
+  optional string paper_id = 11;
+  optional .TSP.Size page_size = 12;
+}
+
+message PlaceholderArchive {
+  required .TSWP.ShapeInfoArchive super = 1;
+}
+
+message SheetArchive {
+  required string name = 1;
+  repeated .TSP.Reference drawable_infos = 2;
+  optional bool in_portrait_page_orientation = 3;
+  optional bool show_repeating_headers = 4 [deprecated = true];
+  optional bool show_page_numbers = 5;
+  optional bool is_autofit_on = 6;
+  optional float content_scale = 7;
+  optional .TN.SheetPageOrder page_order = 8;
+  optional .TSD.EdgeInsetsArchive print_margins = 10;
+  optional bool using_start_page_number = 11;
+  optional int32 start_page_number = 12;
+  optional float page_header_inset = 13;
+  optional float page_footer_inset = 14;
+  optional .TSP.Reference header_storage = 15;
+  optional .TSP.Reference footer_storage = 16;
+  optional .TSP.Reference userDefinedGuideStorage = 17;
+}
+
+message FormBasedSheetArchive {
+  required .TN.SheetArchive super = 1;
+  optional .TSCE.CFUUIDArchive table_id = 2;
+}
+
+message ThemeArchive {
+  required .TSS.ThemeArchive super = 1;
+  repeated .TSP.Reference prototypes = 2;
+}
+
+message ChartMediatorFormulaStorage {
+  repeated .TSCE.FormulaArchive data_formulae = 1;
+  repeated .TSCE.FormulaArchive row_label_formulae = 3;
+  repeated .TSCE.FormulaArchive col_label_formulae = 4;
+  optional int32 direction = 5;
+  repeated .TSCE.FormulaArchive error_custom_pos_formulae = 6;
+  repeated .TSCE.FormulaArchive error_custom_neg_formulae = 7;
+  repeated .TSCE.FormulaArchive error_custom_pos_scatterX_formulae = 8;
+  repeated .TSCE.FormulaArchive error_custom_neg_scatterX_formulae = 9;
+}
+
+message ChartMediatorArchive {
+  required .TSCH.ChartMediatorArchive super = 1;
+  required string entity_id = 2;
+  optional .TN.ChartMediatorFormulaStorage formulas = 3;
+  optional bool columns_are_series = 4;
+  optional bool is_registered_with_calc_engine = 5 [deprecated = true];
+}
+
+message ChartSelectionArchive {
+  optional .TSCE.RangeReferenceArchive reference = 1;
+  optional .TSCH.ChartSelectionArchive super = 2;
+}
+

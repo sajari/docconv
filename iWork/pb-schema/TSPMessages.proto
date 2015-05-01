@@ -1,0 +1,95 @@
+syntax = "proto2";
+
+package TSP;
+
+message Reference {
+  required uint64 identifier = 1;
+  optional int32 deprecated_type = 2;
+  optional bool deprecated_is_external = 3;
+}
+
+message DataReference {
+  required uint64 identifier = 1;
+}
+
+message Point {
+  required float x = 1;
+  required float y = 2;
+}
+
+message Size {
+  required float width = 1;
+  required float height = 2;
+}
+
+message Range {
+  required uint32 location = 1;
+  required uint32 length = 2;
+}
+
+message Date {
+  required double seconds = 1;
+}
+
+message IndexSet {
+  repeated .TSP.Range ranges = 1;
+}
+
+message Color {
+  enum ColorModel {
+    rgb = 1;
+    cmyk = 2;
+    white = 3;
+  }
+  required .TSP.Color.ColorModel model = 1;
+  optional float r = 3;
+  optional float g = 4;
+  optional float b = 5;
+  optional float a = 6 [default = 1];
+  optional float c = 7;
+  optional float m = 8;
+  optional float y = 9;
+  optional float k = 10;
+  optional float w = 11;
+}
+
+message Path {
+  message Element {
+    required .TSP.Path.ElementType type = 1;
+    repeated .TSP.Point points = 2;
+  }
+  enum ElementType {
+    moveTo = 1;
+    lineTo = 2;
+    quadCurveTo = 3;
+    curveTo = 4;
+    closeSubpath = 5;
+  }
+  repeated .TSP.Path.Element elements = 1;
+}
+
+message ReferenceDictionary {
+  message Entry {
+    required .TSP.Reference key = 1;
+    required .TSP.Reference value = 2;
+  }
+  repeated .TSP.ReferenceDictionary.Entry entries = 1;
+}
+
+message PasteboardObject {
+  optional .TSP.Reference stylesheet = 1;
+  repeated .TSP.Reference drawables = 2;
+  repeated .TSP.Reference styles = 3;
+  optional .TSP.Reference theme = 4;
+  optional .TSP.Reference wp_storage = 5;
+  optional .TSP.Reference guide_storage = 9;
+  optional .TSP.Reference app_native_object = 6;
+  optional bool is_text_primary = 7 [default = false];
+  optional bool is_smart = 8 [default = false];
+}
+
+message ObjectContainer {
+  optional uint32 identifier = 1;
+  repeated .TSP.Reference objects = 2;
+}
+

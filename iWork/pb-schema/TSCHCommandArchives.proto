@@ -1,0 +1,265 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSKArchives.proto";
+import "TSSArchives.proto";
+import "TSDArchives.proto";
+import "TSCHArchives.Common.proto";
+import "TSCHArchives.GEN.proto";
+import "TSCH3DArchives.proto";
+import "TSCHArchives.proto";
+package TSCH;
+
+enum StyleOwnerType {
+  chart_info = 1;
+  legend_model = 2;
+  chart_axis = 3;
+  chart_series = 4;
+}
+
+enum StyleSwapType {
+  chart_style = 1;
+  chart_non_style = 2;
+  legend_style = 3;
+  legend_non_style = 4;
+  value_axis_style = 5;
+  value_axis_non_style = 6;
+  category_axis_style = 7;
+  category_axis_non_style = 8;
+  series_theme_style = 9;
+  series_private_style = 10;
+  series_non_style = 11;
+  paragraph_style = 12;
+}
+
+enum ApplyPresetBehavior {
+  remove_overrides = 1;
+  preserve_overrides = 2;
+  preserve_appearance = 3;
+}
+
+message CommandSetChartTypeArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required .TSCH.ChartType oldChartType = 2;
+  required .TSCH.ChartType newChartType = 3;
+  optional .TSP.Reference info_geometry_command = 5;
+  optional .TSP.Reference anchor_attachment_command = 6;
+  optional .TSCH.RectArchive original_legend_rect = 7;
+}
+
+message PropertyMutationUndoTupleArchive {
+  optional .TSP.Reference chart_info = 1;
+  optional .TSCH.StyleOwnerType style_owner_type = 2;
+  optional uint32 index = 3;
+  optional .TSP.Reference old_style = 4;
+  optional .TSP.Reference new_style = 5;
+  optional .TSP.Reference old_non_style = 6;
+  optional .TSP.Reference new_non_style = 7;
+}
+
+message StyleSwapUndoTupleArchive {
+  optional .TSP.Reference chart_info = 1;
+  optional .TSCH.StyleSwapType swap_type = 2;
+  optional uint32 index = 3;
+  optional .TSP.Reference old_value = 4;
+  optional .TSP.Reference new_value = 5;
+}
+
+message CommandStyleSwapArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  repeated .TSCH.StyleSwapUndoTupleArchive undo_tuples = 2;
+}
+
+message CommandSetSeriesNameArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 seriesIndex = 2;
+  required string oldName = 3;
+  required string newName = 4;
+}
+
+message CommandSetCategoryNameArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 categoryIndex = 2;
+  required string oldName = 3;
+  required string newName = 4;
+  optional bool isMultiDataIndex = 5;
+}
+
+message CommandAddGridRowsArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 location = 2;
+  optional uint32 length = 3;
+  repeated string name = 4;
+}
+
+message CommandAddGridColumnsArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 location = 2;
+  optional uint32 length = 3;
+  repeated string name = 4;
+}
+
+message CommandMoveGridRowsArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 location = 2;
+  required uint32 length = 3;
+  required int32 afterrow = 4;
+}
+
+message CommandMoveGridColumnsArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 location = 2;
+  required uint32 length = 3;
+  required int32 aftercolumn = 4;
+}
+
+message CommandDeleteGridRowsArchive {
+  message ValueRow {
+    repeated double value = 5;
+  }
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 location = 2;
+  required uint32 length = 3;
+  repeated string names = 4;
+  repeated .TSCH.CommandDeleteGridRowsArchive.ValueRow value_row = 6;
+  optional bool removed_all_rows = 7;
+  repeated string column_names = 8;
+}
+
+message CommandDeleteGridColumnsArchive {
+  message ValueRow {
+    repeated double value = 5;
+  }
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 location = 2;
+  required uint32 length = 3;
+  repeated string names = 4;
+  repeated .TSCH.CommandDeleteGridColumnsArchive.ValueRow value_row = 6;
+  optional bool removed_all_columns = 7;
+  repeated string row_names = 8;
+}
+
+message CommandSetPreviewLocArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required .TSP.Point old_loc = 2;
+  required .TSP.Point new_loc = 3;
+}
+
+message CommandSetGridValueArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 rowindex = 2;
+  required uint32 columnindex = 3;
+  required double oldvalue = 4;
+  required double newvalue = 5;
+}
+
+message CommandSetGridDirectionArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 old_direction = 2;
+  required uint32 new_direction = 3;
+}
+
+message CommandSetSeriesTypeArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 seriesindex = 2;
+  required uint32 oldtype = 3;
+  required uint32 newtype = 4;
+}
+
+message CommandSetScatterFormatArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 oldformat = 3;
+  required uint32 newformat = 4;
+}
+
+message CommandSetMultiDataSetIndexArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 oldindex = 2;
+  required uint32 newindex = 3;
+}
+
+message CommandSetLegendFrameArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  required .TSCH.RectArchive old_legend_frame = 2;
+  required .TSCH.RectArchive new_legend_frame = 3;
+}
+
+message CommandSetPieWedgeExplosion {
+  required .TSCH.ChartCommandArchive super = 1;
+  optional .TSP.Reference info_geometry_command = 2;
+  optional .TSP.Reference style_mutation_command = 3;
+  optional .TSP.Reference anchor_attachment_command = 4;
+}
+
+message SynchronousCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference command = 2;
+}
+
+message CommandReplaceAllArchive {
+  required .TSK.ReplaceAllChildCommandArchive super = 1;
+  required .TSP.Reference info = 2;
+  repeated .TSP.Reference commands = 3;
+}
+
+message CommandChartApplyTheme {
+  required .TSS.ApplyThemeChildCommandArchive super = 1;
+  required .TSP.Reference info = 2;
+  optional .TSP.Reference swap_command = 3;
+  optional .TSP.Reference preset = 4;
+}
+
+message CommandChartApplyPreset {
+  required .TSCH.ChartCommandArchive super = 1;
+  optional .TSP.Reference swap_command = 2;
+  optional .TSP.Reference preset = 3;
+  optional .TSCH.ApplyPresetBehavior behavior = 4 [default = remove_overrides];
+}
+
+message CommandCleanupGeometryArchive {
+  required .TSCH.ChartCommandArchive super = 1;
+  optional .TSP.Reference info_geometry_command = 2;
+  optional .TSP.Reference anchor_attachment_command = 3;
+  optional .TSCH.RectArchive original_legend_rect = 4;
+}
+
+message ChartCommandArchive {
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference info = 2;
+  optional bool original_dirty_state = 3;
+}
+
+message CommandReplaceGridValuesArchive {
+  message ValueRow {
+    repeated double value = 1;
+  }
+  required .TSCH.ChartCommandArchive super = 1;
+  required uint32 rowindex = 2;
+  required uint32 columnindex = 3;
+  repeated .TSCH.CommandReplaceGridValuesArchive.ValueRow old_data_rows = 4;
+  repeated .TSCH.CommandReplaceGridValuesArchive.ValueRow new_data_rows = 5;
+  repeated string old_row_names = 6;
+  repeated string new_row_names = 7;
+  repeated string old_col_names = 8;
+  repeated string new_col_names = 9;
+  optional uint32 rows_to_add = 10;
+  optional uint32 cols_to_add = 11;
+}
+
+message CommandReplaceThemePresetArchive {
+  message StyleAndIdentifierPair {
+    required .TSP.Reference style = 1;
+    required string identifier = 2;
+  }
+  required .TSK.CommandArchive super = 1;
+  required .TSP.Reference theme = 2;
+  optional .TSP.Reference old_preset = 3;
+  optional .TSP.Reference new_preset = 4;
+  repeated .TSCH.CommandReplaceThemePresetArchive.StyleAndIdentifierPair identifiers = 5;
+  optional uint64 old_preset_index = 6;
+}
+
+message CommandInvalidateWPCaches {
+  required .TSK.CommandArchive super = 1;
+}
+

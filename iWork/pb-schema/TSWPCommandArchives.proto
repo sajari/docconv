@@ -1,0 +1,307 @@
+syntax = "proto2";
+
+import "TSPMessages.proto";
+import "TSSArchives.proto";
+import "TSDArchives.proto";
+import "TSDCommandArchives.proto";
+import "TSKArchives.proto";
+import "TSWPArchives.proto";
+package TSWP;
+
+message DummyCommandArchive {
+  required uint32 foo = 1;
+}
+
+message TextCommandArchive {
+  enum Kind {
+    kKindContained = 0;
+    kKindReplaceText = 1;
+    kKindPaste = 2;
+    kKindParagraphStyle = 3;
+    kKindListStyle = 4;
+    kKindIndentParagraphLevel = 5;
+    kKindDragText = 6;
+    kKindPasteStyle = 7;
+    kKindApplyChangesInRange = 8;
+    kKindSetParagraphLevel = 9;
+    kKindInsertCitationField = 10;
+    kKindInsertBibliographyEntry = 11;
+    kKindFormatCitationFields = 12;
+    kKindInsertTOCSmartField = 13;
+    kKindInsertDateTimeField = 14;
+    kKindUpdateDateTimeField = 15;
+    kKindSetParagraphFirstTopicNumber = 16;
+    kKindCharacterStyle = 17;
+    kKindRevertStyles = 18;
+    kKindSetParagraphBidi = 19;
+  }
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional .TSWP.UndoTransaction undo_transaction = 3;
+  optional uint32 restore_range_location = 4;
+  optional uint32 restore_range_length = 5;
+  optional uint32 redo_restore_range_location = 6;
+  optional uint32 redo_restore_range_length = 7;
+  optional uint32 text_command_flags = 9;
+  optional .TSWP.TextCommandArchive.Kind kind = 10 [default = kKindContained];
+}
+
+message ReplaceAllTextCommandArchive {
+  optional .TSK.ReplaceAllChildCommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional .TSWP.UndoTransaction undo_transaction = 3;
+}
+
+message FormatTextCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional .TSWP.UndoTransaction undo_transaction = 3;
+  optional uint32 selection_range_location = 8;
+  optional uint32 selection_range_length = 9;
+  optional uint32 text_command_flags = 11;
+}
+
+message SetColumnStyleCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional .TSWP.UndoTransaction undo_transaction = 3;
+}
+
+message ReplaceAllUsesOfStyleCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional .TSWP.UndoTransaction undo_transaction = 3;
+}
+
+message InsertAttachmentCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 selection_range_location = 3;
+  optional uint32 selection_range_length = 4;
+  optional .TSP.Reference attachment = 5;
+  optional .TSWP.UndoTransaction undo_transaction = 6;
+  optional uint32 text_command_flags = 7;
+  optional uint32 redo_restore_range_location = 8;
+  optional uint32 redo_restore_range_length = 9;
+}
+
+message InsertColumnsCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 column_index = 3;
+  optional uint32 column_count = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+}
+
+message InsertRowsCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 row_index = 3;
+  optional uint32 row_count = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+}
+
+message RemoveColumnsCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 column_index = 3;
+  optional uint32 column_count = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+}
+
+message RemoveRowsCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 row_index = 3;
+  optional uint32 row_count = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+}
+
+message MergeCellsCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 row = 3;
+  optional uint32 column = 4;
+  optional uint32 row_count = 5;
+  optional uint32 column_count = 6;
+  optional .TSWP.UndoTransaction undo_transaction = 7;
+}
+
+message ApplyPlaceholderTextCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 selection_range_location = 3;
+  optional uint32 selection_range_length = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+}
+
+message ApplyHighlightTextCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 selection_range_location = 3;
+  optional uint32 selection_range_length = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+  optional bool remove = 6;
+}
+
+message CreateHyperlinkCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 selection_range_location = 3;
+  optional uint32 selection_range_length = 4;
+  optional string url_ref = 5;
+  optional .TSWP.UndoTransaction undo_transaction = 6;
+}
+
+message RemoveHyperlinkCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 selection_range_location = 3;
+  optional uint32 selection_range_length = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+  optional bool is_remove_character_style = 6 [default = true];
+}
+
+message ModifyHyperlinkCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference hyperlink = 2;
+  optional string display_text = 3;
+  optional string url_ref = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+}
+
+message UpdateDateTimeFieldCommandArchive {
+  optional .TSWP.TextCommandArchive super = 1;
+  optional .TSP.Reference date_time_field = 2;
+  optional .TSP.Date date = 3;
+  optional .TSWP.DateTimeSmartFieldArchive.DateTimeFormatterStyle date_style = 4;
+  optional .TSWP.DateTimeSmartFieldArchive.DateTimeFormatterStyle time_style = 5;
+}
+
+message ApplyRubyTextCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 selection_range_location = 3;
+  optional uint32 selection_range_length = 4;
+  optional string ruby_text = 5;
+  optional .TSWP.UndoTransaction undo_transaction = 6;
+}
+
+message RemoveRubyTextCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 selection_range_location = 3;
+  optional uint32 selection_range_length = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+}
+
+message ModifyRubyTextCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference ruby_field = 2;
+  optional string ruby_text = 3;
+  optional string base_text = 4;
+  optional .TSWP.UndoTransaction undo_transaction = 5;
+}
+
+message ModifyTOCSettingsBaseCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference old_toc_settings = 2;
+  optional .TSP.Reference new_toc_settings = 3;
+}
+
+message ModifyTOCSettingsForTOCInfoCommandArchive {
+  optional .TSWP.ModifyTOCSettingsBaseCommandArchive super = 1;
+  optional .TSP.Reference toc_info = 2;
+}
+
+message ModifyTOCSettingsPresetForThemeCommandArchive {
+  optional .TSWP.ModifyTOCSettingsBaseCommandArchive super = 1;
+  optional .TSP.Reference theme = 2;
+  optional uint32 preset_index = 3;
+}
+
+message AnchorAttachmentCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional .TSP.Reference attachment = 3;
+  optional uint32 h_offset_type = 4;
+  optional float h_offset = 5;
+  optional uint32 v_offset_type = 6;
+  optional float v_offset = 7;
+  optional .TSWP.UndoTransaction undo_transaction = 8;
+  optional bool is_html_wrap = 9;
+}
+
+message TextApplyThemeCommandArchive {
+  optional .TSS.ApplyThemeChildCommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional .TSWP.UndoTransaction undo_transaction = 6;
+}
+
+message MoveColumnsCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 src_index = 3;
+  optional uint32 dst_index = 4;
+  optional uint32 count = 5;
+  optional .TSWP.UndoTransaction undo_transaction = 6;
+}
+
+message MoveRowsCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference storage = 2;
+  optional uint32 src_index = 3;
+  optional uint32 dst_index = 4;
+  optional uint32 count = 5;
+  optional .TSWP.UndoTransaction undo_transaction = 6;
+}
+
+message ShapeApplyPresetCommandArchive {
+  required .TSD.ShapeApplyPresetCommandArchive super = 1;
+}
+
+message ShapePasteStyleCommandArchive {
+  required .TSD.PasteStyleCommandArchive super = 1;
+  optional .TSP.Reference paragraph_style = 2;
+  optional .TSP.Reference list_style = 3;
+  optional .TSP.Reference character_style = 4;
+}
+
+message StyleBaseCommandArchive {
+  optional .TSK.CommandArchive super = 1;
+  optional .TSP.Reference theme = 2;
+  optional .TSP.Reference style = 3;
+}
+
+message StyleCreateCommandArchive {
+  optional .TSWP.StyleBaseCommandArchive super = 1;
+  optional uint32 preset_index = 2;
+}
+
+message StyleRenameCommandArchive {
+  optional .TSWP.StyleBaseCommandArchive super = 1;
+  optional string updated_name = 2;
+  optional string old_name = 3;
+}
+
+message StyleUpdateCommandArchive {
+  optional .TSWP.StyleBaseCommandArchive super = 1;
+  optional .TSP.Reference original_style = 2;
+  optional .TSP.Reference updated_style = 3;
+}
+
+message StyleDeleteCommandArchive {
+  optional .TSWP.StyleBaseCommandArchive super = 1;
+  optional uint32 old_preset_index = 2;
+}
+
+message StyleReorderCommandArchive {
+  optional .TSWP.StyleBaseCommandArchive super = 1;
+  optional uint32 old_preset_index = 2;
+  optional uint32 new_preset_index = 3;
+}
+
+message StyleUpdatePropertyMapCommandArchive {
+  required .TSS.StyleUpdatePropertyMapCommandArchive super = 1;
+}
+
