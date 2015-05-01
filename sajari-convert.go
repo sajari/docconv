@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"io"
+	"os"
 	"regexp"
 	"time"
 )
@@ -19,6 +21,7 @@ type Response struct {
 }
 
 var (
+	inputPath                     *string  = flag.String("input", "", "The file path to convert and exit; no server")
 	listenAddr                    *string  = flag.String("addr", ":8888", "The address to listen on (e.g. 127.0.0.1:8888)")
 	logLevel                      *uint    = flag.Uint("log-level", 0, "The verbosity of the log")
 	readabilityLengthLow          *int     = flag.Int("readability-length-low", 70, "Sets the readability length low")
@@ -30,12 +33,103 @@ var (
 	readabilityUseClasses         *string  = flag.String("readability-use-classes", "good,neargood", "Comma separated list of readability classes to use")
 )
 
+// Determine the mime type by the file's extension
+func mimeTypeByExtension(filename string) string {
+	reExtension, _ := regexp.Compile(".([a-z]+)$")
+	if matches := reExtension.FindAllStringSubmatch(filename, -1); len(matches) > 0 && len(matches[0]) > 1 {
+		switch matches[0][1] {
+			case "doc":
+				return "application/msword"
+			case "docx":
+				return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+			case "odt":
+				return "application/vnd.oasis.opendocument.text"
+			case "pdf":
+				return "application/pdf"
+			case "rtf":
+				return "application/rtf"
+			case "xml":
+				return "text/xml"
+			case "xhtml":
+			case "html":
+				return "text/html"
+			case "txt":
+				return "text/plain"
+		}
+	}
+	return "application/octet-stream"
+}
+
+// Convert a file to plain text & meta data
+func convert(input io.Reader, mimeType string, readability bool) *Response {
+	startClock := time.Now()
+	response := new(Response)
+	switch mimeType {
+		case "application/msword", "application/vnd.ms-word":
+			response.Body, response.Meta = ConvertDoc(input)
+
+		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+			response.Body, response.Meta = ConvertDocx(input)
+
+		case "application/vnd.oasis.opendocument.text":
+			response.Body, response.Meta = ConvertOdt(input)
+
+		case "application/pdf":
+			response.Body, response.Meta = ConvertPdf(input)
+
+		case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
+			response.Body, response.Meta = ConvertRtf(input)
+
+		case "text/html":
+			response.Body, response.Meta = ConvertHtml(input, readability)
+
+		case "text/url":
+			response.Body, response.Meta = ConvertUrl(input, readability)
+
+		case "text/xml", "application/xml":
+			response.Body, response.Meta = ConvertXml(input)
+
+		case "text/plain":
+			body, _ := ioutil.ReadAll(input)
+			response.Body = string(body)
+	}
+	response.MSecs = uint32(time.Since(startClock).Nanoseconds() / 1000000)
+	return response
+}
+
 func main() {
 	flag.Parse()
+	
+	if *inputPath != "" {
+		fmt.Print(string(convertPath(*inputPath)))
+	} else {
+		serve()
+	}
+}
 
-	// Accept requests at /convert
+func convertPath(path string) []byte {
+	mimeType := mimeTypeByExtension(path)
+	if *logLevel >= 1 {
+		log.Println("Converting file: " + path + " (" + mimeType + ")")
+	}
+	
+	// Open file
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal("Cannot open file: ", err)
+	}
+	defer file.Close()
+	
+	jsonStr, _ := json.Marshal(convert(file, mimeType, false))
+	if *logLevel >= 2 {
+		log.Println(string(jsonStr))
+	}
+	return jsonStr
+}
+
+// Start the conversion web service
+func serve() {
 	http.HandleFunc("/convert", func(writer http.ResponseWriter, request *http.Request) {
-		startClock := time.Now()
 
 		// Get uploaded file
 		file, info, err := request.FormFile("input")
@@ -56,26 +150,7 @@ func main() {
 		// If a generic mime type was provided then use file extension to determine mimetype
 		mimeType := info.Header["Content-Type"][0]
 		if mimeType == "application/octet-stream" {
-			reExtension, _ := regexp.Compile(".([a-z]+)$")
-			if matches := reExtension.FindAllStringSubmatch(info.Filename, -1); len(matches) > 0 && len(matches[0]) > 1 {
-				switch matches[0][1] {
-				case "doc":
-					mimeType = "application/msword"
-				case "docx":
-					mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-				case "pdf":
-					mimeType = "application/pdf"
-				case "rtf":
-					mimeType = "application/rtf"
-				case "xml":
-					mimeType = "text/xml"
-				case "xhtml":
-				case "html":
-					mimeType = "text/html"
-				case "txt":
-					mimeType = "text/plain"
-				}
-			}
+			mimeType = mimeTypeByExtension(info.Filename)
 		}
 
 		if *logLevel >= 1 {
@@ -91,38 +166,7 @@ func main() {
 			}
 		}
 
-		// Convert document
-		response := new(Response)
-		switch mimeType {
-		case "application/msword", "application/vnd.ms-word":
-			response.Body, response.Meta = ConvertDoc(file)
-
-		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-			response.Body, response.Meta = ConvertDocx(file)
-
-		case "application/pdf":
-			response.Body, response.Meta = ConvertPdf(file)
-
-		case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
-			response.Body, response.Meta = ConvertRtf(file)
-
-		case "text/html":
-			response.Body, response.Meta = ConvertHtml(file, readability)
-
-		case "text/url":
-			response.Body, response.Meta = ConvertUrl(file, readability)
-
-		case "text/xml", "application/xml":
-			response.Body, response.Meta = ConvertXml(file)
-
-		case "text/plain":
-			body, _ := ioutil.ReadAll(file)
-			response.Body = string(body)
-		}
-
-		// Return result
-		response.MSecs = uint32(time.Since(startClock).Nanoseconds() / 1000000)
-		jsonStr, _ := json.Marshal(response)
+		jsonStr, _ := json.Marshal(convert(file, mimeType, readability))
 		if *logLevel >= 2 {
 			log.Println(string(jsonStr))
 		}
