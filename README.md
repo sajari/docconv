@@ -1,4 +1,4 @@
-sajari-convert
+docconv
 ==============
 
 A Golang wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, PAGES, etc to plain text
@@ -12,7 +12,7 @@ b) via the command line.
 
 Documents can be sent as an argument, e.g. 
 
-```./sajari-convert -input=document.pdf```
+```./docconv -input=document.pdf```
 
 ### Dependencies
 tidy, wv, popplerutils, unrtf, github.com/JalfResi/justext
@@ -39,9 +39,9 @@ Example install of dependencies (not all systems):
  - "2" - will also log the response payloads
 
 ### How to start the service
-```./sajari-convert -log-level=0   # will only log errors & critical info ```
+```./docconv -log-level=0   # will only log errors & critical info ```
 
-```./sajari-convert -addr=8000 -log-level=1   # will run on port 8000 and log each request as well ```
+```./docconv -addr=8000 -log-level=1   # will run on port 8000 and log each request as well ```
 
 ## FAQ
 
