@@ -52,44 +52,40 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 				}
 			}
 		} else if f.Name == "word/document.xml" {
-			rc, err := f.Open()
+			textBody, err = parseDocxText(f)
 			if err != nil {
-				return "", nil, fmt.Errorf("error opening '%v' from archive: %v", f.Name, err)
-			}
-			defer rc.Close()
-
-			textBody, err = DocxXMLToText(rc)
-			if err != nil {
-				return "", nil, fmt.Errorf("error parsing '%v': %v", f.Name, err)
+				return "", nil, err
 			}
 		} else if reHeaderFile.MatchString(f.Name) {
-			rc, err := f.Open()
+			header, err := parseDocxText(f)
 			if err != nil {
-				return "", nil, fmt.Errorf("error opening '%v' from archive: %v", f.Name, err)
-			}
-			defer rc.Close()
-
-			header, err := DocxXMLToText(rc)
-			if err != nil {
-				return "", nil, fmt.Errorf("error parsing header file '%v': %v", f.Name, err)
+				return "", nil, err
 			}
 			textHeader += header + "\n"
 		} else if reFooterFile.MatchString(f.Name) {
-			rc, err := f.Open()
+			footer, err := parseDocxText(f)
 			if err != nil {
-				return "", nil, fmt.Errorf("error opening '%v' from archive: %v", f.Name, err)
-			}
-			defer rc.Close()
-
-			footer, err := DocxXMLToText(rc)
-			if err != nil {
-				return "", nil, fmt.Errorf("error parsing footer file '%v': %v", f.Name, err)
+				return "", nil, err
 			}
 			textFooter += footer + "\n"
 		}
 	}
 
 	return textHeader + "\n" + textBody + "\n" + textFooter, meta, nil
+}
+
+func parseDocxText(f *zip.File) (string, error) {
+	r, err := f.Open()
+	if err != nil {
+		return "", fmt.Errorf("error opening '%v' from archive: %v", f.Name, err)
+	}
+	defer r.Close()
+
+	text, err := DocxXMLToText(r)
+	if err != nil {
+		return "", fmt.Errorf("error parsing '%v': %v", f.Name, err)
+	}
+	return text, nil
 }
 
 func DocxXMLToText(r io.Reader) (string, error) {
