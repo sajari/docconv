@@ -13,11 +13,10 @@ import (
 )
 
 // Convert MS Word DOC
-func ConvertDoc(r io.Reader) (string, map[string]string) {
+func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {
-		log.Println("error creating local file:", err)
-		return "", nil
+		return "", nil, fmt.Errorf("error creating local file: %v", err)
 	}
 	defer f.Done()
 
@@ -27,6 +26,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string) {
 		meta := make(map[string]string)
 		metaStr, err := exec.Command("wvSummary", f.Name()).Output()
 		if err != nil {
+			// TODO: Remove this.
 			log.Println("wvSummary:", err)
 		}
 
@@ -60,6 +60,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string) {
 		// Save output to a file
 		outputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
 		if err != nil {
+			// TODO: Remove this.
 			log.Println("TempFile Out:", err)
 			return
 		}
@@ -67,24 +68,28 @@ func ConvertDoc(r io.Reader) (string, map[string]string) {
 
 		err = exec.Command("wvText", f.Name(), outputFile.Name()).Run()
 		if err != nil {
+			// TODO: Remove this.
 			log.Println("wvText:", err)
 		}
 
 		var buf bytes.Buffer
 		_, err = buf.ReadFrom(outputFile)
 		if err != nil {
+			// TODO: Remove this.
 			log.Println("wvText:", err)
 		}
 
 		bc <- buf.String()
 	}()
 
+	// TODO: Should errors in either of the above Goroutines stop things from progressing?
 	body := <-bc
 	meta := <-mc
 
+	// TODO: Check for errors instead of len(body) == 0?
 	if len(body) == 0 {
 		f.Seek(0, 0)
 		return ConvertDocx(f)
 	}
-	return body, meta
+	return body, meta, nil
 }

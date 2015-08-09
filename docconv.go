@@ -67,10 +67,10 @@ func convert(r io.Reader, mimeType string, readability bool) *Response {
 	var err error
 	switch mimeType {
 	case "application/msword", "application/vnd.ms-word":
-		body, meta = ConvertDoc(r)
+		body, meta, err = ConvertDoc(r)
 
 	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-		body, meta = ConvertDocx(r)
+		body, meta, err = ConvertDocx(r)
 
 	case "application/vnd.oasis.opendocument.text":
 		body, meta = ConvertODT(r)
