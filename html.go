@@ -16,7 +16,7 @@ func ConvertHtml(input io.Reader, readability bool) (string, map[string]string) 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(input)
 
-	cleanXml, err := Tidy(bytes.NewReader(buf.Bytes()), false)
+	cleanXml, err := Tidy(buf, false)
 	if err != nil {
 		log.Println("Tidy:", err)
 		// Tidy failed, so we now manually tokenize instead
