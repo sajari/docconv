@@ -6,13 +6,15 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/golang/protobuf/proto"
-	"github.com/sajari/sajari-convert/iWork"
-	"github.com/sajari/sajari-convert/snappy"
 	"io"
 	"io/ioutil"
 	"log"
 	"strings"
+
+	"github.com/golang/protobuf/proto"
+
+	"github.com/sajari/docconv/iWork"
+	"github.com/sajari/docconv/snappy"
 )
 
 // Convert PAGES to text
