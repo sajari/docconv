@@ -1,7 +1,6 @@
-docconv
-==============
+# docconv
 
-A Golang wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, PAGES, etc to plain text
+A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, PAGES, etc to plain text.
 
 The compiled binary runs as either 
 a) a service on port 8888 (by default)
