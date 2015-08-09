@@ -109,14 +109,18 @@ func main() {
 	flag.Parse()
 
 	if *inputPath != "" {
-		fmt.Print(string(convertPath(*inputPath)))
+		b, err := convertPath(*inputPath)
+		if err != nil {
+			log.Fatal("Cannot open file: ", err)
+		}
+		fmt.Print(string(b))
 		return
 	}
 	serve()
 }
 
 // Convert a file given a path
-func convertPath(path string) []byte {
+func convertPath(path string) ([]byte, error) {
 	mimeType := mimeTypeByExtension(path)
 	if *logLevel >= 1 {
 		log.Println("Converting file: " + path + " (" + mimeType + ")")
@@ -125,7 +129,7 @@ func convertPath(path string) []byte {
 	// Open file
 	f, err := os.Open(path)
 	if err != nil {
-		log.Fatal("Cannot open file: ", err)
+		return nil, err
 	}
 	defer f.Close()
 
@@ -134,7 +138,7 @@ func convertPath(path string) []byte {
 	if *logLevel >= 2 {
 		log.Println(string(b))
 	}
-	return b
+	return b, nil
 }
 
 // Start the conversion web service
