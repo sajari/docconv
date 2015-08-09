@@ -107,9 +107,9 @@ func main() {
 
 	if *inputPath != "" {
 		fmt.Print(string(convertPath(*inputPath)))
-	} else {
-		serve()
+		return
 	}
+	serve()
 }
 
 // Convert a file given a path
@@ -135,17 +135,14 @@ func convertPath(path string) []byte {
 
 // Start the conversion web service
 func serve() {
-	http.HandleFunc("/convert", func(writer http.ResponseWriter, request *http.Request) {
-
+	http.HandleFunc("/convert", func(w http.ResponseWriter, r *http.Request) {
 		// Get uploaded file
-		file, info, err := request.FormFile("input")
-		if file != nil {
-			defer file.Close()
-		}
+		file, info, err := r.FormFile("input")
 		if err != nil {
 			log.Println("File upload", err)
 			return
 		}
+		defer file.Close()
 
 		// Abort if file doesn't have a mime type
 		if len(info.Header["Content-Type"]) == 0 {
@@ -160,12 +157,12 @@ func serve() {
 		}
 
 		if *logLevel >= 1 {
-			log.Println("Recieved file: " + info.Filename + " (" + mimeType + ")")
+			log.Println("Received file: " + info.Filename + " (" + mimeType + ")")
 		}
 
 		// Readability flag. Currently only used for HTML
-		var readability bool = false
-		if request.FormValue("readability") == "1" {
+		var readability bool
+		if r.FormValue("readability") == "1" {
 			readability = true
 			if *logLevel >= 2 {
 				log.Println("Readability is on")
@@ -176,7 +173,7 @@ func serve() {
 		if *logLevel >= 2 {
 			log.Println(string(jsonStr))
 		}
-		fmt.Fprintf(writer, "%s", jsonStr)
+		fmt.Fprintf(w, "%s", jsonStr)
 	})
 
 	// Start webserver
