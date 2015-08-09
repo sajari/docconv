@@ -60,7 +60,7 @@ func mimeTypeByExtension(filename string) string {
 
 // Convert a file to plain text & meta data
 func convert(input io.Reader, mimeType string, readability bool) *Response {
-	startClock := time.Now()
+	start := time.Now()
 
 	var body string
 	var meta map[string]string
@@ -101,7 +101,7 @@ func convert(input io.Reader, mimeType string, readability bool) *Response {
 	return &Response{
 		Body:  body,
 		Meta:  meta,
-		MSecs: uint32(time.Since(startClock).Nanoseconds() / 1000000),
+		MSecs: uint32(time.Since(start) / time.Millisecond),
 	}
 }
 
