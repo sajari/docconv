@@ -85,7 +85,7 @@ func convert(r io.Reader, mimeType string, readability bool) *Response {
 		body, meta = ConvertRTF(r)
 
 	case "text/html":
-		body, meta = ConvertHTML(r, readability)
+		body, meta, err = ConvertHTML(r, readability)
 
 	case "text/url":
 		body, meta = ConvertURL(r, readability)

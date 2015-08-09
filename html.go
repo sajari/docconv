@@ -12,11 +12,14 @@ import (
 )
 
 // Convert HTML
-func ConvertHTML(r io.Reader, readability bool) (string, map[string]string) {
+func ConvertHTML(r io.Reader, readability bool) (string, map[string]string, error) {
 	meta := make(map[string]string)
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(r)
+	_, err := buf.ReadFrom(r)
+	if err != nil {
+		return "", nil, err
+	}
 
 	cleanXML, err := Tidy(buf, false)
 	if err != nil {
@@ -24,13 +27,14 @@ func ConvertHTML(r io.Reader, readability bool) (string, map[string]string) {
 		// Tidy failed, so we now manually tokenize instead
 		clean := cleanHTML(buf, true)
 		cleanXML = []byte(clean)
+		// TODO: remove this log
 		log.Println("Cleaned HTML using Golang tokenizer")
 	}
 
 	if readability {
 		cleanXML = HTMLReadability(bytes.NewReader(cleanXML))
 	}
-	return HTMLToText(bytes.NewReader(cleanXML)), meta
+	return HTMLToText(bytes.NewReader(cleanXML)), meta, nil
 }
 
 var acceptedHTMLTags = [...]string{
