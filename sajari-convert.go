@@ -61,41 +61,48 @@ func mimeTypeByExtension(filename string) string {
 // Convert a file to plain text & meta data
 func convert(input io.Reader, mimeType string, readability bool) *Response {
 	startClock := time.Now()
-	response := new(Response)
+
+	var body string
+	var meta map[string]string
 	switch mimeType {
 	case "application/msword", "application/vnd.ms-word":
-		response.Body, response.Meta = ConvertDoc(input)
+		body, meta = ConvertDoc(input)
 
 	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-		response.Body, response.Meta = ConvertDocx(input)
+		body, meta = ConvertDocx(input)
 
 	case "application/vnd.oasis.opendocument.text":
-		response.Body, response.Meta = ConvertOdt(input)
+		body, meta = ConvertOdt(input)
 
 	case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
-		response.Body, response.Meta = ConvertPages(input)
+		body, meta = ConvertPages(input)
 
 	case "application/pdf":
-		response.Body, response.Meta = ConvertPdf(input)
+		body, meta = ConvertPdf(input)
 
 	case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
-		response.Body, response.Meta = ConvertRtf(input)
+		body, meta = ConvertRtf(input)
 
 	case "text/html":
-		response.Body, response.Meta = ConvertHtml(input, readability)
+		body, meta = ConvertHtml(input, readability)
 
 	case "text/url":
-		response.Body, response.Meta = ConvertUrl(input, readability)
+		body, meta = ConvertUrl(input, readability)
 
 	case "text/xml", "application/xml":
-		response.Body, response.Meta = ConvertXml(input)
+		body, meta = ConvertXml(input)
 
 	case "text/plain":
-		body, _ := ioutil.ReadAll(input)
-		response.Body = string(body)
+		// TODO: Don't ignore the error.
+		b, _ := ioutil.ReadAll(input)
+		body = string(b)
 	}
-	response.MSecs = uint32(time.Since(startClock).Nanoseconds() / 1000000)
-	return response
+
+	return &Response{
+		Body:  body,
+		Meta:  meta,
+		MSecs: uint32(time.Since(startClock).Nanoseconds() / 1000000),
+	}
 }
 
 func main() {
@@ -116,17 +123,18 @@ func convertPath(path string) []byte {
 	}
 
 	// Open file
-	file, err := os.Open(path)
+	f, err := os.Open(path)
 	if err != nil {
 		log.Fatal("Cannot open file: ", err)
 	}
-	defer file.Close()
+	defer f.Close()
 
-	jsonStr, _ := json.Marshal(convert(file, mimeType, false))
+	// TODO: Don't ignore this error.
+	b, _ := json.Marshal(convert(f, mimeType, false))
 	if *logLevel >= 2 {
-		log.Println(string(jsonStr))
+		log.Println(string(b))
 	}
-	return jsonStr
+	return b
 }
 
 // Start the conversion web service
@@ -175,7 +183,5 @@ func serve() {
 	// Start webserver
 	log.Println("Setting log level to", *logLevel)
 	log.Println("Starting Sajari convert on", *listenAddr)
-	if err := http.ListenAndServe(*listenAddr, nil); err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	log.Fatal(http.ListenAndServe(*listenAddr, nil))
 }
