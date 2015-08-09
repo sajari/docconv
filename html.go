@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	"code.google.com/p/go.net/html"
+	"golang.org/x/net/html"
 
 	"github.com/JalfResi/justext"
 )
