@@ -29,7 +29,8 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 	reFooterFile, _ := regexp.Compile("^word/footer[0-9]+.xml$")
 
 	for _, f := range zr.File {
-		if f.Name == "docProps/core.xml" {
+		switch {
+		case f.Name == "docProps/core.xml":
 			rc, err := f.Open()
 			if err != nil {
 				return "", nil, fmt.Errorf("error opening '%v' from archive: %v", f.Name, err)
@@ -51,18 +52,21 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 					meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 				}
 			}
-		} else if f.Name == "word/document.xml" {
+
+		case f.Name == "word/document.xml":
 			textBody, err = parseDocxText(f)
 			if err != nil {
 				return "", nil, err
 			}
-		} else if reHeaderFile.MatchString(f.Name) {
+
+		case reHeaderFile.MatchString(f.Name):
 			header, err := parseDocxText(f)
 			if err != nil {
 				return "", nil, err
 			}
 			textHeader += header + "\n"
-		} else if reFooterFile.MatchString(f.Name) {
+
+		case reFooterFile.MatchString(f.Name):
 			footer, err := parseDocxText(f)
 			if err != nil {
 				return "", nil, err
