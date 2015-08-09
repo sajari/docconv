@@ -6,31 +6,37 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"time"
 )
 
 // Convert ODT to text
-func ConvertODT(r io.Reader) (string, map[string]string) {
+func ConvertODT(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
-		log.Println("ioutil.ReadAll:", err)
-		return "", nil
+		return "", nil, err
 	}
 	zr, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
 	if err != nil {
-		log.Println("zip.NewReader:", err)
-		return "", nil
+		return "", nil, fmt.Errorf("error unzipping data: %v", err)
 	}
 
 	for _, f := range zr.File {
-		if f.Name == "meta.xml" {
-			rc, _ := f.Open()
+		switch f.Name {
+		case "meta.xml":
+			rc, err := f.Open()
+			if err != nil {
+				return "", nil, fmt.Errorf("error extracting '%v' from archive: %v", f.Name, err)
+			}
 			defer rc.Close()
-			info, _ := XMLToMap(rc)
+
+			info, err := XMLToMap(rc)
+			if err != nil {
+				return "", nil, fmt.Errorf("error parsing '%v': %v", f.Name, err)
+			}
+
 			if tmp, ok := info["creator"]; ok {
 				meta["Author"] = tmp
 			}
@@ -44,12 +50,20 @@ func ConvertODT(r io.Reader) (string, map[string]string) {
 					meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 				}
 			}
-		} else if f.Name == "content.xml" {
-			rc, _ := f.Open()
+
+		case "content.xml":
+			rc, err := f.Open()
+			if err != nil {
+				return "", nil, fmt.Errorf("error extracting '%v' from archive: %v", f.Name, err)
+			}
 			defer rc.Close()
-			textBody, _ = XMLToText(rc, []string{"br", "p", "tab"}, []string{}, true)
+
+			textBody, err = XMLToText(rc, []string{"br", "p", "tab"}, []string{}, true)
+			if err != nil {
+				return "", nil, fmt.Errorf("error parsing '%v': %v", f.Name, err)
+			}
 		}
 	}
 
-	return textBody, meta
+	return textBody, meta, nil
 }

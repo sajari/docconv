@@ -73,7 +73,7 @@ func convert(r io.Reader, mimeType string, readability bool) *Response {
 		body, meta, err = ConvertDocx(r)
 
 	case "application/vnd.oasis.opendocument.text":
-		body, meta = ConvertODT(r)
+		body, meta, err = ConvertODT(r)
 
 	case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
 		body, meta, err = ConvertPages(r)
