@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
-	"code.google.com/p/go.net/html"
-	"github.com/JalfResi/justext"
 	"io"
 	"log"
 	"strings"
+
+	"code.google.com/p/go.net/html"
+
+	"github.com/JalfResi/justext"
 )
 
 // Convert HTML
