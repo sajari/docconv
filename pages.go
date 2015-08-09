@@ -18,23 +18,23 @@ import (
 )
 
 // Convert PAGES to text
-func ConvertPages(input io.Reader) (string, map[string]string) {
+func ConvertPages(r io.Reader) (string, map[string]string) {
 	meta := make(map[string]string)
 	var textBody string
 
-	inputBytes, err := ioutil.ReadAll(input)
+	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Println("ioutil.ReadAll:", err)
 		return "", nil
 	}
 
-	r, err := zip.NewReader(bytes.NewReader(inputBytes), int64(len(inputBytes)))
+	zr, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
 	if err != nil {
 		log.Println("zip.NewReader:", err)
 		return "", nil
 	}
 
-	for _, f := range r.File {
+	for _, f := range zr.File {
 		if strings.HasSuffix(f.Name, "Preview.pdf") {
 			// There is a preview PDF version we can use
 			if rc, err := f.Open(); err == nil {

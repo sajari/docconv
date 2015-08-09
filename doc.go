@@ -13,21 +13,19 @@ import (
 )
 
 // Convert MS Word DOC
-func ConvertDoc(input io.Reader) (string, map[string]string) {
-
-	// Save input to a file
-	inputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
+func ConvertDoc(r io.Reader) (string, map[string]string) {
+	f, err := ioutil.TempFile("/tmp", "sajari-convert-")
 	if err != nil {
 		log.Println("TempFile:", err)
 	}
-	defer os.Remove(inputFile.Name())
-	io.Copy(inputFile, input)
+	defer os.Remove(f.Name())
+	io.Copy(f, r)
 
 	// Meta data
 	mc := make(chan map[string]string, 1)
 	go func() {
 		meta := make(map[string]string)
-		metaStr, err := exec.Command("wvSummary", inputFile.Name()).Output()
+		metaStr, err := exec.Command("wvSummary", f.Name()).Output()
 		if err != nil {
 			log.Println("wvSummary:", err)
 		}
@@ -67,7 +65,7 @@ func ConvertDoc(input io.Reader) (string, map[string]string) {
 		}
 		defer os.Remove(outputFile.Name())
 
-		err = exec.Command("wvText", inputFile.Name(), outputFile.Name()).Run()
+		err = exec.Command("wvText", f.Name(), outputFile.Name()).Run()
 		if err != nil {
 			log.Println("wvText:", err)
 		}
@@ -85,8 +83,8 @@ func ConvertDoc(input io.Reader) (string, map[string]string) {
 	meta := <-mc
 
 	if len(body) == 0 {
-		inputFile.Seek(0, 0)
-		return ConvertDocx(inputFile)
+		f.Seek(0, 0)
+		return ConvertDocx(f)
 	}
 	return body, meta
 }

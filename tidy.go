@@ -9,22 +9,20 @@ import (
 )
 
 // Errors & warnings are deliberately suppressed as tidy throws warnings very easily
-func Tidy(input io.Reader, xmlIn bool) ([]byte, error) {
-
-	// Save input to a file
-	inputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
+func Tidy(r io.Reader, xmlIn bool) ([]byte, error) {
+	f, err := ioutil.TempFile("/tmp", "sajari-convert-")
 	if err != nil {
 		log.Println("TempFile:", err)
 		return nil, err
 	}
-	defer os.Remove(inputFile.Name())
-	io.Copy(inputFile, input)
+	defer os.Remove(f.Name())
+	io.Copy(f, r)
 
 	var output []byte
 	if xmlIn {
-		output, err = exec.Command("tidy", "-xml", "-numeric", "-asxml", "-quiet", "-utf8", inputFile.Name()).Output()
+		output, err = exec.Command("tidy", "-xml", "-numeric", "-asxml", "-quiet", "-utf8", f.Name()).Output()
 	} else {
-		output, err = exec.Command("tidy", "-numeric", "-asxml", "-quiet", "-utf8", inputFile.Name()).Output()
+		output, err = exec.Command("tidy", "-numeric", "-asxml", "-quiet", "-utf8", f.Name()).Output()
 	}
 
 	if err != nil && err.Error() != "exit status 1" {

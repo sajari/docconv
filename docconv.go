@@ -59,42 +59,42 @@ func mimeTypeByExtension(filename string) string {
 }
 
 // Convert a file to plain text & meta data
-func convert(input io.Reader, mimeType string, readability bool) *Response {
+func convert(r io.Reader, mimeType string, readability bool) *Response {
 	start := time.Now()
 
 	var body string
 	var meta map[string]string
 	switch mimeType {
 	case "application/msword", "application/vnd.ms-word":
-		body, meta = ConvertDoc(input)
+		body, meta = ConvertDoc(r)
 
 	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-		body, meta = ConvertDocx(input)
+		body, meta = ConvertDocx(r)
 
 	case "application/vnd.oasis.opendocument.text":
-		body, meta = ConvertODT(input)
+		body, meta = ConvertODT(r)
 
 	case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
-		body, meta = ConvertPages(input)
+		body, meta = ConvertPages(r)
 
 	case "application/pdf":
-		body, meta = ConvertPDF(input)
+		body, meta = ConvertPDF(r)
 
 	case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
-		body, meta = ConvertRTF(input)
+		body, meta = ConvertRTF(r)
 
 	case "text/html":
-		body, meta = ConvertHTML(input, readability)
+		body, meta = ConvertHTML(r, readability)
 
 	case "text/url":
-		body, meta = ConvertURL(input, readability)
+		body, meta = ConvertURL(r, readability)
 
 	case "text/xml", "application/xml":
-		body, meta = ConvertXML(input)
+		body, meta = ConvertXML(r)
 
 	case "text/plain":
 		// TODO: Don't ignore the error.
-		b, _ := ioutil.ReadAll(input)
+		b, _ := ioutil.ReadAll(r)
 		body = string(b)
 	}
 

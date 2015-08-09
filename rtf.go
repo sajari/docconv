@@ -12,18 +12,18 @@ import (
 )
 
 // Convert RTF
-func ConvertRTF(input io.Reader) (string, map[string]string) {
+func ConvertRTF(r io.Reader) (string, map[string]string) {
 
-	// Save input to a file
-	inputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
+	// Save data to a file
+	f, err := ioutil.TempFile("/tmp", "sajari-convert-")
 	if err != nil {
 		log.Println("TempFile:", err)
 	}
-	defer os.Remove(inputFile.Name())
-	io.Copy(inputFile, input)
+	defer os.Remove(f.Name())
+	io.Copy(f, r)
 
 	var output string
-	tmpOutput, err := exec.Command("unrtf", "--nopict", "--text", inputFile.Name()).Output()
+	tmpOutput, err := exec.Command("unrtf", "--nopict", "--text", f.Name()).Output()
 	if err != nil {
 		log.Println("unrtf:", err)
 	}

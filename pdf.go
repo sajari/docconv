@@ -12,21 +12,21 @@ import (
 )
 
 // Convert PDF
-func ConvertPDF(input io.Reader) (string, map[string]string) {
+func ConvertPDF(r io.Reader) (string, map[string]string) {
 
-	// Save input to a file
-	inputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
+	// Save data to a file
+	f, err := ioutil.TempFile("/tmp", "sajari-convert-")
 	if err != nil {
 		log.Println("TempFile:", err)
 	}
-	defer os.Remove(inputFile.Name())
-	io.Copy(inputFile, input)
+	defer os.Remove(f.Name())
+	io.Copy(f, r)
 
 	// Meta data
 	mc := make(chan map[string]string, 1)
 	go func() {
 		meta := make(map[string]string)
-		metaStr, err := exec.Command("pdfinfo", inputFile.Name()).Output()
+		metaStr, err := exec.Command("pdfinfo", f.Name()).Output()
 		if err != nil {
 			log.Println("pdfinfo:", err)
 		}
@@ -60,7 +60,7 @@ func ConvertPDF(input io.Reader) (string, map[string]string) {
 	// Document body
 	bc := make(chan string, 1)
 	go func() {
-		body, err := exec.Command("pdftotext", "-q", "-nopgbrk", "-enc", "UTF-8", "-eol", "unix", inputFile.Name(), "-").Output()
+		body, err := exec.Command("pdftotext", "-q", "-nopgbrk", "-enc", "UTF-8", "-eol", "unix", f.Name(), "-").Output()
 		if err != nil {
 			log.Println("pdftotext:", err)
 		}

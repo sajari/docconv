@@ -11,22 +11,22 @@ import (
 )
 
 // Convert ODT to text
-func ConvertODT(input io.Reader) (string, map[string]string) {
+func ConvertODT(r io.Reader) (string, map[string]string) {
 	meta := make(map[string]string)
 	var textBody string
 
-	inputBytes, err := ioutil.ReadAll(input)
+	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Println("ioutil.ReadAll:", err)
 		return "", nil
 	}
-	r, err := zip.NewReader(bytes.NewReader(inputBytes), int64(len(inputBytes)))
+	zr, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
 	if err != nil {
 		log.Println("zip.NewReader:", err)
 		return "", nil
 	}
 
-	for _, f := range r.File {
+	for _, f := range zr.File {
 		if f.Name == "meta.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()

@@ -12,16 +12,16 @@ import (
 )
 
 // Convert DOCX to text
-func ConvertDocx(input io.Reader) (string, map[string]string) {
+func ConvertDocx(r io.Reader) (string, map[string]string) {
 	meta := make(map[string]string)
 	var textHeader, textBody, textFooter string
 
-	inputBytes, err := ioutil.ReadAll(input)
+	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Println("ioutil.ReadAll:", err)
 		return "", nil
 	}
-	r, err := zip.NewReader(bytes.NewReader(inputBytes), int64(len(inputBytes)))
+	zr, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
 	if err != nil {
 		log.Println("zip.NewReader:", err)
 		return "", nil
@@ -31,7 +31,7 @@ func ConvertDocx(input io.Reader) (string, map[string]string) {
 	reHeaderFile, _ := regexp.Compile("^word/header[0-9]+.xml$")
 	reFooterFile, _ := regexp.Compile("^word/footer[0-9]+.xml$")
 
-	for _, f := range r.File {
+	for _, f := range zr.File {
 		if f.Name == "docProps/core.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()
@@ -64,6 +64,6 @@ func ConvertDocx(input io.Reader) (string, map[string]string) {
 	return textHeader + "\n" + textBody + "\n" + textFooter, meta
 }
 
-func DocxXMLToText(input io.Reader) string {
-	return XMLToText(input, []string{"br", "p", "tab"}, []string{"instrText", "script"}, true)
+func DocxXMLToText(r io.Reader) string {
+	return XMLToText(r, []string{"br", "p", "tab"}, []string{"instrText", "script"}, true)
 }
