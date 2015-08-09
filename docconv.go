@@ -109,7 +109,7 @@ func main() {
 	flag.Parse()
 
 	if *inputPath != "" {
-		b, err := convertPath(*inputPath)
+		b, err := convertPath(*inputPath, false)
 		if err != nil {
 			log.Fatal("Cannot open file: ", err)
 		}
@@ -120,7 +120,7 @@ func main() {
 }
 
 // Convert a file given a path
-func convertPath(path string) ([]byte, error) {
+func convertPath(path string, readability bool) ([]byte, error) {
 	mimeType := mimeTypeByExtension(path)
 	if *logLevel >= 1 {
 		log.Println("Converting file: " + path + " (" + mimeType + ")")
@@ -134,7 +134,7 @@ func convertPath(path string) ([]byte, error) {
 	defer f.Close()
 
 	// TODO: Don't ignore this error.
-	b, _ := json.Marshal(convert(f, mimeType, false))
+	b, _ := json.Marshal(convert(f, mimeType, readability))
 	if *logLevel >= 2 {
 		log.Println(string(b))
 	}
@@ -144,6 +144,27 @@ func convertPath(path string) ([]byte, error) {
 // Start the conversion web service
 func serve() {
 	http.HandleFunc("/convert", func(w http.ResponseWriter, r *http.Request) {
+		// Readability flag. Currently only used for HTML
+		var readability bool
+		if r.FormValue("readability") == "1" {
+			readability = true
+			if *logLevel >= 2 {
+				log.Println("Readability is on")
+			}
+		}
+
+		path := r.FormValue("path")
+		if path != "" {
+			b, err := convertPath(path, readability)
+			if err != nil {
+				// TODO: return a sensible status code for errors like this.
+				log.Printf("error converting path '%v': %v", path, err)
+				return
+			}
+			w.Write(b)
+			return
+		}
+
 		// Get uploaded file
 		file, info, err := r.FormFile("input")
 		if err != nil {
@@ -166,15 +187,6 @@ func serve() {
 
 		if *logLevel >= 1 {
 			log.Println("Received file: " + info.Filename + " (" + mimeType + ")")
-		}
-
-		// Readability flag. Currently only used for HTML
-		var readability bool
-		if r.FormValue("readability") == "1" {
-			readability = true
-			if *logLevel >= 2 {
-				log.Println("Readability is on")
-			}
 		}
 
 		jsonStr, _ := json.Marshal(convert(file, mimeType, readability))
