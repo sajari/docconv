@@ -3,25 +3,23 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"os/exec"
 	"strings"
 	"time"
 )
 
 // Convert RTF
-func ConvertRTF(r io.Reader) (string, map[string]string) {
+func ConvertRTF(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {
-		log.Println("error creating local file:", err)
-		return "", nil
+		return "", nil, fmt.Errorf("error creating local file: %v", err)
 	}
 	defer f.Done()
 
 	var output string
 	tmpOutput, err := exec.Command("unrtf", "--nopict", "--text", f.Name()).Output()
 	if err != nil {
-		log.Println("unrtf:", err)
+		return "", nil, fmt.Errorf("unrtf error: %v", err)
 	}
 
 	// Step through content looking for meta data and stripping out comments
@@ -51,5 +49,5 @@ func ConvertRTF(r io.Reader) (string, map[string]string) {
 		}
 	}
 
-	return output, meta
+	return output, meta, nil
 }

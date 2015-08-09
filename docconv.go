@@ -82,7 +82,7 @@ func convert(r io.Reader, mimeType string, readability bool) *Response {
 		body, meta = ConvertPDF(r)
 
 	case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
-		body, meta = ConvertRTF(r)
+		body, meta, err = ConvertRTF(r)
 
 	case "text/html":
 		body, meta, err = ConvertHTML(r, readability)
