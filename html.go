@@ -12,25 +12,25 @@ import (
 )
 
 // Convert HTML
-func ConvertHTML(input io.Reader, readability bool) (string, map[string]string) {
+func ConvertHTML(r io.Reader, readability bool) (string, map[string]string) {
 	meta := make(map[string]string)
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(input)
+	buf.ReadFrom(r)
 
-	cleanXml, err := Tidy(buf, false)
+	cleanXML, err := Tidy(buf, false)
 	if err != nil {
 		log.Println("Tidy:", err)
 		// Tidy failed, so we now manually tokenize instead
 		clean := cleanHTML(buf, true)
-		cleanXml = []byte(clean)
+		cleanXML = []byte(clean)
 		log.Println("Cleaned HTML using Golang tokenizer")
 	}
 
 	if readability {
-		cleanXml = HtmlReadability(bytes.NewReader(cleanXml))
+		cleanXML = HTMLReadability(bytes.NewReader(cleanXML))
 	}
-	return Html2Text(bytes.NewReader(cleanXml)), meta
+	return HTMLToText(bytes.NewReader(cleanXML)), meta
 }
 
 // Tests for known friendly HTML parameters that tidy is unlikely to choke on
@@ -64,17 +64,6 @@ func cleanHTML(r io.Reader, all bool) string {
 			return output
 		}
 		token := d.Token()
-
-		// type Token struct {
-		//     Type     TokenType
-		//     DataAtom atom.Atom
-		//     Data     string
-		//     Attr     []Attribute
-		// }
-		//
-		// type Attribute struct {
-		//     Namespace, Key, Val string
-		// }
 
 		switch tokenType {
 		case html.StartTagToken: // <tag>
@@ -111,22 +100,17 @@ func cleanHTML(r io.Reader, all bool) string {
 }
 
 // Extract the readable text in an HTML document
-func HtmlReadability(input io.Reader) []byte {
+func HTMLReadability(r io.Reader) []byte {
+	jr := justext.NewReader(r)
+	jr.Stoplist = readabilityStopList
+	jr.LengthLow = *readabilityLengthLow
+	jr.LengthHigh = *readabilityLengthHigh
+	jr.StopwordsLow = *readabilityStopwordsLow
+	jr.StopwordsHigh = *readabilityStopwordsHigh
+	jr.MaxLinkDensity = *readabilityMaxLinkDensity
+	jr.MaxHeadingDistance = *readabilityMaxHeadingDistance
 
-	// Create a justext reader from another reader
-	reader := justext.NewReader(input)
-
-	// Configure the reader
-	reader.Stoplist = readabilityStopList
-	reader.LengthLow = *readabilityLengthLow
-	reader.LengthHigh = *readabilityLengthHigh
-	reader.StopwordsLow = *readabilityStopwordsLow
-	reader.StopwordsHigh = *readabilityStopwordsHigh
-	reader.MaxLinkDensity = *readabilityMaxLinkDensity
-	reader.MaxHeadingDistance = *readabilityMaxHeadingDistance
-
-	// Read from the reader to generate a paragraph set
-	paragraphSet, err := reader.ReadAll()
+	paragraphSet, err := jr.ReadAll()
 	if err != nil {
 		log.Println("Justext:", err)
 		return nil
@@ -146,7 +130,7 @@ func HtmlReadability(input io.Reader) []byte {
 	return []byte(output)
 }
 
-func Html2Text(input io.Reader) string {
+func HTMLToText(input io.Reader) string {
 	return XMLToText(input, []string{"br", "p", "h1", "h2", "h3", "h4"}, []string{}, false)
 }
 
