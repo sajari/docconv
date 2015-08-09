@@ -12,7 +12,7 @@ import (
 )
 
 // Convert PDF
-func ConvertPdf(input io.Reader) (string, map[string]string) {
+func ConvertPDF(input io.Reader) (string, map[string]string) {
 
 	// Save input to a file
 	inputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")

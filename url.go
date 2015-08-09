@@ -7,7 +7,7 @@ import (
 )
 
 // Convert URL
-func ConvertUrl(input io.Reader, readability bool) (string, map[string]string) {
+func ConvertURL(input io.Reader, readability bool) (string, map[string]string) {
 	meta := make(map[string]string)
 
 	buf := new(bytes.Buffer)

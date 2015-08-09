@@ -72,25 +72,25 @@ func convert(input io.Reader, mimeType string, readability bool) *Response {
 		body, meta = ConvertDocx(input)
 
 	case "application/vnd.oasis.opendocument.text":
-		body, meta = ConvertOdt(input)
+		body, meta = ConvertODT(input)
 
 	case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
 		body, meta = ConvertPages(input)
 
 	case "application/pdf":
-		body, meta = ConvertPdf(input)
+		body, meta = ConvertPDF(input)
 
 	case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
-		body, meta = ConvertRtf(input)
+		body, meta = ConvertRTF(input)
 
 	case "text/html":
-		body, meta = ConvertHtml(input, readability)
+		body, meta = ConvertHTML(input, readability)
 
 	case "text/url":
-		body, meta = ConvertUrl(input, readability)
+		body, meta = ConvertURL(input, readability)
 
 	case "text/xml", "application/xml":
-		body, meta = ConvertXml(input)
+		body, meta = ConvertXML(input)
 
 	case "text/plain":
 		// TODO: Don't ignore the error.

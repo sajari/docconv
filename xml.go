@@ -8,18 +8,18 @@ import (
 )
 
 // Convert XML input
-func ConvertXml(input io.Reader) (string, map[string]string) {
+func ConvertXML(input io.Reader) (string, map[string]string) {
 	meta := make(map[string]string)
 	cleanXml, err := Tidy(input, true)
 	if err != nil {
 		// TODO: Return error
 		log.Println("Tidy:", err)
 	}
-	return Xml2Text(bytes.NewReader(cleanXml), []string{}, []string{}, true), meta
+	return XMLToText(bytes.NewReader(cleanXml), []string{}, []string{}, true), meta
 }
 
 // Convert XML to plain text given how to treat elements
-func Xml2Text(r io.Reader, breaks []string, skip []string, strict bool) string {
+func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) string {
 	var result string
 
 	dec := xml.NewDecoder(r)
@@ -69,7 +69,7 @@ func Xml2Text(r io.Reader, breaks []string, skip []string, strict bool) string {
 }
 
 // Convert XML to a nested string map
-func Xml2Map(r io.Reader) map[string]string {
+func XMLToMap(r io.Reader) map[string]string {
 	m := make(map[string]string)
 	dec := xml.NewDecoder(r)
 	var tagName string

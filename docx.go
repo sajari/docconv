@@ -35,7 +35,7 @@ func ConvertDocx(input io.Reader) (string, map[string]string) {
 		if f.Name == "docProps/core.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()
-			info := Xml2Map(rc)
+			info := XMLToMap(rc)
 			if tmp, ok := info["modified"]; ok {
 				if t, err := time.Parse(time.RFC3339, tmp); err == nil {
 					meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
@@ -49,21 +49,21 @@ func ConvertDocx(input io.Reader) (string, map[string]string) {
 		} else if f.Name == "word/document.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()
-			textBody = DocxXml2Text(rc)
+			textBody = DocxXMLToText(rc)
 		} else if reHeaderFile.MatchString(f.Name) {
 			rc, _ := f.Open()
 			defer rc.Close()
-			textHeader += DocxXml2Text(rc) + "\n"
+			textHeader += DocxXMLToText(rc) + "\n"
 		} else if reFooterFile.MatchString(f.Name) {
 			rc, _ := f.Open()
 			defer rc.Close()
-			textFooter += DocxXml2Text(rc) + "\n"
+			textFooter += DocxXMLToText(rc) + "\n"
 		}
 	}
 
 	return textHeader + "\n" + textBody + "\n" + textFooter, meta
 }
 
-func DocxXml2Text(input io.Reader) string {
-	return Xml2Text(input, []string{"br", "p", "tab"}, []string{"instrText", "script"}, true)
+func DocxXMLToText(input io.Reader) string {
+	return XMLToText(input, []string{"br", "p", "tab"}, []string{"instrText", "script"}, true)
 }

@@ -11,7 +11,7 @@ import (
 )
 
 // Convert ODT to text
-func ConvertOdt(input io.Reader) (string, map[string]string) {
+func ConvertODT(input io.Reader) (string, map[string]string) {
 	meta := make(map[string]string)
 	var textBody string
 
@@ -30,7 +30,7 @@ func ConvertOdt(input io.Reader) (string, map[string]string) {
 		if f.Name == "meta.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()
-			info := Xml2Map(rc)
+			info := XMLToMap(rc)
 			if tmp, ok := info["creator"]; ok {
 				meta["Author"] = tmp
 			}
@@ -47,13 +47,9 @@ func ConvertOdt(input io.Reader) (string, map[string]string) {
 		} else if f.Name == "content.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()
-			textBody = OdtXml2Text(rc)
+			textBody = XMLToText(rc, []string{"br", "p", "tab"}, []string{}, true)
 		}
 	}
 
 	return textBody, meta
-}
-
-func OdtXml2Text(input io.Reader) string {
-	return Xml2Text(input, []string{"br", "p", "tab"}, []string{}, true)
 }

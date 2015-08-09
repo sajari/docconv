@@ -12,7 +12,7 @@ import (
 )
 
 // Convert RTF
-func ConvertRtf(input io.Reader) (string, map[string]string) {
+func ConvertRTF(input io.Reader) (string, map[string]string) {
 
 	// Save input to a file
 	inputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")

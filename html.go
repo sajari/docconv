@@ -12,7 +12,7 @@ import (
 )
 
 // Convert HTML
-func ConvertHtml(input io.Reader, readability bool) (string, map[string]string) {
+func ConvertHTML(input io.Reader, readability bool) (string, map[string]string) {
 	meta := make(map[string]string)
 
 	buf := new(bytes.Buffer)
@@ -147,7 +147,7 @@ func HtmlReadability(input io.Reader) []byte {
 }
 
 func Html2Text(input io.Reader) string {
-	return Xml2Text(input, []string{"br", "p", "h1", "h2", "h3", "h4"}, []string{}, false)
+	return XMLToText(input, []string{"br", "p", "h1", "h2", "h3", "h4"}, []string{}, false)
 }
 
 var readabilityStopList map[string]bool = map[string]bool{"and": true, "the": true, "a": true, "about": true, "above": true, "across": true, "after": true, "afterwards": true, "again": true, "against": true, "all": true, "almost": true, "alone": true,

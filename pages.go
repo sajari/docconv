@@ -38,13 +38,13 @@ func ConvertPages(input io.Reader) (string, map[string]string) {
 		if strings.HasSuffix(f.Name, "Preview.pdf") {
 			// There is a preview PDF version we can use
 			if rc, err := f.Open(); err == nil {
-				return ConvertPdf(rc)
+				return ConvertPDF(rc)
 			}
 		}
 		if f.Name == "index.xml" {
 			// There's an XML version we can use
 			if rc, err := f.Open(); err == nil {
-				return ConvertXml(rc)
+				return ConvertXML(rc)
 			}
 		}
 		if f.Name == "Index/Document.iwa" {
