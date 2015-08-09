@@ -33,11 +33,17 @@ func ConvertHTML(r io.Reader, readability bool) (string, map[string]string) {
 	return HTMLToText(bytes.NewReader(cleanXML)), meta
 }
 
+var acceptedHTMLTags = [...]string{
+	"div", "p", "br", "span", "body", "head", "html", "ul", "ol", "li", "dl", "dt", "dd", "a", "form", "article",
+	"section", "table", "tr", "td", "tbody", "thead", "th", "tfoot", "col", "colgroup", "caption", "form", "input",
+	"title", "h1", "h2", "h3", "h4", "h5", "h6", "meta", "strong", "cite", "em", "address", "abbr", "acronym",
+	"blockquote", "q", "pre", "samp", "select", "fieldset", "legend", "button", "option", "textarea", "label",
+}
+
 // Tests for known friendly HTML parameters that tidy is unlikely to choke on
-func acceptedHTML(str string) bool {
-	tags := []string{"div", "p", "br", "span", "body", "head", "html", "ul", "ol", "li", "dl", "dt", "dd", "a", "form", "article", "section", "table", "tr", "td", "tbody", "thead", "th", "tfoot", "col", "colgroup", "caption", "form", "input", "title", "h1", "h2", "h3", "h4", "h5", "h6", "meta", "strong", "cite", "em", "address", "abbr", "acronym", "blockquote", "q", "pre", "samp", "select", "fieldset", "legend", "button", "option", "textarea", "label"}
-	for _, tag := range tags {
-		if tag == str {
+func acceptedHTMLTag(tagName string) bool {
+	for _, tag := range acceptedHTMLTags {
+		if tag == tagName {
 			return true
 		}
 	}
@@ -48,15 +54,14 @@ func acceptedHTML(str string) bool {
 // Also removes made up tags, e.g. <fb:like>
 // Can keep head elements or not. Typically not much in there.
 func cleanHTML(r io.Reader, all bool) string {
-	d := html.NewTokenizer(r)
-
 	output := ""
 	if !all {
 		output = "<html><head></head>"
 	}
-	mainsection := false
-	junksection := false
+	mainSection := false
+	junkSection := false
 
+	d := html.NewTokenizer(r)
 	for {
 		// token type
 		tokenType := d.Next()
@@ -68,31 +73,31 @@ func cleanHTML(r io.Reader, all bool) string {
 		switch tokenType {
 		case html.StartTagToken: // <tag>
 			if token.Data == "body" || (token.Data == "html" && all) {
-				mainsection = true
+				mainSection = true
 			}
-			if !acceptedHTML(token.Data) {
-				junksection = true
+			if !acceptedHTMLTag(token.Data) {
+				junkSection = true
 			}
 
-			if !junksection && mainsection {
+			if !junkSection && mainSection {
 				output += "<" + token.Data + ">"
 			}
 
 		case html.TextToken: // text between start and end tag
-			if !junksection && mainsection {
+			if !junkSection && mainSection {
 				output += token.Data
 			}
 
 		case html.EndTagToken: // </tag>
-			if !junksection && mainsection {
+			if !junkSection && mainSection {
 				output += "</" + token.Data + ">"
 			}
-			if !acceptedHTML(token.Data) {
-				junksection = false
+			if !acceptedHTMLTag(token.Data) {
+				junkSection = false
 			}
 
 		case html.SelfClosingTagToken: // <tag/>
-			if !junksection && mainsection {
+			if !junkSection && mainSection {
 				output += "<" + token.Data + " />" // TODO: Can probably keep attributes from the meta tags
 			}
 		}
