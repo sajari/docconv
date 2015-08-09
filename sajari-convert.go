@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
+	"path"
 	"time"
 )
 
@@ -35,28 +35,25 @@ var (
 
 // Determine the mime type by the file's extension
 func mimeTypeByExtension(filename string) string {
-	reExtension, _ := regexp.Compile(".([a-z]+)$")
-	if matches := reExtension.FindAllStringSubmatch(filename, -1); len(matches) > 0 && len(matches[0]) > 1 {
-		switch matches[0][1] {
-		case "doc":
-			return "application/msword"
-		case "docx":
-			return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-		case "odt":
-			return "application/vnd.oasis.opendocument.text"
-		case "pages":
-			return "application/vnd.apple.pages"
-		case "pdf":
-			return "application/pdf"
-		case "rtf":
-			return "application/rtf"
-		case "xml":
-			return "text/xml"
-		case "xhtml", "html":
-			return "text/html"
-		case "txt":
-			return "text/plain"
-		}
+	switch path.Ext(filename) {
+	case ".doc":
+		return "application/msword"
+	case ".docx":
+		return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	case ".odt":
+		return "application/vnd.oasis.opendocument.text"
+	case ".pages":
+		return "application/vnd.apple.pages"
+	case ".pdf":
+		return "application/pdf"
+	case ".rtf":
+		return "application/rtf"
+	case ".xml":
+		return "text/xml"
+	case ".xhtml", ".html", ".htm":
+		return "text/html"
+	case ".txt":
+		return "text/plain"
 	}
 	return "application/octet-stream"
 }
