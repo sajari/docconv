@@ -35,8 +35,7 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 		if strings.HasSuffix(f.Name, "Preview.pdf") {
 			// There is a preview PDF version we can use
 			if rc, err := f.Open(); err == nil {
-				textBody, meta := ConvertPDF(rc)
-				return textBody, meta, nil
+				return ConvertPDF(rc)
 			}
 		}
 		if f.Name == "index.xml" {

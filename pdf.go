@@ -10,11 +10,10 @@ import (
 )
 
 // Convert PDF
-func ConvertPDF(r io.Reader) (string, map[string]string) {
+func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {
-		log.Println("error creating local file:", err)
-		return "", nil
+		return "", nil, fmt.Errorf("error creating local file: %v", err)
 	}
 	defer f.Done()
 
@@ -24,6 +23,7 @@ func ConvertPDF(r io.Reader) (string, map[string]string) {
 		meta := make(map[string]string)
 		metaStr, err := exec.Command("pdfinfo", f.Name()).Output()
 		if err != nil {
+			// TODO: Remove this.
 			log.Println("pdfinfo:", err)
 		}
 
@@ -58,10 +58,11 @@ func ConvertPDF(r io.Reader) (string, map[string]string) {
 	go func() {
 		body, err := exec.Command("pdftotext", "-q", "-nopgbrk", "-enc", "UTF-8", "-eol", "unix", f.Name(), "-").Output()
 		if err != nil {
+			// TODO: Remove this.
 			log.Println("pdftotext:", err)
 		}
 		bc <- string(body)
 	}()
 
-	return <-bc, <-mc
+	return <-bc, <-mc, nil
 }
