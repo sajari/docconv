@@ -76,7 +76,7 @@ func convert(r io.Reader, mimeType string, readability bool) *Response {
 		body, meta = ConvertODT(r)
 
 	case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
-		body, meta = ConvertPages(r)
+		body, meta, err = ConvertPages(r)
 
 	case "application/pdf":
 		body, meta = ConvertPDF(r)

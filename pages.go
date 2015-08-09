@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
@@ -18,27 +17,26 @@ import (
 )
 
 // Convert PAGES to text
-func ConvertPages(r io.Reader) (string, map[string]string) {
+func ConvertPages(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
-		log.Println("ioutil.ReadAll:", err)
-		return "", nil
+		return "", nil, fmt.Errorf("error reading data: %v", err)
 	}
 
 	zr, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
 	if err != nil {
-		log.Println("zip.NewReader:", err)
-		return "", nil
+		return "", nil, fmt.Errorf("error unzipping data: %v", err)
 	}
 
 	for _, f := range zr.File {
 		if strings.HasSuffix(f.Name, "Preview.pdf") {
 			// There is a preview PDF version we can use
 			if rc, err := f.Open(); err == nil {
-				return ConvertPDF(rc)
+				textBody, meta := ConvertPDF(rc)
+				return textBody, meta, nil
 			}
 		}
 		if f.Name == "index.xml" {
@@ -59,5 +57,5 @@ func ConvertPages(r io.Reader) (string, map[string]string) {
 		}
 	}
 
-	return textBody, meta
+	return textBody, meta, nil
 }
