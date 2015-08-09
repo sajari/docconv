@@ -52,8 +52,7 @@ func mimeTypeByExtension(filename string) string {
 			return "application/rtf"
 		case "xml":
 			return "text/xml"
-		case "xhtml":
-		case "html":
+		case "xhtml", "html":
 			return "text/html"
 		case "txt":
 			return "text/plain"
