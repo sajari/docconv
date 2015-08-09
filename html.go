@@ -136,7 +136,8 @@ func HTMLReadability(r io.Reader) []byte {
 }
 
 func HTMLToText(input io.Reader) string {
-	return XMLToText(input, []string{"br", "p", "h1", "h2", "h3", "h4"}, []string{}, false)
+	text, _ := XMLToText(input, []string{"br", "p", "h1", "h2", "h3", "h4"}, []string{}, false)
+	return text
 }
 
 var readabilityStopList map[string]bool = map[string]bool{"and": true, "the": true, "a": true, "about": true, "above": true, "across": true, "after": true, "afterwards": true, "again": true, "against": true, "all": true, "almost": true, "alone": true,

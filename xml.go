@@ -3,23 +3,26 @@ package main
 import (
 	"bytes"
 	"encoding/xml"
+	"fmt"
 	"io"
-	"log"
 )
 
 // Convert XML input
-func ConvertXML(input io.Reader) (string, map[string]string) {
+func ConvertXML(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
-	cleanXml, err := Tidy(input, true)
+	cleanXML, err := Tidy(r, true)
 	if err != nil {
-		// TODO: Return error
-		log.Println("Tidy:", err)
+		return "", nil, fmt.Errorf("tidy error: %v", err)
 	}
-	return XMLToText(bytes.NewReader(cleanXml), []string{}, []string{}, true), meta
+	result, err := XMLToText(bytes.NewReader(cleanXML), []string{}, []string{}, true)
+	if err != nil {
+		return "", nil, fmt.Errorf("error from XMLToText: %v", err)
+	}
+	return result, meta, nil
 }
 
 // Convert XML to plain text given how to treat elements
-func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) string {
+func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) (string, error) {
 	var result string
 
 	dec := xml.NewDecoder(r)
@@ -27,8 +30,10 @@ func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) string 
 	for {
 		t, err := dec.Token()
 		if err != nil {
-			// TODO: Handle non io.EOF error
-			break
+			if err == io.EOF {
+				break
+			}
+			return "", err
 		}
 
 		switch v := t.(type) {
@@ -46,8 +51,8 @@ func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) string 
 					for {
 						t, err := dec.Token()
 						if err != nil {
-							// TODO: Handle non io.EOF error
-							break
+							// An io.EOF here is actually an error.
+							return "", err
 						}
 
 						switch t.(type) {
@@ -65,7 +70,7 @@ func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) string 
 			}
 		}
 	}
-	return result
+	return result, nil
 }
 
 // Convert XML to a nested string map

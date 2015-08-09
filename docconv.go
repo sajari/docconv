@@ -64,6 +64,7 @@ func convert(r io.Reader, mimeType string, readability bool) *Response {
 
 	var body string
 	var meta map[string]string
+	var err error
 	switch mimeType {
 	case "application/msword", "application/vnd.ms-word":
 		body, meta = ConvertDoc(r)
@@ -90,12 +91,17 @@ func convert(r io.Reader, mimeType string, readability bool) *Response {
 		body, meta = ConvertURL(r, readability)
 
 	case "text/xml", "application/xml":
-		body, meta = ConvertXML(r)
+		body, meta, err = ConvertXML(r)
 
 	case "text/plain":
 		// TODO: Don't ignore the error.
 		b, _ := ioutil.ReadAll(r)
 		body = string(b)
+	}
+
+	if err != nil {
+		// TODO(dhowden): Don't log this, actually return it in the response.
+		log.Printf("could not convert file: %v", err)
 	}
 
 	return &Response{

@@ -47,7 +47,7 @@ func ConvertODT(r io.Reader) (string, map[string]string) {
 		} else if f.Name == "content.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()
-			textBody = XMLToText(rc, []string{"br", "p", "tab"}, []string{}, true)
+			textBody, _ = XMLToText(rc, []string{"br", "p", "tab"}, []string{}, true)
 		}
 	}
 

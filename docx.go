@@ -65,5 +65,6 @@ func ConvertDocx(r io.Reader) (string, map[string]string) {
 }
 
 func DocxXMLToText(r io.Reader) string {
-	return XMLToText(r, []string{"br", "p", "tab"}, []string{"instrText", "script"}, true)
+	result, _ := XMLToText(r, []string{"br", "p", "tab"}, []string{"instrText", "script"}, true)
+	return result
 }
