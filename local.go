@@ -7,8 +7,10 @@ import (
 	"os"
 )
 
+// LocalFile is a type which wraps an *os.File.  See NewLocalFile for more details.
 type LocalFile struct {
-	name   string
+	*os.File
+
 	unlink bool
 }
 
@@ -19,7 +21,7 @@ type LocalFile struct {
 func NewLocalFile(r io.Reader, dir, prefix string) (*LocalFile, error) {
 	if f, ok := r.(*os.File); ok {
 		return &LocalFile{
-			name: f.Name(),
+			File: f,
 		}, nil
 	}
 
@@ -28,25 +30,21 @@ func NewLocalFile(r io.Reader, dir, prefix string) (*LocalFile, error) {
 		return nil, fmt.Errorf("error creating temporary file: %v", err)
 	}
 	_, err = io.Copy(f, r)
-	f.Close()
 	if err != nil {
+		f.Close()
 		os.Remove(f.Name())
 		return nil, fmt.Errorf("error copying data into temporary file: %v", err)
 	}
 
 	return &LocalFile{
-		name:   f.Name(),
+		File:   f,
 		unlink: true,
 	}, nil
 }
 
-// Name returns the path to the file.
-func (l *LocalFile) Name() string {
-	return l.name
-}
-
 // Done cleans up all resources.
 func (l *LocalFile) Done() {
+	l.Close()
 	if l.unlink {
 		os.Remove(l.Name())
 	}
