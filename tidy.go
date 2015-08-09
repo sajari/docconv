@@ -3,7 +3,6 @@ package main
 import (
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 )
@@ -12,7 +11,6 @@ import (
 func Tidy(r io.Reader, xmlIn bool) ([]byte, error) {
 	f, err := ioutil.TempFile("/tmp", "sajari-convert-")
 	if err != nil {
-		log.Println("TempFile:", err)
 		return nil, err
 	}
 	defer os.Remove(f.Name())
