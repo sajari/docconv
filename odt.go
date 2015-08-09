@@ -30,7 +30,7 @@ func ConvertODT(r io.Reader) (string, map[string]string) {
 		if f.Name == "meta.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()
-			info := XMLToMap(rc)
+			info, _ := XMLToMap(rc)
 			if tmp, ok := info["creator"]; ok {
 				meta["Author"] = tmp
 			}

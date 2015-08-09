@@ -69,14 +69,17 @@ func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) string 
 }
 
 // Convert XML to a nested string map
-func XMLToMap(r io.Reader) map[string]string {
+func XMLToMap(r io.Reader) (map[string]string, error) {
 	m := make(map[string]string)
 	dec := xml.NewDecoder(r)
 	var tagName string
 	for {
 		t, err := dec.Token()
 		if err != nil {
-			break
+			if err == io.EOF {
+				break
+			}
+			return nil, err
 		}
 
 		switch v := t.(type) {
@@ -86,5 +89,5 @@ func XMLToMap(r io.Reader) map[string]string {
 			m[tagName] = string(v)
 		}
 	}
-	return m
+	return m, nil
 }

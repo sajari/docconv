@@ -35,7 +35,7 @@ func ConvertDocx(r io.Reader) (string, map[string]string) {
 		if f.Name == "docProps/core.xml" {
 			rc, _ := f.Open()
 			defer rc.Close()
-			info := XMLToMap(rc)
+			info, _ := XMLToMap(rc)
 			if tmp, ok := info["modified"]; ok {
 				if t, err := time.Parse(time.RFC3339, tmp); err == nil {
 					meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
