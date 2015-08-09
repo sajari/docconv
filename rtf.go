@@ -3,9 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -13,14 +11,12 @@ import (
 
 // Convert RTF
 func ConvertRTF(r io.Reader) (string, map[string]string) {
-
-	// Save data to a file
-	f, err := ioutil.TempFile("/tmp", "sajari-convert-")
+	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {
-		log.Println("TempFile:", err)
+		log.Println("error creating local file:", err)
+		return "", nil
 	}
-	defer os.Remove(f.Name())
-	io.Copy(f, r)
+	defer f.Done()
 
 	var output string
 	tmpOutput, err := exec.Command("unrtf", "--nopict", "--text", f.Name()).Output()
