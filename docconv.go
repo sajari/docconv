@@ -94,8 +94,8 @@ func convert(r io.Reader, mimeType string, readability bool) *Response {
 		body, meta, err = ConvertXML(r)
 
 	case "text/plain":
-		// TODO: Don't ignore the error.
-		b, _ := ioutil.ReadAll(r)
+		var b []byte
+		b, err = ioutil.ReadAll(r)
 		body = string(b)
 	}
 
