@@ -1,4 +1,4 @@
-package main
+package docconv
 
 import (
 	"bytes"
@@ -108,16 +108,33 @@ func cleanHTML(r io.Reader, all bool) string {
 	}
 }
 
+// HTMLReadabilityOptions is a type which defines parameters that are passed to the justext paackage.
+// TODO: Improve this!
+type HTMLReadabilityOptions struct {
+	LengthLow             int
+	LengthHigh            int
+	StopwordsLow          float64
+	StopwordsHigh         float64
+	MaxLinkDensity        float64
+	MaxHeadingDistance    int
+	ReadabilityUseClasses string
+}
+
+// TODO: Remove this from global state.
+var HTMLReadabilityOptionsValues HTMLReadabilityOptions
+
 // Extract the readable text in an HTML document
 func HTMLReadability(r io.Reader) []byte {
 	jr := justext.NewReader(r)
+
+	// TODO: Improve this!
 	jr.Stoplist = readabilityStopList
-	jr.LengthLow = *readabilityLengthLow
-	jr.LengthHigh = *readabilityLengthHigh
-	jr.StopwordsLow = *readabilityStopwordsLow
-	jr.StopwordsHigh = *readabilityStopwordsHigh
-	jr.MaxLinkDensity = *readabilityMaxLinkDensity
-	jr.MaxHeadingDistance = *readabilityMaxHeadingDistance
+	jr.LengthLow = HTMLReadabilityOptionsValues.LengthLow
+	jr.LengthHigh = HTMLReadabilityOptionsValues.LengthHigh
+	jr.StopwordsLow = HTMLReadabilityOptionsValues.StopwordsLow
+	jr.StopwordsHigh = HTMLReadabilityOptionsValues.StopwordsHigh
+	jr.MaxLinkDensity = HTMLReadabilityOptionsValues.MaxLinkDensity
+	jr.MaxHeadingDistance = HTMLReadabilityOptionsValues.MaxHeadingDistance
 
 	paragraphSet, err := jr.ReadAll()
 	if err != nil {
@@ -125,7 +142,7 @@ func HTMLReadability(r io.Reader) []byte {
 		return nil
 	}
 
-	useClasses := strings.SplitN(*readabilityUseClasses, ",", 10)
+	useClasses := strings.SplitN(HTMLReadabilityOptionsValues.ReadabilityUseClasses, ",", 10)
 
 	var output string = ""
 	for _, paragraph := range paragraphSet {

@@ -1,4 +1,4 @@
-package main
+package docconv
 
 import (
 	"fmt"
