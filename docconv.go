@@ -86,6 +86,9 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 	case "text/xml", "application/xml":
 		body, meta, err = ConvertXML(r)
 
+	case "image/jpeg", "image/png", "image/tif", "image/tiff":
+		body, meta, err = ConvertImage(r)
+
 	case "text/plain":
 		var b []byte
 		b, err = ioutil.ReadAll(r)
