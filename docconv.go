@@ -36,6 +36,14 @@ func MimeTypeByExtension(filename string) string {
 		return "text/xml"
 	case ".xhtml", ".html", ".htm":
 		return "text/html"
+	case ".jpg", ".jpeg", ".jpe", ".jfif", ".jfif-tbnl":
+		return "image/jpeg"
+	case ".png":
+		return "image/png"
+	case ".tif":
+		return "image/tif"
+	case ".tiff":
+		return "image/tiff"
 	case ".txt":
 		return "text/plain"
 	}
@@ -77,6 +85,9 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 
 	case "text/xml", "application/xml":
 		body, meta, err = ConvertXML(r)
+
+	case "image/jpeg", "image/png", "image/tif", "image/tiff":
+		body, meta, err = ConvertImage(r)
 
 	case "text/plain":
 		var b []byte
