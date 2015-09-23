@@ -36,6 +36,14 @@ func MimeTypeByExtension(filename string) string {
 		return "text/xml"
 	case ".xhtml", ".html", ".htm":
 		return "text/html"
+	case ".jpg", ".jpeg", ".jpe", ".jfif", ".jfif-tbnl":
+		return "image/jpeg"
+	case ".png":
+		return "image/png"
+	case ".tif":
+		return "image/tif"
+	case ".tiff":
+		return "image/tiff"
 	case ".txt":
 		return "text/plain"
 	}
