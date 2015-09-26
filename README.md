@@ -1,29 +1,39 @@
 # docconv
 
-A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, PAGES, etc to plain text.
+A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, Pages documents and images (see optional dependneices below) to plain text.
 
-The compiled binary runs as either 
-a) a service on port 8888 (by default)
+The `docconv` tool runs as either
 
-Documents can be sent as a multipart POST request and the plain text (body) and meta information are then returned as a JSON object
+1. a service on port 8888 (by default)
 
-b) via the command line. 
+   Documents can be sent as a multipart POST request and the plain text (body) and meta information are then returned as a JSON object
 
-Documents can be sent as an argument, e.g. 
+2. via the command line.
 
-```./docconv -input=document.pdf```
+   Documents can be sent as an argument, e.g.
 
-### Dependencies
-tidy, wv, popplerutils, unrtf, github.com/JalfResi/justext
+   ```./docconv -input document.pdf```
+
+## Dependencies
+tidy, wv, popplerutils, unrtf, https://github.com/JalfResi/justext
 
 Example install of dependencies (not all systems):
 
-```sudo apt-get install poppler-utils wv unrtf tidy``` 
-```go get github.com/JalfResi/justext``` 
+    $ sudo apt-get install poppler-utils wv unrtf tidy
+    $ go get github.com/JalfResi/justext
 
-### Optional Flags
- - "addr" - the port to listen on, default is "8888"
- - "log-level" - can be 0, 1 or 2. Levels described below
+### Optional Dependencies
+
+To add image support to `docconv`, you first need to install and build https://github.com/otiai10/gosseract.  Now you can add `-tags ocr` to any `go` command when building/fetching `docconv` to include support for processing images:
+
+    $ go get -tags ocr github.com/sajari/docconv/...
+
+## Optional Flags
+ - "addr" - the bind address for the HTTP server, default is ":8888"
+ - "log-level"
+    - 0: errors & critical info
+    - 1: inclues 0 and logs each request as well
+    - 2: include 1 and logs the response payloads
  - "readability-length-low" - Sets the readability length low if the ?readability=1 parameter is set
  - "readability-length-high" - Sets the readability length high if the ?readability=1 parameter is set
  - "readability-stopwords-low" - Sets the readability stopwords low if the ?readability=1 parameter is set
@@ -32,26 +42,15 @@ Example install of dependencies (not all systems):
  - "readability-max-heading-distance" - Sets the readability max heading distance if the ?readability=1 parameter is set
  - "readability-use-classes - Comma separated list of readability classes to use if the ?readability=1 parameter is set
 
-##### Log levels
- - "0" - will only log errors & critical info
- - "1" - will log each request as well
- - "2" - will also log the response payloads
-
 ### How to start the service
-```./docconv -log-level=0   # will only log errors & critical info ```
+```./docconv -log-level 0   # will only log errors & critical info ```
 
-```./docconv -addr=8000 -log-level=1   # will run on port 8000 and log each request as well ```
+```./docconv -addr 8000 -log-level 1   # will run on port 8000 and log each request as well ```
 
 ## FAQ
 
 ### How to install?
 Compile the binary. Check the binary is executable and then launch as per above with relevant flag settings.
-
-### Why run as a service?
-You don't have to, you can import the pkg directly. However, if you have a large memory footprint (many GB) you may have trouble with memory forking caused by underlying Go functions when accessing the above mentioned dependencies. 
-
-### How to ensure the service stays running?
-This is an operating system question, but we use "upstart"
 
 ### Any sample code on how to call the service?
 Some basic code is shown below, but normally you would accept the file by http or open it from the file system. It should be enough to get you started though...
@@ -60,7 +59,7 @@ Some basic code is shown below, but normally you would accept the file by http o
 package main
 
 import (
-    "encoding/json"
+	"encoding/json"
 	"io/ioutil"
 	"bytes"
 	"net/http"
@@ -100,7 +99,7 @@ func ConvertData(input []byte, mimeType string) ([]byte, map[string]string, erro
 	  return nil, nil, err
 	}
 	client := &http.Client{}
-	
+
 	request, err := http.NewRequest("POST", convertUrl, body)
 	if err != nil {
 		return nil, nil, err
