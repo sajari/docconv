@@ -1,3 +1,5 @@
+// +build ocr
+
 package docconv
 
 import (
