@@ -3,11 +3,90 @@ package docconv
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 )
+
+func compareExt(ext string, exts []string) bool {
+	for _, e := range exts {
+		if ext == e {
+			return true
+		}
+	}
+	return false
+}
+
+func PdfImages(path string) (string, map[string]string, error) {
+
+	tmp, err := ioutil.TempDir("/tmp", "tmp-imgs-")
+	if err != nil {
+		log.Println(err)
+		return "", nil, err
+	}
+	tmpDir := fmt.Sprintf("%s/", tmp)
+	defer os.RemoveAll(tmpDir)
+
+	cmd := "pdfimages -j %s %s"
+	_, err = exec.Command("bash", "-c", fmt.Sprintf(cmd, path, tmpDir)).Output()
+	if err != nil {
+		log.Println(err)
+		return "", nil, err
+	}
+
+	files := []string{}
+	m := make(map[int]string)
+
+	walkFunc := func(path string, info os.FileInfo, err error) error {
+		path, err = filepath.Abs(path)
+		if err != nil {
+			return err
+		}
+
+		exts := []string{".jpg", ".tif", ".tiff", ".png"}
+		if compareExt(filepath.Ext(path), exts) == true {
+			files = append(files, path)
+		}
+		return nil
+	}
+
+	filepath.Walk(tmpDir, walkFunc)
+
+	for indx, p := range files {
+		f, err := os.Open(p)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		out, _, _ := ConvertImage(f)
+		m[indx] = out
+		f.Close()
+	}
+	o := make([]string, len(m))
+	for i := 0; i < len(m); i++ {
+		o = append(o, m[i])
+	}
+
+	return strings.Join(o, " "), nil, nil
+}
+
+// PdfHasImage verify if `path` (PDF) has images
+func PdfHasImage(path string) bool {
+	cmd := "pdffonts -l 5 %s | tail -n +3 | cut -d' ' -f1 | sort | uniq"
+	out, err := exec.Command("bash", "-c", fmt.Sprintf(cmd, path)).Output()
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	if string(out) == "" {
+		return true
+	}
+	return false
+}
 
 // Convert PDF
 func ConvertPDF(r io.Reader) (string, map[string]string, error) {
@@ -16,6 +95,11 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 		return "", nil, fmt.Errorf("error creating local file: %v", err)
 	}
 	defer f.Done()
+
+	// Verify if pdf has images or is pdf only-text
+	if PdfHasImage(f.Name()) == true {
+		return PdfImages(f.Name())
+	}
 
 	// Meta data
 	mc := make(chan map[string]string, 1)
@@ -52,7 +136,6 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 
 		mc <- meta
 	}()
-
 	// Document body
 	bc := make(chan string, 1)
 	go func() {
