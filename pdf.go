@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -22,7 +23,6 @@ func compareExt(ext string, exts []string) bool {
 }
 
 func PdfImages(path string) (string, map[string]string, error) {
-
 	tmp, err := ioutil.TempDir("/tmp", "tmp-imgs-")
 	if err != nil {
 		log.Println(err)
@@ -31,8 +31,7 @@ func PdfImages(path string) (string, map[string]string, error) {
 	tmpDir := fmt.Sprintf("%s/", tmp)
 	defer os.RemoveAll(tmpDir)
 
-	cmd := "pdfimages -j %s %s"
-	_, err = exec.Command("bash", "-c", fmt.Sprintf(cmd, path, tmpDir)).Output()
+	_, err = exec.Command("pdfimages", "-j", path, tmpDir).Output()
 	if err != nil {
 		log.Println(err)
 		return "", nil, err
@@ -53,24 +52,28 @@ func PdfImages(path string) (string, map[string]string, error) {
 		}
 		return nil
 	}
-
 	filepath.Walk(tmpDir, walkFunc)
 
+	var wg sync.WaitGroup
+	wg.Add(len(files))
 	for indx, p := range files {
-		f, err := os.Open(p)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		out, _, _ := ConvertImage(f)
-		m[indx] = out
-		f.Close()
+		go func(idx int, pathFile string, m map[int]string, ww *sync.WaitGroup) {
+			defer ww.Done()
+			f, err := os.Open(pathFile)
+			if err != nil {
+				log.Println(err)
+			}
+			out, _, _ := ConvertImage(f)
+			m[idx] = out
+			f.Close()
+		}(indx, p, m, &wg)
 	}
+	wg.Wait()
+
 	o := make([]string, len(m))
 	for i := 0; i < len(m); i++ {
 		o = append(o, m[i])
 	}
-
 	return strings.Join(o, " "), nil, nil
 }
 
