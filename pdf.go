@@ -13,6 +13,10 @@ import (
 	"time"
 )
 
+var (
+	exts = []string{".jpg", ".tif", ".tiff", ".png"}
+)
+
 func compareExt(ext string, exts []string) bool {
 	for _, e := range exts {
 		if ext == e {
@@ -22,7 +26,7 @@ func compareExt(ext string, exts []string) bool {
 	return false
 }
 
-func PdfImages(path string) (string, map[string]string, error) {
+func PDFImages(path string) (string, map[string]string, error) {
 	tmp, err := ioutil.TempDir("/tmp", "tmp-imgs-")
 	if err != nil {
 		log.Println(err)
@@ -33,7 +37,6 @@ func PdfImages(path string) (string, map[string]string, error) {
 
 	_, err = exec.Command("pdfimages", "-j", path, tmpDir).Output()
 	if err != nil {
-		log.Println(err)
 		return "", nil, err
 	}
 
@@ -46,7 +49,6 @@ func PdfImages(path string) (string, map[string]string, error) {
 			return err
 		}
 
-		exts := []string{".jpg", ".tif", ".tiff", ".png"}
 		if compareExt(filepath.Ext(path), exts) == true {
 			files = append(files, path)
 		}
@@ -63,7 +65,10 @@ func PdfImages(path string) (string, map[string]string, error) {
 			if err != nil {
 				log.Println(err)
 			}
-			out, _, _ := ConvertImage(f)
+			out, _, err := ConvertImage(f)
+			if err != nil {
+				log.Println(err)
+			}
 			m[idx] = out
 			f.Close()
 		}(indx, p, m, &wg)
@@ -78,7 +83,7 @@ func PdfImages(path string) (string, map[string]string, error) {
 }
 
 // PdfHasImage verify if `path` (PDF) has images
-func PdfHasImage(path string) bool {
+func PDFHasImage(path string) bool {
 	cmd := "pdffonts -l 5 %s | tail -n +3 | cut -d' ' -f1 | sort | uniq"
 	out, err := exec.Command("bash", "-c", fmt.Sprintf(cmd, path)).Output()
 	if err != nil {
@@ -100,8 +105,8 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 	defer f.Done()
 
 	// Verify if pdf has images or is pdf only-text
-	if PdfHasImage(f.Name()) == true {
-		return PdfImages(f.Name())
+	if PDFHasImage(f.Name()) {
+		return PDFImages(f.Name())
 	}
 
 	// Meta data
