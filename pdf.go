@@ -39,7 +39,6 @@ func compareExt(ext string, exts []string) bool {
 }
 
 func PDFImages(path string) (string, map[string]string, error) {
-	log.Println("Running with PDFImages")
 	tmp, err := ioutil.TempDir("/tmp", "tmp-imgs-")
 	if err != nil {
 		log.Println(err)
@@ -70,6 +69,8 @@ func PDFImages(path string) (string, map[string]string, error) {
 	filepath.Walk(tmpDir, walkFunc)
 
 	var wg sync.WaitGroup
+	mt := &sync.Mutex{}
+
 	wg.Add(len(files))
 	for indx, p := range files {
 		go func(idx int, pathFile string, m *[]PagePDF, ww *sync.WaitGroup) {
@@ -85,7 +86,11 @@ func PDFImages(path string) (string, map[string]string, error) {
 			var p PagePDF
 			p.NumPage = idx
 			p.Page = out
+
+			mt.Lock()
 			*m = append(*m, p)
+			mt.Unlock()
+
 			f.Close()
 		}(indx, p, &m, &wg)
 	}
