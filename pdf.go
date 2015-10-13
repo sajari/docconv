@@ -11,11 +11,23 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"sort"
 )
 
 var (
 	exts = []string{".jpg", ".tif", ".tiff", ".png"}
 )
+
+type PagePDF struct {
+	NumPage int
+	Page    string
+}
+
+type ByPage []PagePDF
+
+func (a ByPage) Len() int           { return len(a) }
+func (a ByPage) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByPage) Less(i, j int) bool { return a[i].NumPage < a[j].NumPage }
 
 func compareExt(ext string, exts []string) bool {
 	for _, e := range exts {
@@ -27,6 +39,7 @@ func compareExt(ext string, exts []string) bool {
 }
 
 func PDFImages(path string) (string, map[string]string, error) {
+	log.Println("Running with PDFImages")
 	tmp, err := ioutil.TempDir("/tmp", "tmp-imgs-")
 	if err != nil {
 		log.Println(err)
@@ -41,7 +54,7 @@ func PDFImages(path string) (string, map[string]string, error) {
 	}
 
 	files := []string{}
-	m := make(map[int]string)
+	m := []PagePDF{}
 
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		path, err = filepath.Abs(path)
@@ -59,7 +72,7 @@ func PDFImages(path string) (string, map[string]string, error) {
 	var wg sync.WaitGroup
 	wg.Add(len(files))
 	for indx, p := range files {
-		go func(idx int, pathFile string, m map[int]string, ww *sync.WaitGroup) {
+		go func(idx int, pathFile string, m *[]PagePDF, ww *sync.WaitGroup) {
 			defer ww.Done()
 			f, err := os.Open(pathFile)
 			if err != nil {
@@ -69,16 +82,23 @@ func PDFImages(path string) (string, map[string]string, error) {
 			if err != nil {
 				log.Println(err)
 			}
-			m[idx] = out
+			var p PagePDF
+			p.NumPage = idx
+			p.Page = out
+			*m = append(*m, p)
 			f.Close()
-		}(indx, p, m, &wg)
+		}(indx, p, &m, &wg)
 	}
 	wg.Wait()
 
 	o := make([]string, len(m))
-	for i := 0; i < len(m); i++ {
-		o = append(o, m[i])
+
+	sort.Sort(ByPage(m))
+
+	for _, sPdf := range m {
+		o = append(o, sPdf.Page)
 	}
+
 	return strings.Join(o, " "), nil, nil
 }
 
