@@ -18,16 +18,9 @@ var (
 	exts = []string{".jpg", ".tif", ".tiff", ".png"}
 )
 
-type PagePDF struct {
-	NumPage int
-	Page    string
+var pdfMutex struct {
+	sync.Mutex
 }
-
-type ByPage []PagePDF
-
-func (a ByPage) Len() int           { return len(a) }
-func (a ByPage) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByPage) Less(i, j int) bool { return a[i].NumPage < a[j].NumPage }
 
 func compareExt(ext string, exts []string) bool {
 	for _, e := range exts {
@@ -69,11 +62,11 @@ func PDFImages(path string) (string, map[string]string, error) {
 	filepath.Walk(tmpDir, walkFunc)
 
 	var wg sync.WaitGroup
-	mt := &sync.Mutex{}
+	m := make(map[int]string)
 
 	wg.Add(len(files))
 	for indx, p := range files {
-		go func(idx int, pathFile string, m *[]PagePDF, ww *sync.WaitGroup) {
+		go func(idx int, pathFile string, m map[int]string, ww *sync.WaitGroup) {
 			defer ww.Done()
 			f, err := os.Open(pathFile)
 			if err != nil {
@@ -83,25 +76,20 @@ func PDFImages(path string) (string, map[string]string, error) {
 			if err != nil {
 				log.Println(err)
 			}
-			var p PagePDF
-			p.NumPage = idx
-			p.Page = out
 
-			mt.Lock()
-			*m = append(*m, p)
-			mt.Unlock()
+			pdfMutex.Lock()
+			m[idx] = out
+			pdfMutex.Unlock()
 
 			f.Close()
-		}(indx, p, &m, &wg)
+		}(indx, p, m, &wg)
 	}
 	wg.Wait()
 
 	o := make([]string, len(m))
 
-	sort.Sort(ByPage(m))
-
-	for _, sPdf := range m {
-		o = append(o, sPdf.Page)
+	for i := 0; i < len(m); i++ {
+		o = append(o, m[i])
 	}
 
 	return strings.Join(o, " "), nil, nil
