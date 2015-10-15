@@ -11,7 +11,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"sort"
 )
 
 var (
@@ -46,7 +45,6 @@ func PDFImages(path string) (string, map[string]string, error) {
 	}
 
 	files := []string{}
-	m := []PagePDF{}
 
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		path, err = filepath.Abs(path)
