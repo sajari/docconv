@@ -17,7 +17,7 @@ func ConvertURL(input io.Reader, readability bool) (string, map[string]string, e
 	}
 
 	g := goose.New()
-	article := g.ExtractFromUrl(buf.String())
+	article := g.ExtractFromURL(buf.String())
 
 	meta["title"] = article.Title
 	meta["description"] = article.MetaDescription
