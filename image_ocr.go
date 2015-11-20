@@ -9,6 +9,8 @@ import (
 	"github.com/otiai10/gosseract"
 )
 
+var languages = "eng"
+
 func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {
@@ -19,9 +21,15 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	out := make(chan string, 1)
 	go func(file *LocalFile) {
-		body := gosseract.Must(gosseract.Params{Src: file.Name()})
+		fmt.Println(languages)
+		body := gosseract.Must(gosseract.Params{Src: file.Name(), Languages: languages})
 		out <- string(body)
 	}(f)
 
 	return <-out, meta, nil
 }
+
+func SetLanguages(l string) {
+	languages = l
+}
+

@@ -2,8 +2,9 @@ package docconv
 
 import (
 	"bytes"
-	"github.com/advancedlogic/GoOse"
 	"io"
+
+	"github.com/advancedlogic/GoOse"
 )
 
 // Convert URL
