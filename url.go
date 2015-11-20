@@ -2,8 +2,9 @@ package docconv
 
 import (
 	"bytes"
-	"github.com/advancedlogic/GoOse"
 	"io"
+
+	"github.com/advancedlogic/GoOse"
 )
 
 // Convert URL
@@ -17,7 +18,7 @@ func ConvertURL(input io.Reader, readability bool) (string, map[string]string, e
 	}
 
 	g := goose.New()
-	article := g.ExtractFromUrl(buf.String())
+	article := g.ExtractFromURL(buf.String())
 
 	meta["title"] = article.Title
 	meta["description"] = article.MetaDescription
