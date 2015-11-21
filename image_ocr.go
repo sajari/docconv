@@ -5,11 +5,15 @@ package docconv
 import (
 	"fmt"
 	"io"
+	"sync"
 
 	"github.com/otiai10/gosseract"
 )
 
-var languages = "eng"
+var languages = struct {
+	sync.RWMutex
+	lang string
+}{lang: "eng"}
 
 func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
@@ -21,8 +25,9 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	out := make(chan string, 1)
 	go func(file *LocalFile) {
-		fmt.Println(languages)
-		body := gosseract.Must(gosseract.Params{Src: file.Name(), Languages: languages})
+		languages.RLock()
+		body := gosseract.Must(gosseract.Params{Src: file.Name(), Languages: languages.lang})
+		languages.RUnlock()
 		out <- string(body)
 	}(f)
 
@@ -30,6 +35,8 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 }
 
 func SetLanguages(l string) {
-	languages = l
-}
+	languages.Lock()
+	languages.lang = l
+	languages.Unlock()
 
+}
