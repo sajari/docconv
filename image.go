@@ -1,4 +1,4 @@
-// build !ocr
+// +build !ocr
 
 package docconv
 
@@ -9,4 +9,7 @@ import (
 
 func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	return "", nil, fmt.Errorf("docconv not built with `ocr` build tag")
+}
+
+func SetLanguages(l string) {
 }
