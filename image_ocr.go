@@ -24,6 +24,8 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 
 	meta := make(map[string]string)
 	out := make(chan string, 1)
+
+	// TODO: Why is this done in a separate goroutine when ConvertImage blocks until it returns?
 	go func(file *LocalFile) {
 		langs.RLock()
 		body := gosseract.Must(gosseract.Params{Src: file.Name(), Languages: langs.lang})
