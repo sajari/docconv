@@ -38,5 +38,4 @@ func SetLanguages(l string) {
 	languages.Lock()
 	languages.lang = l
 	languages.Unlock()
-
 }
