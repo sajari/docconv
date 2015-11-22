@@ -34,8 +34,8 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	return <-out, meta, nil
 }
 
-func SetLanguages(l string) {
 	languages.Lock()
 	languages.lang = l
 	languages.Unlock()
+func SetImageLanguages(l string) {
 }
