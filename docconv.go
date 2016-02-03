@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -19,7 +20,7 @@ type Response struct {
 
 // Determine the mime type by the file's extension
 func MimeTypeByExtension(filename string) string {
-	switch path.Ext(filename) {
+	switch strings.ToLower(path.Ext(filename)) {
 	case ".doc":
 		return "application/msword"
 	case ".docx":
