@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/nuveo/docconv"
+	"github.com/sajari/docconv"
 )
 
 // Response payload sent back to the requestor
