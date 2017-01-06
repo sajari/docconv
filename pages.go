@@ -12,8 +12,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/poorny/docconv/iWork"
-	"github.com/poorny/docconv/snappy"
+	"github.com/nuveo/docconv/iWork"
+	"github.com/nuveo/docconv/snappy"
 )
 
 // Convert PAGES to text
