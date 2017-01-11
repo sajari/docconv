@@ -29,23 +29,25 @@ func ConvertXLS(r io.Reader) (string, map[string]string, error) {
 	meta["ModifiedDate"] = fmt.Sprintf("%d", fileStat.ModTime().Unix())
 
 	// Document body
-	// TODO: find out why the order isn't being respected
 	var body string
 	for i := 0; i < w.NumSheets(); i++ {
-		for _, row := range w.GetSheet(i).Rows {
+		for j := 0; j <= int(w.GetSheet(i).MaxRow); j++ {
+			row := w.GetSheet(i).Rows[uint16(j)]
 			r := make([]string, 0)
-			for _, j := range row.Cols {
-				if uint16(len(r)) <= j.LastCol() {
-					r = append(r, make([]string, j.LastCol()-uint16(len(r))+1)...)
+			for _, col := range row.Cols {
+				if uint16(len(r)) <= col.LastCol() {
+					r = append(r, make([]string, col.LastCol()-uint16(len(r))+1)...)
 				}
-				str := j.String(w)
-				for k := uint16(0); k < j.LastCol()-j.FirstCol()+1; k++ {
-					r[j.FirstCol()+k] = str[k]
+				str := col.String(w)
+				for k := uint16(0); k < col.LastCol()-col.FirstCol()+1; k++ {
+					r[col.FirstCol()+k] = str[k]
 				}
 			}
 
 			body += strings.Join(r[:], ",")
-			body += "\n"
+			if j < int(w.GetSheet(i).MaxRow) {
+				body += "\n"
+			}
 		}
 	}
 
