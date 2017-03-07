@@ -35,7 +35,7 @@ func ConvertXLS(r io.Reader) (string, map[string]string, error) {
 		for j := 0; j <= int(w.GetSheet(i).MaxRow); j++ {
 			row := w.GetSheet(i).Row(j)
 			r := make([]string, 0)
-			for k := row.FirstCol(); k == row.LastCol(); k++ {
+			for k := row.FirstCol(); k <= row.LastCol(); k++ {
 				col := row.Col(i)
 				r = append(r, col)
 			}
