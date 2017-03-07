@@ -1,0 +1,91 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "oQCJ4dRkQ9ynMydNoBBOP1U9Ifs=",
+			"path": "github.com/JalfResi/justext",
+			"revision": "363c8d476a3acf372397b9c0ebda8fdcf5252037",
+			"revisionTime": "2016-11-17T18:02:10Z"
+		},
+		{
+			"checksumSHA1": "9OzAD2wCqpfqkwf7QWLuLWb5Afg=",
+			"path": "github.com/advancedlogic/GoOse",
+			"revision": "cd96655d7995de0888df4be59d54194817c9f20a",
+			"revisionTime": "2016-07-09T07:57:05Z"
+		},
+		{
+			"checksumSHA1": "rEdbN7VuK9Musj1PvCldvOTPznY=",
+			"path": "github.com/advancedlogic/goquery",
+			"revision": "aeb03ad57afc3c00f7c2422504d3bbd58e2326b4",
+			"revisionTime": "2015-03-28T07:21:03Z"
+		},
+		{
+			"checksumSHA1": "2rWSos1D+xqNSGkvEMOG3pntod8=",
+			"path": "github.com/andybalholm/cascadia",
+			"revision": "349dd0209470eabd9514242c688c403c0926d266",
+			"revisionTime": "2016-12-24T14:14:13Z"
+		},
+		{
+			"checksumSHA1": "qYPnsdffPV/ySELmbQEyMTGLeZw=",
+			"path": "github.com/bjarneh/latinx",
+			"revision": "4dfe9ba2a293f28a5e06fc7ffe56b1d71a47b8c8",
+			"revisionTime": "2012-03-29T06:19:22Z"
+		},
+		{
+			"checksumSHA1": "oHNnteZIJBtpQ4A6ZjczFDSomso=",
+			"path": "github.com/extrame/ole2",
+			"revision": "d69429661ad7efb189d2ad8074c867265009d0a4",
+			"revisionTime": "2016-08-12T06:52:07Z"
+		},
+		{
+			"checksumSHA1": "4M+NCZ4GFFNDJbFkyBBTo1DEDZw=",
+			"path": "github.com/extrame/xls",
+			"revision": "79987c0cd7f3711e20df106043c5921ee53e1d47",
+			"revisionTime": "2017-02-21T08:59:50Z"
+		},
+		{
+			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "c9c7427a2a70d2eb3bafa0ab2dc163e45f143317",
+			"revisionTime": "2017-03-07T00:15:33Z"
+		},
+		{
+			"checksumSHA1": "d7ne3HS358PpJaNXEcqbdZ0cFbI=",
+			"path": "github.com/levigross/exp-html",
+			"revision": "8df60c69a8f5b0fe4a72ff6ae3811d4b57154e39",
+			"revisionTime": "2012-09-02T18:19:39Z"
+		},
+		{
+			"checksumSHA1": "sESN0ZfX2JIOB6pcxXuw5yXo4+E=",
+			"path": "github.com/rogpeppe/go-charset/charset",
+			"revision": "e9ff06f347d3f5d0013d59ed83754f0e88de10d4",
+			"revisionTime": "2015-06-15T17:25:32Z"
+		},
+		{
+			"checksumSHA1": "bEnb8FN4kNKXCS1ztGVq/5cQtuc=",
+			"path": "github.com/tealeg/xlsx",
+			"revision": "47e33bbbedd12ad4f29abb9e7e894b3a1969c0fc",
+			"revisionTime": "2017-02-22T16:59:48Z"
+		},
+		{
+			"checksumSHA1": "vqc3a+oTUGX8PmD0TS+qQ7gmN8I=",
+			"path": "golang.org/x/net/html",
+			"revision": "10c134ea0df15f7e34d789338c7a2d76cc7a3ab9",
+			"revisionTime": "2017-02-23T22:05:28Z"
+		},
+		{
+			"checksumSHA1": "00eQaGynDYrv3tL+C7l9xH0IDZg=",
+			"path": "golang.org/x/net/html/atom",
+			"revision": "10c134ea0df15f7e34d789338c7a2d76cc7a3ab9",
+			"revisionTime": "2017-02-23T22:05:28Z"
+		},
+		{
+			"checksumSHA1": "NGg7/qIJVUfXi7xnEyyDLocdi6Y=",
+			"path": "gopkg.in/fatih/set.v0",
+			"revision": "27c40922c40b43fe04554d8223a402af3ea333f3",
+			"revisionTime": "2014-12-10T08:48:24Z"
+		}
+	],
+	"rootPath": "github.com/nuveo/docconv"
+}

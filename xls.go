@@ -2,9 +2,10 @@ package docconv
 
 import (
 	"fmt"
-	"github.com/extrame/xls"
 	"io"
 	"strings"
+
+	"github.com/extrame/xls"
 )
 
 // ConvertXLS Convert MS Excel Spreadsheet
@@ -32,16 +33,11 @@ func ConvertXLS(r io.Reader) (string, map[string]string, error) {
 	var body string
 	for i := 0; i < w.NumSheets(); i++ {
 		for j := 0; j <= int(w.GetSheet(i).MaxRow); j++ {
-			row := w.GetSheet(i).Rows[uint16(j)]
+			row := w.GetSheet(i).Row(j)
 			r := make([]string, 0)
-			for _, col := range row.Cols {
-				if uint16(len(r)) <= col.LastCol() {
-					r = append(r, make([]string, col.LastCol()-uint16(len(r))+1)...)
-				}
-				str := col.String(w)
-				for k := uint16(0); k < col.LastCol()-col.FirstCol()+1; k++ {
-					r[col.FirstCol()+k] = str[k]
-				}
+			for k := row.FirstCol(); k == row.LastCol(); k++ {
+				col := row.Col(i)
+				r = append(r, col)
 			}
 
 			body += strings.Join(r[:], ",")
