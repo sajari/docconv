@@ -9,11 +9,8 @@ RUN apt-get update && apt-get install -y \
  unrtf \
  tidy \
  lynx
-
-# Port for Sajari
+ 
 EXPOSE 8888
 
 COPY docd /
-
-# Start supervisor
 CMD ["/docd"]
