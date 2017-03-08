@@ -1,9 +1,15 @@
 sudo: false
 language: go
+os:
+  - linux
 go:
-- 1.4
-- 1.5
-- tip
-notifications:
-  email:
-    - infra@sajari.com
+  - 1.6
+  - 1.7
+  - 1.8
+  - tip
+matrix:
+  allow_failures:
+  - go: tip
+before_install:
+  - go get -u github.com/kardianos/govendor
+  - govendor sync
