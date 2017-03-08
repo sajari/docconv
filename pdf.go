@@ -6,7 +6,6 @@ import (
 	"log"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 // Convert PDF
@@ -20,8 +19,7 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 	// Meta data
 	mc := make(chan map[string]string, 1)
 	go func() {
-		meta := make(map[string]string)
-		metaStr, err := exec.Command("pdfinfo", f.Name()).Output()
+		metaStr, err := exec.Command("pdfinfo", "-box", f.Name()).Output()
 		if err != nil {
 			// TODO: Remove this.
 			log.Println("pdfinfo:", err)
@@ -34,23 +32,7 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 				info[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
 			}
 		}
-
-		// Convert parsed meta
-		if tmp, ok := info["Author"]; ok {
-			meta["Author"] = tmp
-		}
-		if tmp, ok := info["ModDate"]; ok {
-			if t, err := time.Parse(time.ANSIC, tmp); err == nil {
-				meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
-			}
-		}
-		if tmp, ok := info["CreationDate"]; ok {
-			if t, err := time.Parse(time.ANSIC, tmp); err == nil {
-				meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
-			}
-		}
-
-		mc <- meta
+		mc <- info
 	}()
 
 	// Document body
