@@ -57,6 +57,18 @@
 			"revisionTime": "2012-09-02T18:19:39Z"
 		},
 		{
+			"checksumSHA1": "73mwnQ2UhMkyXQ18TZF9jI54Jcw=",
+			"path": "github.com/otiai10/gosseract",
+			"revision": "5e15d71c88a605e6bb3b84f53cc628a66f3b6500",
+			"revisionTime": "2016-12-07T06:31:16Z"
+		},
+		{
+			"checksumSHA1": "lWr+vSk6vqMnkFtR0QLIaR700yo=",
+			"path": "github.com/otiai10/gosseract/tesseract",
+			"revision": "5e15d71c88a605e6bb3b84f53cc628a66f3b6500",
+			"revisionTime": "2016-12-07T06:31:16Z"
+		},
+		{
 			"checksumSHA1": "sESN0ZfX2JIOB6pcxXuw5yXo4+E=",
 			"path": "github.com/rogpeppe/go-charset/charset",
 			"revision": "e9ff06f347d3f5d0013d59ed83754f0e88de10d4",
