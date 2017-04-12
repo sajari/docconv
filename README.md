@@ -64,84 +64,53 @@ The `docd` tool runs as either
 ### How to start the service
 ```docd -log-level 0   # will only log errors & critical info ```
 
-```docd -addr 8000 -log-level 1   # will run on port 8000 and log each request as well ```
+```docd -addr :8000 -log-level 1   # will run on port 8000 and log each request as well ```
 
 ## Example Usage (code)
 Some basic code is shown below, but normally you would accept the file by http or open it from the file system. It should be enough to get you started though...
+
+Use case 1: run locally 
+Note: this assumes you have the dependencies installed.
 
 ```go
 package main
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"bytes"
-	"net/http"
-	"mime/multipart"
-	"net/textproto"
 	"fmt"
+	"log"
+
+	"github.com/sajari/docconv"
 )
 
-type ConversionResponse struct {
-	Body string             `json:"body"`
-	Meta map[string]string  `json:"meta"`
-	MSecs uint32            `json:"msecs"`
+func main() {
+	res, err := docconv.ConvertPath("your-file.pdf")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
 }
+```
 
-// Use the conversion service to convert data
-func ConvertData(input []byte, mimeType string) ([]byte, map[string]string, error) {
+Use case 2: request over the network
 
-	convertUrl := "http://localhost:8888/convert"
-	convertParam := "input"
+```go
+package main
 
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
+import (
+	"fmt"
+	"log"
 
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition", `form-data; name="`+convertParam+`"; filename="noname"`)
-	h.Set("Content-Type", mimeType)
-	part, err := writer.CreatePart(h)
-	if err != nil {
-		return nil, nil, err
-	}
-	_, err = part.Write(input)
-	if err != nil {
-		return nil, nil, err
-	}
-	err = writer.Close()
-	if err != nil {
-	  return nil, nil, err
-	}
-	client := &http.Client{}
-
-	request, err := http.NewRequest("POST", convertUrl, body)
-	if err != nil {
-		return nil, nil, err
-	}
-	request.Header["Content-Type"] = []string{"multipart/form-data; boundary="+writer.Boundary()}
-	resp, err := client.Do(request)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer resp.Body.Close()
-	jsonBlob, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, nil, err
-	}
-	converted := new(ConversionResponse)
-	err = json.Unmarshal(jsonBlob, &converted)
-	if err != nil {
-		return nil, nil, err
-	}
-	return []byte(converted.Body), converted.Meta, nil
-}
+	"github.com/sajari/docconv/client"
+)
 
 func main() {
-	input := []byte{} // This would be the file contents
-	mimeType := "application/pdf" // Also pass the mimetype of the file
-	body, meta, err := ConvertData(input, mimeType)
-	fmt.Println("The body text is : ", body)
-	fmt.Println("The file meta data is a map : ", meta)
-	fmt.Println("Any errors are returned here : ", err)
+	// Create a new client, using the default endpoint (localhost:8888)
+	c := client.New()
+
+	res, err := client.ConvertPath(c, "your-file.pdf")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
 }
 ```
