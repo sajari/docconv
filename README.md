@@ -104,9 +104,10 @@ import (
 )
 
 func main() {
-	c := client.NewDefaultClient()
+	// Create a new client, using the default endpoint (localhost:8888)
+	c := client.New()
 
-	res, err := c.Convert("your-file.pdf")
+	res, err := client.ConvertPath(c, "your-file.pdf")
 	if err != nil {
 		log.Fatal(err)
 	}

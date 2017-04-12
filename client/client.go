@@ -1,9 +1,12 @@
+// Package client defines types and functions for interacting with
+// docconv HTTP servers.
 package client
 
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -12,83 +15,98 @@ import (
 	"github.com/sajari/docconv"
 )
 
-var (
-	defaultParam    = "input"
-	defaultEndpoint = "http://localhost:8888/convert"
-)
+// DefaultEndpoint is the default endpoint for a docconv HTTP
+// server.
+const DefaultEndpoint = "localhost:8888"
 
-type client struct {
-	endpoint string
-	param    string
-	client   http.Client
-}
+// DefaultHTTPClient is the default HTTP client used to make
+// all requests.
+var DefaultHTTPClient = http.DefaultClient
 
-// Returns a client that will send to the default parameters used for the docconv pkg
-func NewDefaultClient() *client {
-	return &client{
-		endpoint: defaultEndpoint,
-		param:    defaultParam,
-		client:   http.Client{},
+// Opt is an option used in New to create Clients.
+type Opt func(*Client)
+
+// WithEndpoint set the endpoint on a Client.
+func WithEndpoint(endpoint string) Opt {
+	return func(c *Client) {
+		c.endpoint = endpoint
 	}
 }
 
-// Returns a client using a custom endpoint to send to. The param indicates the
-// name of the parameter that the file will be send as in the form
-func NewClient(endpoint, param string) (*client, error) {
-	if endpoint == "" {
-		return nil, errors.New("You must specify an endpoint in the format domain:port")
+// WithHTTPClient sets the *http.Client used for all underlying
+// calls.
+func WithHTTPClient(client *http.Client) Opt {
+	return func(c *Client) {
+		c.httpClient = client
 	}
-	if defaultParam == "" {
-		return nil, errors.New("You must specify an input param, the default is 'input'")
+}
+
+// New creates a new docconv client for interacting with a docconv HTTP
+// server.
+func New(opts ...Opt) *Client {
+	c := &Client{
+		endpoint:   DefaultEndpoint,
+		httpClient: DefaultHTTPClient,
 	}
-	return &client{
-		endpoint: defaultEndpoint,
-		param:    defaultParam,
-		client:   http.Client{},
-	}, nil
+
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
+}
+
+// Client is a docconv HTTP client.  Use New to make new Clients.
+type Client struct {
+	endpoint   string
+	httpClient *http.Client
 }
 
 // Convert a file from a local path using the http client
-func (c *client) Convert(path string) (*docconv.Response, error) {
-
-	file, err := os.Open(path)
+func (c *Client) Convert(r io.Reader, filename string) (*docconv.Response, error) {
+	buf := &bytes.Buffer{}
+	w := multipart.NewWriter(buf)
+	part, err := w.CreateFormFile("input", filename)
 	if err != nil {
 		return nil, err
 	}
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(c.param, file.Name())
-
-	r, err := ioutil.ReadAll(file)
-
-	_, err = part.Write(r)
-	if err != nil {
+	if _, err := io.Copy(part, r); err != nil {
 		return nil, err
 	}
-	err = writer.Close()
-	if err != nil {
+	if err := w.Close(); err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", c.endpoint, body)
+	req, err := http.NewRequest("POST", fmt.Sprintf("http://%v/convert", c.endpoint), buf)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	resp, err := c.client.Do(req)
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
 	jsonBlob, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	res := new(docconv.Response)
-	err = json.Unmarshal(jsonBlob, &res)
-	if err != nil {
+	res := &docconv.Response{}
+	if err := json.Unmarshal(jsonBlob, &res); err != nil {
 		return nil, err
 	}
 	return res, nil
+}
+
+// ConvertPath uses the docconv Client to convert the local file
+// found at path.
+func ConvertPath(c *Client, path string) (*docconv.Response, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	return c.Convert(f, f.Name())
 }
