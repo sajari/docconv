@@ -14,12 +14,16 @@ import (
 	"github.com/sajari/docconv"
 )
 
-// DefaultEndpoint is the default endpoint for a docconv HTTP
-// server.
+// DefaultProtocol is the default protocol used to construct paths
+// when making docconv requests.
+const DefaultProtocol = "http://"
+
+// DefaultEndpoint is the default endpoint address (host:port) for
+// docconv HTTP servers.
 const DefaultEndpoint = "localhost:8888"
 
-// DefaultHTTPClient is the default HTTP client used to make
-// all requests.
+// DefaultHTTPClient is the default HTTP client used to make requests
+// to docconv HTTP servers.
 var DefaultHTTPClient = http.DefaultClient
 
 // Opt is an option used in New to create Clients.
@@ -40,11 +44,20 @@ func WithHTTPClient(client *http.Client) Opt {
 	}
 }
 
+// WithProtocol sets the protocol used in HTTP requests.  Currently this
+// must be either http:// or https://.
+func WithProtocol(protocol string) Opt {
+	return func(c *Client) {
+		c.protocol = protocol
+	}
+}
+
 // New creates a new docconv client for interacting with a docconv HTTP
 // server.
 func New(opts ...Opt) *Client {
 	c := &Client{
 		endpoint:   DefaultEndpoint,
+		protocol:   DefaultProtocol,
 		httpClient: DefaultHTTPClient,
 	}
 
@@ -57,6 +70,7 @@ func New(opts ...Opt) *Client {
 // Client is a docconv HTTP client.  Use New to make new Clients.
 type Client struct {
 	endpoint   string
+	protocol   string
 	httpClient *http.Client
 }
 
@@ -75,7 +89,7 @@ func (c *Client) Convert(r io.Reader, filename string) (*docconv.Response, error
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("http://%v/convert", c.endpoint), buf)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%v%v/convert", c.protocol, c.endpoint), buf)
 	if err != nil {
 		return nil, err
 	}
