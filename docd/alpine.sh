@@ -16,5 +16,3 @@ cd $VERSION
 docker build -t $NAME . || exit 1
 rm docd
 
-echo "Tagging ${NAME} to ${NAME}:latest"
-
