@@ -64,7 +64,7 @@ The `docd` tool runs as either
 ### How to start the service
 ```docd -log-level 0   # will only log errors & critical info ```
 
-```docd -addr 8000 -log-level 1   # will run on port 8000 and log each request as well ```
+```docd -addr :8000 -log-level 1   # will run on port 8000 and log each request as well ```
 
 ## Example Usage (code)
 Some basic code is shown below, but normally you would accept the file by http or open it from the file system. It should be enough to get you started though...
