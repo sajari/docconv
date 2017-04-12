@@ -35,7 +35,13 @@ The `docd` tool runs as either
 
    Documents can be sent as a multipart POST request and the plain text (body) and meta information are then returned as a JSON object
 
-2. via the command line.
+2. a service exposed from within a Docker container
+
+   This also runs as a service, but from within a Docker container. There are two build scripts [./docd/debian.sh](./docd/debian.sh) and [./docd/alpine.sh](./docd/alpine.sh). 
+
+   The debian version uses the Debian package repository which can vary with builds. The Alpine version uses a very cut down Linux distribution to produce a container ~40MB. It also locks the dependency versions for consistency, but may miss out on future updates.
+
+3. via the command line.
 
    Documents can be sent as an argument, e.g.
 
