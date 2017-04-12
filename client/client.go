@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -88,12 +87,8 @@ func (c *Client) Convert(r io.Reader, filename string) (*docconv.Response, error
 	}
 	defer resp.Body.Close()
 
-	jsonBlob, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
 	res := &docconv.Response{}
-	if err := json.Unmarshal(jsonBlob, &res); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
 	return res, nil
