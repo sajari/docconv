@@ -1,5 +1,5 @@
 # docconv
-[![Build Status](https://travis-ci.org/sajari/docconv.svg?branch=master)](https://travis-ci.org/sajari/docconv)
+[![Build Status](https://travis-ci.org/nuveo/docconv.svg?branch=master)](https://travis-ci.org/nuveo/docconv)
 
 A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, Pages documents and images (see optional dependencies below) to plain text.
 
@@ -9,7 +9,7 @@ If you haven't setup Go before, you need to first set a `GOPATH` (see [https://g
 
 To fetch and build the code:
 
-    $ go get github.com/sajari/docconv/...
+    $ go get github.com/nuveo/docconv/...
 
 This will also build the command line tool `docd` into `$GOPATH/bin` (assumed to be in your `PATH` already).
 
@@ -25,7 +25,7 @@ Example install of dependencies (not all systems):
 
 To add image support to the `docconv` library you first need to install and build https://github.com/otiai10/gosseract.  Now you can add `-tags ocr` to any `go` command when building/fetching `docconv` to include support for processing images:
 
-    $ go get -tags ocr github.com/sajari/docconv/...
+    $ go get -tags ocr github.com/nuveo/docconv/...
 
 ## docd tool
 

@@ -1,0 +1,28 @@
+[ What ]
+
+A small library to encode/decode ISO-8859
+byte streams in golang (to/from UTF-8).
+
+
+[ Install ]
+
+goinstall github.com/bjarneh/latinx
+
+
+[ Example ]
+
+
+import "github.com/bjarneh/latinx"
+
+// fetch converter for desired charset
+converter := latinx.Get(latinx.ISO_8859_1)
+
+// convert a stream of ISO_8859_1 bytes to UTF-8
+utf8bytes,err := converter.Decode(latin1bytes)
+
+// encode a UTF-8 stream as ISO_8859_1
+latin1bytes, size, err := converter.Encode(utf8bytes)
+
+if err != nil {
+    log.Fatalf("encoded: %d, not: %d, err: %s", size, len(utf8bytes), err)
+}
