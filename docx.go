@@ -37,17 +37,17 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 			}
 			defer rc.Close()
 
-			info, err := XMLToMap(rc)
+			meta, err = XMLToMap(rc)
 			if err != nil {
 				return "", nil, fmt.Errorf("error parsing '%v': %v", f.Name, err)
 			}
 
-			if tmp, ok := info["modified"]; ok {
+			if tmp, ok := meta["modified"]; ok {
 				if t, err := time.Parse(time.RFC3339, tmp); err == nil {
 					meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
 				}
 			}
-			if tmp, ok := info["created"]; ok {
+			if tmp, ok := meta["created"]; ok {
 				if t, err := time.Parse(time.RFC3339, tmp); err == nil {
 					meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 				}

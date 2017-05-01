@@ -28,23 +28,19 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 		}
 
 		// Parse meta output
-		info := make(map[string]string)
 		for _, line := range strings.Split(string(metaStr), "\n") {
 			if parts := strings.SplitN(line, ":", 2); len(parts) > 1 {
-				info[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+				meta[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
 			}
 		}
 
-		// Convert parsed meta
-		if tmp, ok := info["Author"]; ok {
-			meta["Author"] = tmp
-		}
-		if tmp, ok := info["ModDate"]; ok {
+		// Convert parsed dates into unix timestamps
+		if tmp, ok := meta["ModDate"]; ok {
 			if t, err := time.Parse(time.ANSIC, tmp); err == nil {
 				meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
 		}
-		if tmp, ok := info["CreationDate"]; ok {
+		if tmp, ok := meta["CreationDate"]; ok {
 			if t, err := time.Parse(time.ANSIC, tmp); err == nil {
 				meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
