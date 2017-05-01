@@ -31,20 +31,19 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 		}
 
 		// Parse meta output
-		info := make(map[string]string)
 		for _, line := range strings.Split(string(metaStr), "\n") {
 			if parts := strings.SplitN(line, "=", 2); len(parts) > 1 {
-				info[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+				meta[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
 			}
 		}
 
 		// Convert parsed meta
-		if tmp, ok := info["Last Modified"]; ok {
+		if tmp, ok := meta["Last Modified"]; ok {
 			if t, err := time.Parse(time.RFC3339, tmp); err == nil {
 				meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
 		}
-		if tmp, ok := info["Created"]; ok {
+		if tmp, ok := meta["Created"]; ok {
 			if t, err := time.Parse(time.RFC3339, tmp); err == nil {
 				meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
