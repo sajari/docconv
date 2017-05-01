@@ -10,8 +10,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-
-	"github.com/sajari/docconv"
 )
 
 // DefaultProtocol is the default protocol used to construct paths
@@ -74,8 +72,16 @@ type Client struct {
 	httpClient *http.Client
 }
 
+// Response is from docconv.Response copied here to avoid dependency on
+// the docconv package.
+type Response struct {
+	Body  string            `json:"body"`
+	Meta  map[string]string `json:"meta"`
+	MSecs uint32            `json:"msecs"`
+}
+
 // Convert a file from a local path using the http client
-func (c *Client) Convert(r io.Reader, filename string) (*docconv.Response, error) {
+func (c *Client) Convert(r io.Reader, filename string) (*Response, error) {
 	buf := &bytes.Buffer{}
 	w := multipart.NewWriter(buf)
 	part, err := w.CreateFormFile("input", filename)
@@ -101,7 +107,7 @@ func (c *Client) Convert(r io.Reader, filename string) (*docconv.Response, error
 	}
 	defer resp.Body.Close()
 
-	res := &docconv.Response{}
+	res := &Response{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
@@ -110,7 +116,7 @@ func (c *Client) Convert(r io.Reader, filename string) (*docconv.Response, error
 
 // ConvertPath uses the docconv Client to convert the local file
 // found at path.
-func ConvertPath(c *Client, path string) (*docconv.Response, error) {
+func ConvertPath(c *Client, path string) (*Response, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
