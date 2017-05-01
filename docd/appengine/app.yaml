@@ -1,0 +1,14 @@
+runtime: custom
+env: flex
+
+service: docd
+
+resources:
+  memory_gb: .6
+
+manual_scaling:
+  instances: 1
+
+handlers:
+- url: /.*
+  script: _go_app
