@@ -2,11 +2,16 @@ package docconv
 
 import (
 	"fmt"
-	"github.com/tealeg/xlsx"
 	"io"
+
+	"encoding/csv"
+
+	"io/ioutil"
+
+	"github.com/tealeg/xlsx"
 )
 
-// Convert MS Excel Spreadsheet
+// ConvertXLSX Excel Spreadsheet
 func ConvertXLSX(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {
@@ -45,4 +50,52 @@ func ConvertXLSX(r io.Reader) (string, map[string]string, error) {
 	}
 
 	return body, meta, nil
+}
+
+// CSVtoXLSX convert CSV data to XLSX
+func CSVtoXLSX(r io.Reader) (xlsByte string, err error) {
+	reader := csv.NewReader(r)
+
+	var file *xlsx.File
+	var sheet *xlsx.Sheet
+
+	file = xlsx.NewFile()
+	sheet, err = file.AddSheet("Sheet1")
+	if err != nil {
+		return "", fmt.Errorf("error try add sheet: %s", err.Error())
+	}
+
+	// write others rows
+	for {
+		rec, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+		}
+		rows := sheet.AddRow()
+
+		for _, h := range rec {
+			row := rows.AddCell()
+			row.Value = h
+		}
+	}
+
+	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
+	if err != nil {
+		return "", fmt.Errorf("error creating local file: %v", err)
+	}
+	defer f.Done()
+
+	err = file.Write(f)
+	if err != nil {
+		return "", fmt.Errorf("error try write xlsx: %s", err.Error())
+	}
+
+	xlsxB, err := ioutil.ReadFile(f.Name())
+	if err != nil {
+		return
+	}
+	xlsByte = string(xlsxB)
+	return
 }
