@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// Convert ODT to text
+// ConvertODT converts a ODT file to text
 func ConvertODT(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string

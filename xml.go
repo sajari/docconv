@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-// Convert XML input
+// ConvertXML converts an XML file to text.
 func ConvertXML(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	cleanXML, err := Tidy(r, true)
@@ -21,7 +21,7 @@ func ConvertXML(r io.Reader) (string, map[string]string, error) {
 	return result, meta, nil
 }
 
-// Convert XML to plain text given how to treat elements
+// XMLToText converts XML to plain text given how to treat elements.
 func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) (string, error) {
 	var result string
 
@@ -73,7 +73,7 @@ func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) (string
 	return result, nil
 }
 
-// Convert XML to a nested string map
+// XMLToMap converts XML to a nested string map.
 func XMLToMap(r io.Reader) (map[string]string, error) {
 	m := make(map[string]string)
 	dec := xml.NewDecoder(r)

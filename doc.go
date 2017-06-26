@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// Convert MS Word DOC
+// ConvertDoc converts an MS Word .doc to text.
 func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {

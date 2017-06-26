@@ -7,7 +7,9 @@ import (
 	"os/exec"
 )
 
-// Errors & warnings are deliberately suppressed as tidy throws warnings very easily
+// Tidy attempts to tidy up XML.
+// Errors & warnings are deliberately suppressed as underlying tools
+// throw warnings very easily.
 func Tidy(r io.Reader, xmlIn bool) ([]byte, error) {
 	f, err := ioutil.TempFile("/tmp", "sajari-convert-")
 	if err != nil {

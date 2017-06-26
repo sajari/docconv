@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Convert RTF
+// ConvertRTF converts RTF files to text.
 func ConvertRTF(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {

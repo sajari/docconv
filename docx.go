@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// Convert DOCX to text
+// ConvertDocx converts an MS Word docx file to text.
 func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textHeader, textBody, textFooter string
@@ -92,6 +92,7 @@ func parseDocxText(f *zip.File) (string, error) {
 	return text, nil
 }
 
+// DocxXMLToText converts Docx XML into plain text.
 func DocxXMLToText(r io.Reader) (string, error) {
 	return XMLToText(r, []string{"br", "p", "tab"}, []string{"instrText", "script"}, true)
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/JalfResi/justext"
 )
 
-// Convert HTML
+// ConvertHTML converts HTML into text.
 func ConvertHTML(r io.Reader, readability bool) (string, map[string]string, error) {
 	meta := make(map[string]string)
 
@@ -120,10 +120,11 @@ type HTMLReadabilityOptions struct {
 	ReadabilityUseClasses string
 }
 
+// HTMLReadabilityOptionsValues are the global settings used for HTMLReadability.
 // TODO: Remove this from global state.
 var HTMLReadabilityOptionsValues HTMLReadabilityOptions
 
-// Extract the readable text in an HTML document
+// HTMLReadability extracts the readable text in an HTML document
 func HTMLReadability(r io.Reader) []byte {
 	jr := justext.NewReader(r)
 
@@ -144,7 +145,7 @@ func HTMLReadability(r io.Reader) []byte {
 
 	useClasses := strings.SplitN(HTMLReadabilityOptionsValues.ReadabilityUseClasses, ",", 10)
 
-	var output string = ""
+	output := ""
 	for _, paragraph := range paragraphSet {
 		for _, class := range useClasses {
 			if paragraph.CfClass == class {
@@ -156,12 +157,13 @@ func HTMLReadability(r io.Reader) []byte {
 	return []byte(output)
 }
 
+// HTMLToText converts HTML to plain text.
 func HTMLToText(input io.Reader) string {
 	text, _ := XMLToText(input, []string{"br", "p", "h1", "h2", "h3", "h4"}, []string{}, false)
 	return text
 }
 
-var readabilityStopList map[string]bool = map[string]bool{"and": true, "the": true, "a": true, "about": true, "above": true, "across": true, "after": true, "afterwards": true, "again": true, "against": true, "all": true, "almost": true, "alone": true,
+var readabilityStopList = map[string]bool{"and": true, "the": true, "a": true, "about": true, "above": true, "across": true, "after": true, "afterwards": true, "again": true, "against": true, "all": true, "almost": true, "alone": true,
 	"along": true, "already": true, "also": true, "although": true, "always": true, "am": true, "among": true, "amongst": true, "amoungst": true, "amount": true, "an": true, "another": true, "any": true,
 	"anyhow": true, "anyone": true, "anything": true, "anyway": true, "anywhere": true, "are": true, "around": true, "as": true, "at": true, "back": true, "be": true, "became": true, "because": true,
 	"become": true, "becomes": true, "becoming": true, "been": true, "before": true, "beforehand": true, "behind": true, "being": true, "below": true, "beside": true, "besides": true, "between": true,

@@ -7,7 +7,7 @@ import (
 	"github.com/advancedlogic/GoOse"
 )
 
-// Convert URL
+// ConvertURL fetches the HTML page at the URL given in the io.Reader.
 func ConvertURL(input io.Reader, readability bool) (string, map[string]string, error) {
 	meta := make(map[string]string)
 

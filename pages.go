@@ -16,7 +16,7 @@ import (
 	"github.com/sajari/docconv/snappy"
 )
 
-// Convert PAGES to text
+// ConvertPages converts a Pages file to text.
 func ConvertPages(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string

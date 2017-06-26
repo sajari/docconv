@@ -19,16 +19,16 @@ type Response struct {
 }
 
 var (
-	inputPath                     *string  = flag.String("input", "", "The file path to convert and exit; no server")
-	listenAddr                    *string  = flag.String("addr", ":8888", "The address to listen on (e.g. 127.0.0.1:8888)")
-	logLevel                      *uint    = flag.Uint("log-level", 0, "The verbosity of the log")
-	readabilityLengthLow          *int     = flag.Int("readability-length-low", 70, "Sets the readability length low")
-	readabilityLengthHigh         *int     = flag.Int("readability-length-high", 200, "Sets the readability length high")
-	readabilityStopwordsLow       *float64 = flag.Float64("readability-stopwords-low", 0.2, "Sets the readability stopwords low")
-	readabilityStopwordsHigh      *float64 = flag.Float64("readability-stopwords-high", 0.3, "Sets the readability stopwords high")
-	readabilityMaxLinkDensity     *float64 = flag.Float64("readability-max-link-density", 0.2, "Sets the readability max link density")
-	readabilityMaxHeadingDistance *int     = flag.Int("readability-max-heading-distance", 200, "Sets the readability max heading distance")
-	readabilityUseClasses         *string  = flag.String("readability-use-classes", "good,neargood", "Comma separated list of readability classes to use")
+	inputPath                     = flag.String("input", "", "The file path to convert and exit; no server")
+	listenAddr                    = flag.String("addr", ":8888", "The address to listen on (e.g. 127.0.0.1:8888)")
+	logLevel                      = flag.Uint("log-level", 0, "The verbosity of the log")
+	readabilityLengthLow          = flag.Int("readability-length-low", 70, "Sets the readability length low")
+	readabilityLengthHigh         = flag.Int("readability-length-high", 200, "Sets the readability length high")
+	readabilityStopwordsLow       = flag.Float64("readability-stopwords-low", 0.2, "Sets the readability stopwords low")
+	readabilityStopwordsHigh      = flag.Float64("readability-stopwords-high", 0.3, "Sets the readability stopwords high")
+	readabilityMaxLinkDensity     = flag.Float64("readability-max-link-density", 0.2, "Sets the readability max link density")
+	readabilityMaxHeadingDistance = flag.Int("readability-max-heading-distance", 200, "Sets the readability max heading distance")
+	readabilityUseClasses         = flag.String("readability-use-classes", "good,neargood", "Comma separated list of readability classes to use")
 )
 
 func main() {

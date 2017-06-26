@@ -15,6 +15,8 @@ var langs = struct {
 	lang string
 }{lang: "eng"}
 
+// ConvertImage converts images to text.
+// Requires gosseract.
 func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {
@@ -36,6 +38,7 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	return <-out, meta, nil
 }
 
+// SetImageLanguages sets the languages parameter passed to gosseract.
 func SetImageLanguages(l string) {
 	langs.Lock()
 	langs.lang = l

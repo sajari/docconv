@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// Convert PDF
+// ConvertPDF converts a PDF file to text.
 func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
 	if err != nil {

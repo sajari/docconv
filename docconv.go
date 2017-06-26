@@ -18,7 +18,8 @@ type Response struct {
 	MSecs uint32            `json:"msecs"`
 }
 
-// Determine the mime type by the file's extension
+// MimeTypeByExtension returns a mimetype for the given extension, or
+// application/octet-stream if none can be determined.
 func MimeTypeByExtension(filename string) string {
 	switch strings.ToLower(path.Ext(filename)) {
 	case ".doc":
@@ -51,8 +52,7 @@ func MimeTypeByExtension(filename string) string {
 	return "application/octet-stream"
 }
 
-// TODO(dhowden): Refactor this.
-// Convert a file to plain text & meta data
+// Convert a file to plain text.
 func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) {
 	start := time.Now()
 
@@ -107,8 +107,7 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 	}, nil
 }
 
-// TODO(dhowden): Refactor this.
-// Convert a file given a path
+// ConvertPath converts a local path to text.
 func ConvertPath(path string) (*Response, error) {
 	mimeType := MimeTypeByExtension(path)
 
@@ -121,8 +120,8 @@ func ConvertPath(path string) (*Response, error) {
 	return Convert(f, mimeType, true)
 }
 
-// TODO(dhowden): Refactor this.
-// Convert a file given a path
+// ConvertPathReadability converts a local path to text, with the given readability
+// option.
 func ConvertPathReadability(path string, readability bool) ([]byte, error) {
 	mimeType := MimeTypeByExtension(path)
 
