@@ -37,7 +37,7 @@ func ConvertXLSX(r io.Reader) (string, map[string]string, error) {
 	for _, sheet := range xlsFile.Sheets {
 		for rowIndex, row := range sheet.Rows {
 			for cellIndex, cell := range row.Cells {
-				text, _ := cell.String()
+				text := cell.String()
 				body += text
 				if cellIndex < len(row.Cells)-1 {
 					body += ","
