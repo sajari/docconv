@@ -1,6 +1,4 @@
-// Package client defines types and functions for interacting with
-// docconv HTTP servers.
-package client
+package docconv
 
 import (
 	"bytes"
@@ -50,9 +48,9 @@ func WithProtocol(protocol string) Opt {
 	}
 }
 
-// New creates a new docconv client for interacting with a docconv HTTP
+// NewClient creates a new docconv client for interacting with a docconv HTTP
 // server.
-func New(opts ...Opt) *Client {
+func NewClient(opts ...Opt) *Client {
 	c := &Client{
 		endpoint:   DefaultEndpoint,
 		protocol:   DefaultProtocol,
@@ -70,14 +68,6 @@ type Client struct {
 	endpoint   string
 	protocol   string
 	httpClient *http.Client
-}
-
-// Response is from docconv.Response copied here to avoid dependency on
-// the docconv package.
-type Response struct {
-	Body  string            `json:"body"`
-	Meta  map[string]string `json:"meta"`
-	MSecs uint32            `json:"msecs"`
 }
 
 // Convert a file from a local path using the http client
@@ -116,7 +106,7 @@ func (c *Client) Convert(r io.Reader, filename string) (*Response, error) {
 
 // ConvertPath uses the docconv Client to convert the local file
 // found at path.
-func ConvertPath(c *Client, path string) (*Response, error) {
+func (c *Client) ConvertPath(path string) (*Response, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err

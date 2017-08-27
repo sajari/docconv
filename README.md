@@ -100,14 +100,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/sajari/docconv/client"
+	"github.com/sajari/docconv"
 )
 
 func main() {
 	// Create a new client, using the default endpoint (localhost:8888)
-	c := client.New()
+	c := docconv.NewClient()
 
-	res, err := client.ConvertPath(c, "your-file.pdf")
+	res, err := c.ConvertPath("your-file.pdf")
 	if err != nil {
 		log.Fatal(err)
 	}
