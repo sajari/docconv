@@ -1,3 +1,5 @@
+// +build !appengine
+
 package docconv
 
 import (
@@ -108,7 +110,7 @@ func cleanHTML(r io.Reader, all bool) string {
 	}
 }
 
-// HTMLReadabilityOptions is a type which defines parameters that are passed to the justext paackage.
+// HTMLReadabilityOptions is a type which defines parameters that are passed to the justext package.
 // TODO: Improve this!
 type HTMLReadabilityOptions struct {
 	LengthLow             int
