@@ -1,14 +1,14 @@
 package docconv
 
 import (
+	"encoding/csv"
 	"fmt"
 	"io"
-
-	"encoding/csv"
-
 	"io/ioutil"
+	"strconv"
 
 	"github.com/tealeg/xlsx"
+	"github.com/xuri/excelize"
 )
 
 // ConvertXLSX Excel Spreadsheet
@@ -23,8 +23,10 @@ func ConvertXLSX(r io.Reader) (string, map[string]string, error) {
 	if err != nil {
 		return "", nil, fmt.Errorf("error on getting file stats: %v", err)
 	}
-	xlsFile, err := xlsx.OpenReaderAt(f, fileStat.Size())
+
+	xlsFile, err := excelize.OpenFile(f.Name())
 	if err != nil {
+		fmt.Println(".... > ", err)
 		return "", nil, fmt.Errorf("error on xlsx parsing: %v", err)
 	}
 
@@ -34,16 +36,17 @@ func ConvertXLSX(r io.Reader) (string, map[string]string, error) {
 
 	// Document body
 	var body string
-	for _, sheet := range xlsFile.Sheets {
-		for rowIndex, row := range sheet.Rows {
-			for cellIndex, cell := range row.Cells {
-				text := cell.String()
+	for sheetIndex, _ := range xlsFile.GetSheetMap() {
+		rows := xlsFile.GetRows("sheet" + strconv.Itoa(sheetIndex))
+		for rowIndex, row := range rows {
+			for cellIndex, colCell := range row {
+				text := colCell
 				body += text
-				if cellIndex < len(row.Cells)-1 {
+				if cellIndex < len(row)-1 {
 					body += ","
 				}
 			}
-			if rowIndex < len(sheet.Rows)-1 {
+			if rowIndex < len(rows)-1 {
 				body += "\n"
 			}
 		}
