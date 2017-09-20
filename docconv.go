@@ -26,6 +26,10 @@ func MimeTypeByExtension(filename string) string {
 		return "application/msword"
 	case ".docx":
 		return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	case ".xls":
+		return "application/vnd.ms-excel"
+	case ".xlsx":
+		return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 	case ".odt":
 		return "application/vnd.oasis.opendocument.text"
 	case ".pages":
@@ -68,6 +72,12 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 
 	case "application/vnd.oasis.opendocument.text":
 		body, meta, err = ConvertODT(r)
+
+	case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+		body, meta, err = ConvertXLSX(r)
+
+	case "application/vnd.ms-excel":
+		body, meta, err = ConvertXLS(r)
 
 	case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
 		body, meta, err = ConvertPages(r)
