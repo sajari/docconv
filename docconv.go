@@ -101,7 +101,7 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 	}
 
 	return &Response{
-		Body:  body,
+		Body:  strings.TrimSpace(body),
 		Meta:  meta,
 		MSecs: uint32(time.Since(start) / time.Millisecond),
 	}, nil
