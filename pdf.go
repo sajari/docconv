@@ -15,7 +15,7 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 	}
 	defer f.Done()
 
-	bodyResult, metaResult, convertErr := ConvertTextPDF(f.Name())
+	bodyResult, metaResult, convertErr := ConvertPDFText(f.Name())
 	if convertErr != nil {
 		return "", nil, convertErr
 	}
