@@ -146,8 +146,6 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 		return bodyResult.body, metaResult.meta, nil
 	}
 
-	fmt.Println("converting PDF images")
-
 	imageConvertResult, imageConvertErr := ConvertPDFImages(f.Name())
 	if imageConvertErr != nil {
 		log.Println(imageConvertErr)
@@ -158,11 +156,7 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 		return bodyResult.body, metaResult.meta, nil
 	}
 
-	fmt.Println("no errors...")
-
 	fullBody := strings.Join([]string{bodyResult.body, imageConvertResult.body}, " ")
-
-	fmt.Println("returning response...")
 
 	return fullBody, metaResult.meta, nil
 
