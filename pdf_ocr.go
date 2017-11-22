@@ -83,6 +83,9 @@ func ConvertPDFImages(path string) (BodyResult, error) {
 			wg.Done()
 
 			f, err := os.Open(pathFile)
+
+			defer f.Close()
+
 			if err != nil {
 				bodyResult.err = err
 			}
@@ -97,7 +100,6 @@ func ConvertPDFImages(path string) (BodyResult, error) {
 				close(data)
 			}
 
-			f.Close()
 		}(idx, p)
 	}
 	wg.Wait()
