@@ -27,21 +27,18 @@ func compareExt(ext string, exts []string) bool {
 	return false
 }
 
-func cleanupTemp(tmpDir string) error {
+func cleanupTemp(tmpDir string) {
 	err := os.RemoveAll(tmpDir)
 	if err != nil {
-		return err
+		log.Println(err)
 	}
-	return nil
 }
 
 func ConvertPDFImages(path string) (BodyResult, error) {
-	fmt.Println("in here: ")
 	bodyResult := BodyResult{}
 
 	tmp, err := ioutil.TempDir("/tmp", "tmp-imgs-")
 	if err != nil {
-		fmt.Println("	this err: ", err)
 		bodyResult.err = err
 		return bodyResult, err
 	}
@@ -78,31 +75,33 @@ func ConvertPDFImages(path string) (BodyResult, error) {
 	data := make(chan string, 1)
 
 	wg.Add(len(files))
-	for idx, p := range files {
-		go func(idx int, pathFile string) {
-			wg.Done()
+	for _, p := range files {
+		go func(pathFile string) {
 
 			f, err := os.Open(pathFile)
-
-			defer f.Close()
 
 			if err != nil {
 				bodyResult.err = err
 			}
+
+			defer f.Close()
 			out, _, err := ConvertImage(f)
 			if err != nil {
 				bodyResult.err = err
 			}
 
+			wg.Done()
+
 			data <- out
 
-			if idx == len(files)-1 {
-				close(data)
-			}
-
-		}(idx, p)
+		}(p)
 	}
+
 	wg.Wait()
+
+	go func() {
+		close(data)
+	}()
 
 	for str := range data {
 		bodyResult.body += str + " "
@@ -147,6 +146,8 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 		return bodyResult.body, metaResult.meta, nil
 	}
 
+	fmt.Println("converting PDF images")
+
 	imageConvertResult, imageConvertErr := ConvertPDFImages(f.Name())
 	if imageConvertErr != nil {
 		log.Println(imageConvertErr)
@@ -157,7 +158,11 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 		return bodyResult.body, metaResult.meta, nil
 	}
 
+	fmt.Println("no errors...")
+
 	fullBody := strings.Join([]string{bodyResult.body, imageConvertResult.body}, " ")
+
+	fmt.Println("returning response...")
 
 	return fullBody, metaResult.meta, nil
 
