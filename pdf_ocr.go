@@ -51,7 +51,7 @@ func ConvertPDFImages(path string) (BodyResult, error) {
 		return bodyResult, err
 	}
 
-	files := []string{}
+	filePaths := []string{}
 
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		path, err = filepath.Abs(path)
@@ -60,13 +60,13 @@ func ConvertPDFImages(path string) (BodyResult, error) {
 		}
 
 		if compareExt(filepath.Ext(path), exts) {
-			files = append(files, path)
+			filePaths = append(filePaths, path)
 		}
 		return nil
 	}
 	filepath.Walk(tmpDir, walkFunc)
 
-	fileLength := len(files)
+	fileLength := len(filePaths)
 
 	if fileLength < 1 {
 		return bodyResult, nil
@@ -78,20 +78,18 @@ func ConvertPDFImages(path string) (BodyResult, error) {
 
 	wg.Add(fileLength)
 
-	for _, p := range files {
+	for _, p := range filePaths {
 		go func(pathFile string) {
 			defer wg.Done()
 			f, err := os.Open(pathFile)
-
 			if err != nil {
-				bodyResult.err = err
 				return
 			}
 
 			defer f.Close()
 			out, _, err := ConvertImage(f)
 			if err != nil {
-				bodyResult.err = err
+				return
 			}
 
 			data <- out

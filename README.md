@@ -1,4 +1,5 @@
 # docconv
+[![GoDoc](https://godoc.org/github.com/sajari/docconv?status.svg)](https://godoc.org/github.com/sajari/docconv)
 [![Build Status](https://travis-ci.org/sajari/docconv.svg?branch=master)](https://travis-ci.org/sajari/docconv)
 
 A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, Pages documents and images (see optional dependencies below) to plain text.
@@ -26,6 +27,10 @@ Example install of dependencies (not all systems):
 To add image support to the `docconv` library you first need to install and build https://github.com/otiai10/gosseract.  Now you can add `-tags ocr` to any `go` command when building/fetching `docconv` to include support for processing images:
 
     $ go get -tags ocr github.com/sajari/docconv/...
+
+This may complain on OSX, which you can fix by installing tesseract via brew:
+	
+	$ brew install tesseract
 
 ## docd tool
 
