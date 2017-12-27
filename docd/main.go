@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/sajari/docconv"
+	"code.sajari.com/docconv"
 )
 
 // Response payload sent back to the requestor
