@@ -4,6 +4,7 @@ go:
 - 1.4
 - 1.9
 - tip
+go_import_path: code.sajari.com/docconv
 notifications:
   email:
     - infra@sajari.com
