@@ -13,8 +13,6 @@ make install
 # Install UnRTF
 tar -C /unrtf -xvf /unrtf-0.21.9.tar.gz
 cd /unrtf/unrtf-0.21.9
-ls
-./configure --help
 ./configure; make; make install; make clean
 
 cd /
