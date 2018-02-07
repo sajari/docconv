@@ -11,13 +11,6 @@ import (
 	"code.sajari.com/docconv"
 )
 
-// Response payload sent back to the requestor
-type Response struct {
-	Body  string            `json:"body"`
-	Meta  map[string]string `json:"meta"`
-	MSecs uint32            `json:"msecs"`
-}
-
 var (
 	inputPath                     = flag.String("input", "", "The file path to convert and exit; no server")
 	listenAddr                    = flag.String("addr", ":8888", "The address to listen on (e.g. 127.0.0.1:8888)")
@@ -135,17 +128,15 @@ func serve() {
 		data, err := docconv.Convert(file, mimeType, readability)
 		if err != nil {
 			log.Printf("error converting data: %v", err)
-			return
+			data = &docconv.Response{
+				Error: err.Error(),
+			}
 		}
-		b, err := json.Marshal(data)
-		if err != nil {
+
+		if err := json.NewEncoder(w).Encode(data); err != nil {
 			log.Printf("error marshaling JSON data: %v", err)
 			return
 		}
-		if *logLevel >= 2 {
-			log.Println(string(b))
-		}
-		fmt.Fprintf(w, "%s", b)
 	})
 
 	// Start webserver
