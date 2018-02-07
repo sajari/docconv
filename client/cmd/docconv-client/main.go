@@ -38,5 +38,6 @@ func main() {
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(resp); err != nil {
 		fmt.Printf("Could not encode response: %v", err)
+		os.Exit(1)
 	}
 }
