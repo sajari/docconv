@@ -5,11 +5,19 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"strings"
 	"time"
 )
+
+var logger = &log.Logger{}
+
+func init() {
+	// Create logger instance exactly as the standard one from log library
+	logger = log.New(os.Stderr, "", log.LstdFlags)
+}
 
 // Response payload sent back to the requestor
 type Response struct {
@@ -142,4 +150,9 @@ func ConvertPathReadability(path string, readability bool) ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(data)
+}
+
+// SetLogOutput sets the output for this packages logger instance
+func SetLogOutput(w io.Writer) {
+	logger.SetOutput(w)
 }

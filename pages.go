@@ -61,7 +61,7 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 
 			archiveInfo := &TSP.ArchiveInfo{}
 			err = proto.Unmarshal(archiveInfoData, archiveInfo)
-			fmt.Println("archiveInfo:", archiveInfo, err)
+			logger.Println("archiveInfo:", archiveInfo, err)
 		}
 	}
 

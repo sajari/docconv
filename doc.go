@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -35,14 +34,14 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 
 		doc, err := mscfb.New(f)
 		if err != nil {
-			log.Printf("ConvertDoc: could not read doc: %v", err)
+			logger.Printf("ConvertDoc: could not read doc: %v", err)
 		}
 
 		props := msoleps.New()
 		for entry, err := doc.Next(); err == nil; entry, err = doc.Next() {
 			if msoleps.IsMSOLEPS(entry.Initial) {
 				if oerr := props.Reset(doc); oerr != nil {
-					log.Printf("ConvertDoc: could not reset props: %v", oerr)
+					logger.Printf("ConvertDoc: could not reset props: %v", oerr)
 					break
 				}
 
@@ -77,7 +76,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 		outputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
 		if err != nil {
 			// TODO: Remove this.
-			log.Println("TempFile Out:", err)
+			logger.Println("TempFile Out:", err)
 			return
 		}
 		defer os.Remove(outputFile.Name())
@@ -85,14 +84,14 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 		err = exec.Command("wvText", f.Name(), outputFile.Name()).Run()
 		if err != nil {
 			// TODO: Remove this.
-			log.Println("wvText:", err)
+			logger.Println("wvText:", err)
 		}
 
 		var buf bytes.Buffer
 		_, err = buf.ReadFrom(outputFile)
 		if err != nil {
 			// TODO: Remove this.
-			log.Println("wvText:", err)
+			logger.Println("wvText:", err)
 		}
 
 		bc <- buf.String()

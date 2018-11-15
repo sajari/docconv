@@ -5,7 +5,6 @@ package docconv
 import (
 	"bytes"
 	"io"
-	"log"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -25,12 +24,12 @@ func ConvertHTML(r io.Reader, readability bool) (string, map[string]string, erro
 
 	cleanXML, err := Tidy(buf, false)
 	if err != nil {
-		log.Println("Tidy:", err)
+		logger.Println("Tidy:", err)
 		// Tidy failed, so we now manually tokenize instead
 		clean := cleanHTML(buf, true)
 		cleanXML = []byte(clean)
 		// TODO: remove this log
-		log.Println("Cleaned HTML using Golang tokenizer")
+		logger.Println("Cleaned HTML using Golang tokenizer")
 	}
 
 	if readability {
@@ -141,7 +140,7 @@ func HTMLReadability(r io.Reader) []byte {
 
 	paragraphSet, err := jr.ReadAll()
 	if err != nil {
-		log.Println("Justext:", err)
+		logger.Println("Justext:", err)
 		return nil
 	}
 
