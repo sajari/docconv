@@ -11,7 +11,19 @@ import (
 
 	"github.com/richardlehane/mscfb"
 	"github.com/richardlehane/msoleps"
+
+	"github.com/pkg/errors"
 )
+
+type meta struct {
+	m map[string]string
+	e error
+}
+
+type body struct {
+	b string
+	e error
+}
 
 // ConvertDoc converts an MS Word .doc to text.
 func ConvertDoc(r io.Reader) (string, map[string]string, error) {
@@ -22,15 +34,15 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	defer f.Done()
 
 	// Meta data
-	mc := make(chan map[string]string, 1)
+	mc := make(chan meta, 1)
 	go func() {
 		defer func() {
 			if e := recover(); e != nil {
-				log.Printf("panic when reading doc format: %v", e)
+				logger.Printf("panic when reading doc format: %v", e)
 			}
 		}()
 
-		meta := make(map[string]string)
+		metaData := make(map[string]string)
 
 		doc, err := mscfb.New(f)
 		if err != nil {
@@ -46,7 +58,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 				}
 
 				for _, prop := range props.Property {
-					meta[prop.Name] = prop.String()
+					metaData[prop.Name] = prop.String()
 				}
 			}
 		}
@@ -54,57 +66,80 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 		const defaultTimeFormat = "2006-01-02 15:04:05.999999999 -0700 MST"
 
 		// Convert parsed meta
-		if tmp, ok := meta["LastSaveTime"]; ok {
+		if tmp, ok := metaData["LastSaveTime"]; ok {
 			if t, err := time.Parse(defaultTimeFormat, tmp); err == nil {
-				meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
+				metaData["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
 		}
-		if tmp, ok := meta["CreateTime"]; ok {
+		if tmp, ok := metaData["CreateTime"]; ok {
 			if t, err := time.Parse(defaultTimeFormat, tmp); err == nil {
-				meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
+				metaData["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
 		}
 
-		mc <- meta
+		mc <- meta{
+			m: metaData,
+			e: err,
+		}
 	}()
 
 	// Document body
-	bc := make(chan string, 1)
+	bc := make(chan body, 1)
 	go func() {
 
 		// Save output to a file
 		outputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
 		if err != nil {
-			// TODO: Remove this.
-			logger.Println("TempFile Out:", err)
+			bc <- body{
+				e: errors.WithMessage(err, "fatal: failed to create tempfile"),
+			}
 			return
 		}
 		defer os.Remove(outputFile.Name())
 
-		err = exec.Command("wvText", f.Name(), outputFile.Name()).Run()
-		if err != nil {
-			// TODO: Remove this.
-			logger.Println("wvText:", err)
+		wvTextErr := exec.Command("wvText", f.Name(), outputFile.Name()).Run()
+		if wvTextErr != nil {
+			bc <- body{
+				e: errors.WithMessage(wvTextErr, "fatal: wvText error"),
+			}
+			return
 		}
 
 		var buf bytes.Buffer
-		_, err = buf.ReadFrom(outputFile)
-		if err != nil {
-			// TODO: Remove this.
-			logger.Println("wvText:", err)
+		_, bufErr := buf.ReadFrom(outputFile)
+		if bufErr != nil {
+			bc <- body{
+				e: errors.WithMessage(bufErr, "fatal: wvText error reading from tempfile"),
+			}
+			return
 		}
 
-		bc <- buf.String()
+		bc <- body{
+			b: buf.String(),
+		}
 	}()
 
 	// TODO: Should errors in either of the above Goroutines stop things from progressing?
+	// The errors need to be aggregated into Warn or Fatal groups, fail on Fatal errors
+	// but, bubble up warnings to inform the user without blocking content
 	body := <-bc
 	meta := <-mc
 
 	// TODO: Check for errors instead of len(body) == 0?
-	if len(body) == 0 {
+	// Since this is catching an empty content, the document may actually be empty but there could have been an error.
+	// Having an empty document is valid and we are returning errors in each case they can occur, we check for errors.
+	switch errors.Cause(body.e) {
+	case nil:
+		// carry on
+	case os.ErrClosed, os.ErrPermission, &os.PathError{}:
+		// encountered an os error while attempting to create or read tempfile
+		return body.b, meta.m, body.e
+	default:
+		// Falling back to attempt decoding as "docx", discarding errors received so far...
+		// We definitely want to do this in case of &exec.ExitError{}, but then what should be the default behavior?
+		// this should be fine for now...
 		f.Seek(0, 0)
 		return ConvertDocx(f)
 	}
-	return body, meta, nil
+	return body.b, meta.m, meta.e
 }
