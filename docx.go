@@ -3,12 +3,23 @@ package docconv
 import (
 	"archive/zip"
 	"bytes"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"regexp"
 	"time"
 )
+
+type TypeOverride struct {
+	XMLName     xml.Name `xml:"Override"`
+	ContentType string   `xml:"ContentType,attr"`
+	PartName    string   `xml:"PartName,attr"`
+}
+
+type Type struct {
+	XMLName   xml.Name       `xml:"Types"`
+	Overrides []TypeOverride `xml:"Override"`
+}
 
 // ConvertDocx converts an MS Word docx file to text.
 func ConvertDocx(r io.Reader) (string, map[string]string, error) {
@@ -24,13 +35,18 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 		return "", nil, fmt.Errorf("error unzipping data: %v", err)
 	}
 
-	// Regular expression for XML files to include in the text parsing
-	reHeaderFile, _ := regexp.Compile("^word/header[0-9]+.xml$")
-	reFooterFile, _ := regexp.Compile("^word/footer[0-9]+.xml$")
+	zipFiles := mapZipFiles(zr.File)
 
-	for _, f := range zr.File {
+	types, err := getContentTypes(zipFiles["[Content_Types].xml"])
+	if err != nil {
+		return "", nil, err
+	}
+
+	for _, override := range types.Overrides {
+		f := zipFiles[override.PartName]
+
 		switch {
-		case f.Name == "docProps/core.xml":
+		case override.ContentType == "application/vnd.openxmlformats-package.core-properties+xml":
 			rc, err := f.Open()
 			if err != nil {
 				return "", nil, fmt.Errorf("error opening '%v' from archive: %v", f.Name, err)
@@ -52,30 +68,57 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 					meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 				}
 			}
-
-		case f.Name == "word/document.xml":
-			textBody, err = parseDocxText(f)
+		case override.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml":
+			body, err := parseDocxText(f)
 			if err != nil {
 				return "", nil, err
 			}
-
-		case reHeaderFile.MatchString(f.Name):
-			header, err := parseDocxText(f)
-			if err != nil {
-				return "", nil, err
-			}
-			textHeader += header + "\n"
-
-		case reFooterFile.MatchString(f.Name):
+			textBody += body + "\n"
+		case override.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml":
 			footer, err := parseDocxText(f)
 			if err != nil {
 				return "", nil, err
 			}
 			textFooter += footer + "\n"
+		case override.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml":
+			header, err := parseDocxText(f)
+			if err != nil {
+				return "", nil, err
+			}
+			textHeader += header + "\n"
 		}
+
+	}
+	return textHeader + "\n" + textBody + "\n" + textFooter, meta, nil
+}
+
+func getContentTypes(f *zip.File) (*Type, error) {
+	contentTypesFile, err := f.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer contentTypesFile.Close()
+
+	contentTypesFileBytes, err := ioutil.ReadAll(contentTypesFile)
+	if err != nil {
+		return nil, err
 	}
 
-	return textHeader + "\n" + textBody + "\n" + textFooter, meta, nil
+	var types Type
+	err = xml.Unmarshal(contentTypesFileBytes, &types)
+	if err != nil {
+		return nil, err
+	}
+	return &types, nil
+}
+
+func mapZipFiles(files []*zip.File) map[string]*zip.File {
+	filesMap := map[string]*zip.File{}
+	for _, f := range files {
+		filesMap[f.Name] = f
+		filesMap["/"+f.Name] = f
+	}
+	return filesMap
 }
 
 func parseDocxText(f *zip.File) (string, error) {
