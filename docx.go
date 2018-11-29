@@ -10,15 +10,15 @@ import (
 	"time"
 )
 
-type TypeOverride struct {
+type typeOverride struct {
 	XMLName     xml.Name `xml:"Override"`
 	ContentType string   `xml:"ContentType,attr"`
 	PartName    string   `xml:"PartName,attr"`
 }
 
-type Type struct {
+type contentTypeDefinition struct {
 	XMLName   xml.Name       `xml:"Types"`
-	Overrides []TypeOverride `xml:"Override"`
+	Overrides []typeOverride `xml:"Override"`
 }
 
 // ConvertDocx converts an MS Word docx file to text.
@@ -37,12 +37,12 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 
 	zipFiles := mapZipFiles(zr.File)
 
-	types, err := getContentTypes(zipFiles["[Content_Types].xml"])
+	contentTypeDefinition, err := getContentTypeDefinition(zipFiles["[Content_Types].xml"])
 	if err != nil {
 		return "", nil, err
 	}
 
-	for _, override := range types.Overrides {
+	for _, override := range contentTypeDefinition.Overrides {
 		f := zipFiles[override.PartName]
 
 		switch {
@@ -92,28 +92,27 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 	return textHeader + "\n" + textBody + "\n" + textFooter, meta, nil
 }
 
-func getContentTypes(f *zip.File) (*Type, error) {
-	contentTypesFile, err := f.Open()
+func getContentTypeDefinition(zf *zip.File) (*contentTypeDefinition, error) {
+	f, err := zf.Open()
 	if err != nil {
 		return nil, err
 	}
-	defer contentTypesFile.Close()
+	defer f.Close()
 
-	contentTypesFileBytes, err := ioutil.ReadAll(contentTypesFile)
+	b, err := ioutil.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
 
-	var types Type
-	err = xml.Unmarshal(contentTypesFileBytes, &types)
+	var definition contentTypeDefinition; err = xml.Unmarshal(b, &definition)
 	if err != nil {
 		return nil, err
 	}
-	return &types, nil
+	return &definition, nil
 }
 
 func mapZipFiles(files []*zip.File) map[string]*zip.File {
-	filesMap := map[string]*zip.File{}
+	filesMap := make(map[string]*zip.File, 2*len(files))
 	for _, f := range files {
 		filesMap[f.Name] = f
 		filesMap["/"+f.Name] = f

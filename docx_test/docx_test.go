@@ -6,14 +6,14 @@ import (
 	"testing"
 
 	"code.sajari.com/docconv"
-	_ "code.sajari.com/docconv/docx_test/resources"
 )
 
 func TestConvertDocx(t *testing.T) {
-	f, err := os.Open("./resources/sample.docx")
+	f, err := os.Open("./testdata/sample.docx")
 	if err != nil {
 		t.Fatalf("got error = %v, want nil", err)
 	}
+
 	resp, _, err := docconv.ConvertDocx(f)
 	if err != nil {
 		t.Fatalf("got error = %v, want nil", err)
@@ -31,7 +31,7 @@ func TestConvertDocx(t *testing.T) {
 }
 
 func TestConvertDocxWithUncommonValidStructure(t *testing.T) {
-	f, err := os.Open("./resources/sample_2.docx")
+	f, err := os.Open("./testdata/sample_2.docx")
 	if err != nil {
 		t.Fatalf("got error = %v, want nil", err)
 	}
