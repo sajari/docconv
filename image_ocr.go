@@ -7,7 +7,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/otiai10/gosseract/v1/gosseract"
+	"github.com/otiai10/gosseract"
 )
 
 var langs = struct {
@@ -30,9 +30,15 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	// TODO: Why is this done in a separate goroutine when ConvertImage blocks until it returns?
 	go func(file *LocalFile) {
 		langs.RLock()
-		body := gosseract.Must(gosseract.Params{Src: file.Name(), Languages: langs.lang})
+		c := gosseract.NewClient()
+		c.SetLanguage(langs.lang)
+		c.SetImage(file.Name())
+		body, err := c.Text()
 		langs.RUnlock()
-		out <- string(body)
+		if err != nil {
+			panic(err)
+		}
+		out <- body
 	}(f)
 
 	return <-out, meta, nil
