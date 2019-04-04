@@ -4,39 +4,19 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/monzo/docconv"
 	"log"
 	"net/http"
-	"os"
-
-	"code.sajari.com/docconv"
 )
 
 var (
 	inputPath                     = flag.String("input", "", "The file path to convert and exit; no server")
 	listenAddr                    = flag.String("addr", ":8888", "The address to listen on (e.g. 127.0.0.1:8888)")
 	logLevel                      = flag.Uint("log-level", 0, "The verbosity of the log")
-	readabilityLengthLow          = flag.Int("readability-length-low", 70, "Sets the readability length low")
-	readabilityLengthHigh         = flag.Int("readability-length-high", 200, "Sets the readability length high")
-	readabilityStopwordsLow       = flag.Float64("readability-stopwords-low", 0.2, "Sets the readability stopwords low")
-	readabilityStopwordsHigh      = flag.Float64("readability-stopwords-high", 0.3, "Sets the readability stopwords high")
-	readabilityMaxLinkDensity     = flag.Float64("readability-max-link-density", 0.2, "Sets the readability max link density")
-	readabilityMaxHeadingDistance = flag.Int("readability-max-heading-distance", 200, "Sets the readability max heading distance")
-	readabilityUseClasses         = flag.String("readability-use-classes", "good,neargood", "Comma separated list of readability classes to use")
 )
 
 func main() {
 	flag.Parse()
-
-	// TODO: Improve this (remove the need for it!)
-	docconv.HTMLReadabilityOptionsValues = docconv.HTMLReadabilityOptions{
-		LengthLow:             *readabilityLengthLow,
-		LengthHigh:            *readabilityLengthHigh,
-		StopwordsLow:          *readabilityStopwordsLow,
-		StopwordsHigh:         *readabilityStopwordsHigh,
-		MaxLinkDensity:        *readabilityMaxLinkDensity,
-		MaxHeadingDistance:    *readabilityMaxHeadingDistance,
-		ReadabilityUseClasses: *readabilityUseClasses,
-	}
 
 	if *inputPath != "" {
 		resp, err := docconv.ConvertPath(*inputPath)
@@ -47,34 +27,6 @@ func main() {
 		return
 	}
 	serve()
-}
-
-// Convert a file given a path
-func convertPath(path string, readability bool) ([]byte, error) {
-	mimeType := docconv.MimeTypeByExtension(path)
-	if *logLevel >= 1 {
-		log.Println("Converting file: " + path + " (" + mimeType + ")")
-	}
-
-	// Open file
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	data, err := docconv.Convert(f, mimeType, readability)
-	if err != nil {
-		return nil, err
-	}
-	b, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-	if *logLevel >= 2 {
-		log.Println(string(b))
-	}
-	return b, nil
 }
 
 // Start the conversion web service

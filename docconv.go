@@ -1,4 +1,4 @@
-package docconv // import "code.sajari.com/docconv"
+package docconv // import "github.com/monzo/docconv"
 
 import (
 	"encoding/json"
@@ -78,9 +78,6 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 
 	case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
 		body, meta, err = ConvertRTF(r)
-
-	case "text/html":
-		body, meta, err = ConvertHTML(r, readability)
 
 	case "text/url":
 		body, meta, err = ConvertURL(r, readability)
