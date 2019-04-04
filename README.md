@@ -1,10 +1,13 @@
 # docconv
-[![GoDoc](https://godoc.org/code.sajari.com/docconv?status.svg)](https://godoc.org/code.sajari.com/docconv)
-[![Build Status](https://travis-ci.org/sajari/docconv.svg?branch=master)](https://travis-ci.org/sajari/docconv)
 
-A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, Pages documents and images (see optional dependencies below) to plain text.
+## Notes about this fork
 
-**Note for returning users:** the Go code path for this pkg been moved to `code.sajari.com/docconv`.  Follow the installation instructions to checkout a version of the code in the correct place.
+This is a fork of https://github.com/sajari/docconv . It removes support for HTML conversion because the original project
+relies on https://github.com/JalfResi/justext which has [licensing issues](https://github.com/JalfResi/justext/issues/32).
+
+## Introduction
+
+A Go wrapper library to convert PDF, DOC, DOCX, XML, RTF, ODT, Pages documents and images (see optional dependencies below) to plain text.
 
 ## Installation
 
@@ -63,13 +66,6 @@ The `docd` tool runs as either
     - 0: errors & critical info
     - 1: inclues 0 and logs each request as well
     - 2: include 1 and logs the response payloads
- - "readability-length-low" - Sets the readability length low if the ?readability=1 parameter is set
- - "readability-length-high" - Sets the readability length high if the ?readability=1 parameter is set
- - "readability-stopwords-low" - Sets the readability stopwords low if the ?readability=1 parameter is set
- - "readability-stopwords-high" - Sets the readability stopwords high if the ?readability=1 parameter is set
- - "readability-max-link-density" - Sets the readability max link density if the ?readability=1 parameter is set
- - "readability-max-heading-distance" - Sets the readability max heading distance if the ?readability=1 parameter is set
- - "readability-use-classes - Comma separated list of readability classes to use if the ?readability=1 parameter is set
 
 ### How to start the service
 ```docd -log-level 0   # will only log errors & critical info ```
@@ -89,7 +85,7 @@ import (
 	"fmt"
 	"log"
 
-	"code.sajari.com/docconv"
+	"github.com/monzo/docconv"
 )
 
 func main() {
@@ -110,7 +106,7 @@ import (
 	"fmt"
 	"log"
 
-	"code.sajari.com/docconv/client"
+	"github.com/monzo/docconv/client"
 )
 
 func main() {
