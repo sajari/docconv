@@ -3,7 +3,7 @@ language: go
 go:
 - 1.9
 - tip
-go_import_path: code.sajari.com/docconv
+go_import_path: code.osprey.com/docconv
 notifications:
   email:
     - infra@sajari.com

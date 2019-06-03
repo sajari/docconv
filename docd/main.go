@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"code.sajari.com/docconv"
+	"code.osprey.com/docconv"
 )
 
 var (
