@@ -1,4 +1,4 @@
-package docconv // import "code.osprey.com/docconv"
+package docconv
 
 import (
 	"encoding/json"
