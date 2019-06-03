@@ -1,4 +1,4 @@
-// +build ocr
+
 
 package docconv
 

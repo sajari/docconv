@@ -1,4 +1,4 @@
-// +build !ocr
+// +build no_ocr
 
 package docconv
 

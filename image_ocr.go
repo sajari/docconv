@@ -1,4 +1,4 @@
-// +build ocr
+
 
 package docconv
 
@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"sync"
-
 	"github.com/otiai10/gosseract"
 )
 
