@@ -37,7 +37,7 @@ func cleanupTemp(tmpDir string) {
 func ConvertPDFImages(path string) (BodyResult, error) {
 	bodyResult := BodyResult{}
 
-	tmp, err := ioutil.TempDir("/tmp", "tmp-imgs-")
+	tmp, err := ioutil.TempDir(os.TempDir(), "tmp-imgs-")
 	if err != nil {
 		bodyResult.err = err
 		return bodyResult, err
@@ -123,7 +123,7 @@ func PDFHasImage(path string) bool {
 }
 
 func ConvertPDF(r io.Reader) (string, map[string]string, error) {
-	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
+	f, err := NewLocalFile(r)
 	if err != nil {
 		return "", nil, fmt.Errorf("error creating local file: %v", err)
 	}
