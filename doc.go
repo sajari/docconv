@@ -14,7 +14,7 @@ import (
 
 // ConvertDoc converts an MS Word .doc to text.
 func ConvertDoc(r io.Reader) (string, map[string]string, error) {
-	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
+	f, err := NewLocalFile(r)
 	if err != nil {
 		return "", nil, fmt.Errorf("error creating local file: %v", err)
 	}

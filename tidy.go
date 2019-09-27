@@ -11,7 +11,7 @@ import (
 // Errors & warnings are deliberately suppressed as underlying tools
 // throw warnings very easily.
 func Tidy(r io.Reader, xmlIn bool) ([]byte, error) {
-	f, err := ioutil.TempFile("/tmp", "sajari-convert-")
+	f, err := ioutil.TempFile(os.TempDir(), "sajari-convert-")
 	if err != nil {
 		return nil, err
 	}
