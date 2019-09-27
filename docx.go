@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"time"
 )
 
@@ -23,14 +24,31 @@ type contentTypeDefinition struct {
 
 // ConvertDocx converts an MS Word docx file to text.
 func ConvertDocx(r io.Reader) (string, map[string]string, error) {
-	meta := make(map[string]string)
-	var textHeader, textBody, textFooter string
+	var size int64
 
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
-		return "", nil, err
+	// Common case: if the reader is a file (or trivial wrapper), avoid
+	// loading it all into memory.
+	var ra io.ReaderAt
+	if f, ok := r.(interface {
+		io.ReaderAt
+		Stat() (os.FileInfo, error)
+	}); ok {
+		si, err := f.Stat()
+		if err != nil {
+			return "", nil, err
+		}
+		size = si.Size()
+		ra = f
+	} else {
+		b, err := ioutil.ReadAll(r)
+		if err != nil {
+			return "", nil, nil
+		}
+		size = int64(len(b))
+		ra = bytes.NewReader(b)
 	}
-	zr, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
+
+	zr, err := zip.NewReader(ra, size)
 	if err != nil {
 		return "", nil, fmt.Errorf("error unzipping data: %v", err)
 	}
@@ -42,6 +60,8 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 		return "", nil, err
 	}
 
+	meta := make(map[string]string)
+	var textHeader, textBody, textFooter string
 	for _, override := range contentTypeDefinition.Overrides {
 		f := zipFiles[override.PartName]
 
@@ -99,16 +119,11 @@ func getContentTypeDefinition(zf *zip.File) (*contentTypeDefinition, error) {
 	}
 	defer f.Close()
 
-	b, err := ioutil.ReadAll(f)
-	if err != nil {
+	x := &contentTypeDefinition{}
+	if err := xml.NewDecoder(f).Decode(x); err != nil {
 		return nil, err
 	}
-
-	var definition contentTypeDefinition; err = xml.Unmarshal(b, &definition)
-	if err != nil {
-		return nil, err
-	}
-	return &definition, nil
+	return x, nil
 }
 
 func mapZipFiles(files []*zip.File) map[string]*zip.File {
