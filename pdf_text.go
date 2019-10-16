@@ -40,16 +40,13 @@ func ConvertPDFText(path string) (BodyResult, MetaResult, error) {
 		}
 
 		// Convert parsed meta
-		if tmp, ok := metaResult.meta["Author"]; ok {
-			metaResult.meta["Author"] = tmp
-		}
-		if tmp, ok := metaResult.meta["ModDate"]; ok {
-			if t, err := time.Parse(time.ANSIC, tmp); err == nil {
+		if x, ok := metaResult.meta["ModDate"]; ok {
+			if t, ok := pdfTimeLayouts.Parse(x); ok {
 				metaResult.meta["ModifiedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
 		}
-		if tmp, ok := metaResult.meta["CreationDate"]; ok {
-			if t, err := time.Parse(time.ANSIC, tmp); err == nil {
+		if x, ok := metaResult.meta["CreationDate"]; ok {
+			if t, ok := pdfTimeLayouts.Parse(x); ok {
 				metaResult.meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 			}
 		}
@@ -70,4 +67,18 @@ func ConvertPDFText(path string) (BodyResult, MetaResult, error) {
 	}()
 
 	return <-br, <-mr, nil
+}
+
+var pdfTimeLayouts = timeLayouts{time.ANSIC, "Mon Jan _2 15:04:05 2006 MST"}
+
+type timeLayouts []string
+
+func (tl timeLayouts) Parse(x string) (time.Time, bool) {
+	for _, layout := range tl {
+		t, err := time.Parse(layout, x)
+		if err == nil {
+			return t, true
+		}
+	}
+	return time.Time{}, false
 }
