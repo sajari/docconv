@@ -8,7 +8,8 @@ function die {
   exit 1
 }
 
-ln -s alpine/dependencies appengine/dependencies
+mkdir appengine/dependencies
+cp alpine/dependencies/* appengine/dependencies
 
 echo "Building ${NAME} for ${VERSION}..."
 
@@ -19,5 +20,6 @@ cd $VERSION
 echo "Deploying to AppEngine..."
 gcloud app deploy --version="1"
 
+# clean up
 rm docd
-rm appengine/dependencies
+rm -r appengine/dependencies
