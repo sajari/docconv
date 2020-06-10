@@ -5,11 +5,12 @@ package docconv
 import (
 	"fmt"
 	"io"
+	"os"
 )
 
 func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 
-	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
+	f, err := NewLocalFile(r, os.TempDir(), "sajari-convert-")
 	if err != nil {
 		return "", nil, fmt.Errorf("error creating local file: %v", err)
 	}

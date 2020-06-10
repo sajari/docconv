@@ -14,7 +14,7 @@ import (
 
 // ConvertDoc converts an MS Word .doc to text.
 func ConvertDoc(r io.Reader) (string, map[string]string, error) {
-	f, err := NewLocalFile(r, "/tmp", "sajari-convert-")
+	f, err := NewLocalFile(r, os.TempDir(), "sajari-convert-")
 	if err != nil {
 		return "", nil, fmt.Errorf("error creating local file: %v", err)
 	}
@@ -57,7 +57,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	go func() {
 
 		// Save output to a file
-		outputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
+		outputFile, err := ioutil.TempFile(os.TempDir(), "sajari-convert-")
 		if err != nil {
 			// TODO: Remove this.
 			log.Println("TempFile Out:", err)
