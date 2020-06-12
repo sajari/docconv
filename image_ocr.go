@@ -5,9 +5,23 @@ package docconv
 import (
 	"fmt"
 	"io"
+	"sync"
 
 	"github.com/otiai10/gosseract/v2"
 )
+
+var ocrConfig = struct {
+	langs []string
+	sync.RWMutex
+}{
+	langs: []string{"eng"},
+}
+
+func SetImageLanguages(l ...string) {
+	ocrConfig.Lock()
+	ocrConfig.langs = l
+	ocrConfig.Unlock()
+}
 
 // ConvertImage converts images to text.
 // Requires gosseract.
@@ -22,6 +36,11 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 
 	client := gosseract.NewClient()
 	defer client.Close()
+
+	ocrConfig.RLock()
+	client.SetLanguage(ocrConfig.langs...)
+	ocrConfig.RUnlock()
+
 	client.SetImage(f.Name())
 	text, err := client.Text()
 	if err != nil {
