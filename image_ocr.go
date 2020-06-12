@@ -12,7 +12,7 @@ import (
 
 var ocrConfig = struct {
 	langs []string
-	sync.RWMutex
+	sync.Mutex
 }{
 	langs: []string{"eng"},
 }
@@ -37,10 +37,10 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	client := gosseract.NewClient()
 	defer client.Close()
 
-	ocrConfig.RLock()
-	client.SetLanguage(ocrConfig.langs...)
-	ocrConfig.RUnlock()
+	ocrConfig.Lock()
+	defer ocrConfig.Unlock()
 
+	client.SetLanguage(ocrConfig.langs...)
 	client.SetImage(f.Name())
 	text, err := client.Text()
 	if err != nil {
