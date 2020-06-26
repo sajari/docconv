@@ -3,6 +3,7 @@ package docconv
 import (
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -54,9 +55,20 @@ func ConvertPDFText(path string) (BodyResult, MetaResult, error) {
 		mr <- metaResult
 	}()
 
+	parameters := []string{
+		"-q", "-nopgbrk", "-enc", "UTF-8", "-eol", "unix",
+	}
+	if config.Limitation.PdfFirstPage > 0 {
+		parameters = append(parameters, "-f", strconv.Itoa(config.Limitation.PdfFirstPage))
+	}
+	if config.Limitation.PdfLastPage > 0 {
+		parameters = append(parameters, "-l", strconv.Itoa(config.Limitation.PdfLastPage))
+	}
+	parameters = append(parameters, path, "-")
+
 	br := make(chan BodyResult, 1)
 	go func() {
-		body, err := exec.Command("pdftotext", "-q", "-nopgbrk", "-enc", "UTF-8", "-eol", "unix", path, "-").Output()
+		body, err := exec.Command("pdftotext", parameters...).Output()
 		if err != nil {
 			bodyResult.err = err
 		}
