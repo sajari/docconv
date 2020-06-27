@@ -5,6 +5,8 @@ go:
 - "1.14"
 - tip
 go_import_path: code.sajari.com/docconv
+before_install:
+  - sudo apt-get -y install poppler-utils
 notifications:
   email:
     - infra@sajari.com
