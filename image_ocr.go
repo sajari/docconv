@@ -10,7 +10,7 @@ import (
 	"github.com/otiai10/gosseract/v2"
 )
 
-var ocrConfig = struct {
+var config = struct {
 	langs []string
 	sync.Mutex
 }{
@@ -18,9 +18,9 @@ var ocrConfig = struct {
 }
 
 func SetImageLanguages(l ...string) {
-	ocrConfig.Lock()
-	ocrConfig.langs = l
-	ocrConfig.Unlock()
+	config.Lock()
+	config.langs = l
+	config.Unlock()
 }
 
 // ConvertImage converts images to text.
@@ -37,10 +37,10 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 	client := gosseract.NewClient()
 	defer client.Close()
 
-	ocrConfig.Lock()
-	defer ocrConfig.Unlock()
+	config.Lock()
+	defer config.Unlock()
 
-	client.SetLanguage(ocrConfig.langs...)
+	client.SetLanguage(config.langs...)
 	client.SetImage(f.Name())
 	text, err := client.Text()
 	if err != nil {

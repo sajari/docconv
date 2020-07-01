@@ -26,7 +26,7 @@ Example install of dependencies (not all systems):
 
 ### Optional Dependencies
 
-To add image support to the `docconv` library you first need to install and build https://github.com/otiai10/gosseract.  Now you can add `-tags ocr` to any `go` command when building/fetching `docconv` to include support for processing images:
+To add image support to the `docconv` library you first need to install and build https://github.com/otiai10/gosseract/tree/v2.2.4.  Now you can add `-tags ocr` to any `go` command when building/fetching `docconv` to include support for processing images:
 
     $ go get -tags ocr code.sajari.com/docconv/...
 
