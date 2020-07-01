@@ -14,4 +14,4 @@ func ConvertImage(r io.Reader) (string, map[string]string, error) {
 }
 
 // SetImageLanguages sets the languages parameter passed to gosseract.
-func SetImageLanguages(string) {}
+func SetImageLanguages(...string) {}
