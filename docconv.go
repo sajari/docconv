@@ -33,6 +33,8 @@ func MimeTypeByExtension(filename string) string {
 		return "application/vnd.apple.pages"
 	case ".pdf":
 		return "application/pdf"
+	case ".pptx":
+		return "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 	case ".rtf":
 		return "application/rtf"
 	case ".xml":
@@ -66,6 +68,9 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 
 	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
 		body, meta, err = ConvertDocx(r)
+
+	case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+		body, meta, err = ConvertPptx(r)
 
 	case "application/vnd.oasis.opendocument.text":
 		body, meta, err = ConvertODT(r)
