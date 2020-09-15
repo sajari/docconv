@@ -131,15 +131,19 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	switch errors.Cause(body.e) {
 	case nil:
 		// carry on
-	case os.ErrClosed, os.ErrPermission, &os.PathError{}:
+	case os.ErrClosed, os.ErrPermission:
 		// encountered an os error while attempting to create or read tempfile
 		return body.b, meta.m, body.e
 	default:
+		switch errors.Cause(body.e).(type) {
+		case *os.PathError:
+			return body.b, meta.m, body.e
+		}
 		// Falling back to attempt decoding as "docx", discarding errors received so far...
 		// We definitely want to do this in case of &exec.ExitError{}, but then what should be the default behavior?
 		// this should be fine for now...
 		f.Seek(0, 0)
 		return ConvertDocx(f)
 	}
-	return body.b, meta.m, meta.e
+	return body.b, meta.m, body.e
 }
