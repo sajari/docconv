@@ -17,6 +17,14 @@ To fetch and build the code:
 
 This will also build the command line tool `docd` into `$GOPATH/bin`. Make sure that `$GOPATH/bin` is in your `PATH` environment variable.
 
+## Build
+
+```
+docker run -it -v $(pwd):/go/src/github.com/skpr/docconv -w /go/src/github.com/skpr/docconv golang:1.14-alpine3.11 /bin/sh -c "./build.sh 3.11"
+docker run -it -v $(pwd):/go/src/github.com/skpr/docconv -w /go/src/github.com/skpr/docconv golang:1.15-alpine3.12 /bin/sh -c "./build.sh 3.12"
+docker run -it -v $(pwd):/go/src/github.com/skpr/docconv -w /go/src/github.com/skpr/docconv golang:1.15-alpine3.13 /bin/sh -c "./build.sh 3.13"
+```
+
 ## Dependencies
 
 tidy, wv, popplerutils, unrtf, https://github.com/JalfResi/justext
