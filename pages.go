@@ -17,7 +17,7 @@ import (
 )
 
 // ConvertPages converts a Pages file to text.
-func ConvertPages(r io.Reader) (string, map[string]string, error) {
+func ConvertPages(r io.Reader, readability bool) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 
@@ -35,7 +35,7 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 		if strings.HasSuffix(f.Name, "Preview.pdf") {
 			// There is a preview PDF version we can use
 			if rc, err := f.Open(); err == nil {
-				return ConvertPDF(rc)
+				return ConvertPDF(rc, readability)
 			}
 		}
 		if f.Name == "index.xml" {
