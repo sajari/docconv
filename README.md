@@ -5,7 +5,7 @@
 
 A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, Pages documents and images (see optional dependencies below) to plain text.
 
-> **Note for returning users:** the Go import path for this package been moved to `code.sajari.com/docconv`.
+> **Note for returning users:** the Go import path for this package changed to `code.sajari.com/docconv`.
 
 ## Installation
 
