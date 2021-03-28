@@ -1,7 +1,8 @@
 # docconv
 
-[![GoDoc](https://godoc.org/code.sajari.com/docconv?status.svg)](https://godoc.org/code.sajari.com/docconv)
-[![Build Status](https://travis-ci.org/sajari/docconv.svg?branch=master)](https://travis-ci.org/sajari/docconv)
+[![Go reference](https://pkg.go.dev/badge/code.sajari.com/docconv.svg)](https://pkg.go.dev/code.sajari.com/docconv)
+[![Build status](https://github.com/sajari/docconv/workflows/Go/badge.svg?branch=master)](https://github.com/sajari/docconv/actions)
+[![Report card](https://goreportcard.com/badge/code.sajari.com/docconv)](https://goreportcard.com/report/code.sajari.com/docconv)
 
 A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, Pages documents and images (see optional dependencies below) to plain text.
 
