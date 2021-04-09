@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"code.sajari.com/docconv"
 )
@@ -47,34 +46,6 @@ func main() {
 		return
 	}
 	serve()
-}
-
-// Convert a file given a path
-func convertPath(path string, readability bool) ([]byte, error) {
-	mimeType := docconv.MimeTypeByExtension(path)
-	if *logLevel >= 1 {
-		log.Println("Converting file: " + path + " (" + mimeType + ")")
-	}
-
-	// Open file
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	data, err := docconv.Convert(f, mimeType, readability)
-	if err != nil {
-		return nil, err
-	}
-	b, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-	if *logLevel >= 2 {
-		log.Println(string(b))
-	}
-	return b, nil
 }
 
 // Start the conversion web service
