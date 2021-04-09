@@ -10,6 +10,9 @@ import (
 
 func TestConvertPptx(t *testing.T) {
 	f, err := os.Open("./testdata/sample.pptx")
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer f.Close()
 
 	if err != nil {
