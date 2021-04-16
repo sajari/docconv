@@ -10,6 +10,10 @@ import (
 )
 
 func TestConvertHTML(t *testing.T) {
+
+	// enable output with readability: true
+	docconv.HTMLReadabilityOptionsValues.ReadabilityUseClasses = "good"
+
 	data, err := ioutil.ReadFile("testdata/test.html")
 	if err != nil {
 		t.Fatalf("got error %v, want nil", err)
