@@ -124,9 +124,7 @@ type HTMLReadabilityOptions struct {
 
 // HTMLReadabilityOptionsValues are the global settings used for HTMLReadability.
 // TODO: Remove this from global state.
-var HTMLReadabilityOptionsValues HTMLReadabilityOptions = HTMLReadabilityOptions{
-	ReadabilityUseClasses: "good",
-}
+var HTMLReadabilityOptionsValues HTMLReadabilityOptions
 
 // HTMLReadability extracts the readable text in an HTML document
 func HTMLReadability(r io.Reader) []byte {
