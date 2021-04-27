@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -30,7 +29,7 @@ func compareExt(ext string, exts []string) bool {
 func cleanupTemp(tmpDir string) {
 	err := os.RemoveAll(tmpDir)
 	if err != nil {
-		log.Println(err)
+		logger.Println(err)
 	}
 }
 
@@ -113,7 +112,7 @@ func PDFHasImage(path string) bool {
 	cmd := "pdffonts -l 5 %s | tail -n +3 | cut -d' ' -f1 | sort | uniq"
 	out, err := exec.Command("bash", "-c", fmt.Sprintf(cmd, path)).Output()
 	if err != nil {
-		log.Println(err)
+		logger.Println(err)
 		return false
 	}
 	if string(out) == "" {
@@ -146,11 +145,11 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 
 	imageConvertResult, imageConvertErr := ConvertPDFImages(f.Name())
 	if imageConvertErr != nil {
-		log.Println(imageConvertErr)
+		logger.Println(imageConvertErr)
 		return bodyResult.body, metaResult.meta, nil
 	}
 	if imageConvertResult.err != nil {
-		log.Println(imageConvertResult.err)
+		logger.Println(imageConvertResult.err)
 		return bodyResult.body, metaResult.meta, nil
 	}
 
