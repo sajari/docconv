@@ -23,6 +23,15 @@ This will also build the command line tool `docd` into `$GOPATH/bin`. Make sure 
 
 tidy, wv, popplerutils, unrtf, https://github.com/JalfResi/justext
 
+The search support each dependency offers is described below: 
+
+- ``docconv``: A Go library used to extract document text.
+- ``tidy``: Pre-processes XML-based documents before they are parsed and searched.
+- ``wv``: Used to search the contents of DOC and DOCX documents.
+- ``popplerutils``: Used to significantly improve server performance when extracting the contents of PDF documents.
+- ``unrtf``: Used to search the contents of RTF documents.
+- ``Justtext``: Used to search HTML documents.
+
 Example install of dependencies (not all systems):
 
     $ sudo apt-get install poppler-utils wv unrtf tidy
