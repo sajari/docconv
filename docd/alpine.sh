@@ -4,12 +4,6 @@ main() {
   export NAME=docd
   export VERSION=alpine
   
-  if [ "$#" -ne 1 ];
-    then echo "usage: ${0} <version>"
-    exit 1
-  fi
-
-
   echo "Building ${NAME} for ${VERSION}..."
 
   GOOS=linux GOARCH=amd64 go build -o $NAME || exit 1
