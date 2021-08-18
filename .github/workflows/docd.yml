@@ -1,0 +1,33 @@
+name: Release docd
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  docker:
+    name: Publish Docker image
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    - id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: sajari/docd
+        labels: |
+          org.opencontainers.image.description=A tool which exposes code.sajari.com/docconv as a service
+          org.opencontainers.image.title=docd
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+    - uses: docker/build-push-action@v2
+      with:
+        context: docd
+        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+        push: true
