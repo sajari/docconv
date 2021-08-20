@@ -141,3 +141,9 @@ func main() {
 	fmt.Println(res)
 }
 ```
+
+Alternatively, via a `curl`:
+
+```
+curl -s -F input=your-file.pdf http://localhost:8888/convert
+```
