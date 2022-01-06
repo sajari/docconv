@@ -55,8 +55,8 @@ jobs:
             export DOCKER_CLI_EXPERIMENTAL=enabled
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker manifest create docker.io/skpr/docconv:alpine<< parameters.alpine >> \
-              --amend=docker.io/skpr/docconv:alpine<< parameters.alpine >>-arm64 \
-              --amend=docker.io/skpr/docconv:alpine<< parameters.alpine >>-amd64
+              --amend docker.io/skpr/docconv:alpine<< parameters.alpine >>-arm64 \
+              --amend docker.io/skpr/docconv:alpine<< parameters.alpine >>-amd64
             docker manifest push docker.io/skpr/docconv:alpine<< parameters.alpine >>
 
 workflows:
