@@ -49,6 +49,12 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
           version: 20.10.7
+      - name: Enable Docker Experimental Features
+        run: |
+          ssh remote-docker \<<EOF
+            sudo bash -c 'echo "{\"experimental\": true}" > /etc/docker/daemon.json'
+            sudo systemctl restart docker
+          EOF
       - run:
           name: Push Manifest
           command: |
