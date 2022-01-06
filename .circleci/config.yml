@@ -15,28 +15,65 @@ platforms: &platforms
   - amd64
   - arm64
 
+alpine: &alpine
+  - "3.14"
+  - "3.15"
+
 jobs:
-  release:
+  build_and_push:
     parameters:
       executor:
+        type: string
+      alpine:
         type: string
     machine: true
     executor: << parameters.executor >>
     steps:
       - checkout
       - run:
-          name: Build, Test and Release
+          name: Build and Push
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            make build push
+            IMAGE=docker.io/skpr/docconv:alpine<< parameters.alpine >>-<< parameters.executor >>
+            docker build --build-arg alpine_version=<< parameters.alpine >> -t ${IMAGE} .
+            docker push ${IMAGE}
+
+  manifest:
+    parameters:
+      alpine:
+        type: string
+    docker:
+      - image: docker:stable
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 20.10.7
+      - run:
+          name: Push Manifest
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker manifest create docker.io/skpr/docconv:alpine<< parameters.alpine >> \
+              --amend=docker.io/skpr/docconv:alpine<< parameters.alpine >>-arm64 \
+              --amend=docker.io/skpr/docconv:alpine<< parameters.alpine >>-amd64
+            docker manifest push docker.io/skpr/docconv:alpine<< parameters.alpine >>
 
 workflows:
   release:
     jobs:
-      - release:
+      - build_and_push:
           filters:
             branches:
               only: master
           matrix:
             parameters:
               executor: *platforms
+              alpine: *alpine
+
+      - manifest:
+          matrix:
+            parameters:
+              alpine: *alpine
+          requires:
+            - build_and_push
+            
