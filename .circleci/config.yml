@@ -1,0 +1,42 @@
+version: 2.1
+
+executors:
+  amd64:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: medium
+
+  arm64:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: arm.medium
+
+platforms: &platforms
+  - amd64
+  - arm64
+
+jobs:
+  release:
+    parameters:
+      executor:
+        type: string
+    machine: true
+    executor: << parameters.executor >>
+    steps:
+      - checkout
+      - run:
+          name: Build, Test and Release
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            make build push
+
+workflows:
+  release:
+    jobs:
+      - release:
+          filters:
+            branches:
+              only: master
+          matrix:
+            parameters:
+              executor: *platforms
