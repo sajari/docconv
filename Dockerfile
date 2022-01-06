@@ -24,4 +24,4 @@ RUN apk add tesseract-ocr \
 
 COPY --from=build /go/src/code.sajari.com/docconv/dist/docconv /usr/local/bindocconv
 
-ENTRYPOINT ["/usr/local/bindocconv"]
+ENTRYPOINT ["/usr/local/bin/docconv"]
