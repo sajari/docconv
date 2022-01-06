@@ -22,6 +22,6 @@ RUN apk add tesseract-ocr \
             tesseract-ocr-dev \
             poppler-utils
 
-COPY --from=build /go/src/code.sajari.com/docconv/dist/docconv /usr/local/bindocconv
+COPY --from=build /go/src/code.sajari.com/docconv/dist/docconv /usr/local/bin/docconv
 
 ENTRYPOINT ["/usr/local/bin/docconv"]
