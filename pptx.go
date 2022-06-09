@@ -43,7 +43,7 @@ func ConvertPptx(r io.Reader) (string, map[string]string, error) {
 
 	zipFiles := mapZipFiles(zr.File)
 
-	contentTypeDefinition, err := getContentTypeDefinition(zipFiles["[Content_Types].xml"])
+	contentTypeDefinition, err := getContentTypeDefinition(zipFiles["[content_types].xml"])
 	if err != nil {
 		return "", nil, err
 	}
@@ -51,7 +51,7 @@ func ConvertPptx(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 	for _, override := range contentTypeDefinition.Overrides {
-		f := zipFiles[override.PartName]
+		f := zipFiles[strings.ToLower(override.PartName)]
 
 		switch override.ContentType {
 		case "application/vnd.openxmlformats-officedocument.presentationml.slide+xml",
