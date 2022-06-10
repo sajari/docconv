@@ -1,3 +1,4 @@
+//go:build ocr
 // +build ocr
 
 package docconv
@@ -10,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 )
@@ -111,7 +113,8 @@ func ConvertPDFImages(path string) (BodyResult, error) {
 // PdfHasImage verify if `path` (PDF) has images
 func PDFHasImage(path string) bool {
 	cmd := "pdffonts -l 5 %s | tail -n +3 | cut -d' ' -f1 | sort | uniq"
-	out, err := exec.Command("bash", "-c", fmt.Sprintf(cmd, path)).Output()
+	out, err := exec.Command("bash", "-c", fmt.Sprintf(cmd, shellEscape(path))).CombinedOutput()
+
 	if err != nil {
 		log.Println(err)
 		return false
@@ -158,4 +161,23 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 
 	return fullBody, metaResult.meta, nil
 
+}
+
+var shellEscapePattern *regexp.Regexp
+
+func init() {
+	shellEscapePattern = regexp.MustCompile(`[^\w@%+=:,./-]`)
+}
+
+// shellEscape returns a shell-escaped version of the string s. The returned value
+// is a string that can safely be used as one token in a shell command line.
+func shellEscape(s string) string {
+	if len(s) == 0 {
+		return "''"
+	}
+	if shellEscapePattern.MatchString(s) {
+		return "'" + strings.Replace(s, "'", "'\"'\"'", -1) + "'"
+	}
+
+	return s
 }
