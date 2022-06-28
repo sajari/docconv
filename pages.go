@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	TSP "code.sajari.com/docconv/iWork"
 	"code.sajari.com/docconv/snappy"

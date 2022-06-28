@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+option go_package = "code.sajari.com/docconv/tsp";
+
 import "TSPMessages.proto";
 package TSP;
 
