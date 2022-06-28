@@ -89,8 +89,8 @@ func (c *Client) Convert(r io.Reader, filename string) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, err := io.Copy(part, r); err != nil {
-		return nil, err
+	if n, err := io.Copy(part, r); err != nil {
+		return nil, fmt.Errorf("could not copy file data into request (failed after %d bytes): %w", n, err)
 	}
 	if err := w.Close(); err != nil {
 		return nil, err
@@ -109,6 +109,16 @@ func (c *Client) Convert(r io.Reader, filename string) (*Response, error) {
 	defer resp.Body.Close()
 
 	res := &Response{}
+	if resp.StatusCode != http.StatusOK {
+		err := json.NewDecoder(resp.Body).Decode(&res)
+		if err != nil {
+			// Invalid JSON can come from proxies etc, so try
+			// to give something meaningful.
+			return nil, fmt.Errorf("non-OK status from convert server: %d (%v)", resp.StatusCode, http.StatusText(resp.StatusCode))
+		}
+		return nil, fmt.Errorf("non-OK status from convert server: %d (%v) with error: %v", resp.StatusCode, http.StatusText(resp.StatusCode), res.Error)
+	}
+
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
