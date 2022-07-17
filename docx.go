@@ -40,7 +40,7 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 		size = si.Size()
 		ra = f
 	} else {
-		b, err := ioutil.ReadAll(r)
+		b, err := ioutil.ReadAll(io.LimitReader(r, maxBytes))
 		if err != nil {
 			return "", nil, nil
 		}

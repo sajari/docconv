@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -48,8 +47,6 @@ func main() {
 	}
 	serve()
 }
-
-const maxFileSize = 20 << 20 // 10MB
 
 // Start the conversion web service
 func serve() {
@@ -95,16 +92,11 @@ func serve() {
 			mimeType = docconv.MimeTypeByExtension(info.Filename)
 		}
 
-		if info.Size > maxFileSize {
-			w.WriteHeader(http.StatusRequestEntityTooLarge)
-			return
-		}
-
 		if *logLevel >= 1 {
 			log.Println("Received file: " + info.Filename + " (" + mimeType + ")")
 		}
 
-		data, err := docconv.Convert(io.LimitReader(file, maxFileSize), mimeType, readability)
+		data, err := docconv.Convert(file, mimeType, readability)
 		if err != nil {
 			log.Printf("error converting data: %v", err)
 			data = &docconv.Response{
