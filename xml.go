@@ -25,7 +25,7 @@ func ConvertXML(r io.Reader) (string, map[string]string, error) {
 func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) (string, error) {
 	var result string
 
-	dec := xml.NewDecoder(r)
+	dec := xml.NewDecoder(io.LimitReader(r, maxBytes))
 	dec.Strict = strict
 	for {
 		t, err := dec.Token()
@@ -76,7 +76,7 @@ func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) (string
 // XMLToMap converts XML to a nested string map.
 func XMLToMap(r io.Reader) (map[string]string, error) {
 	m := make(map[string]string)
-	dec := xml.NewDecoder(r)
+	dec := xml.NewDecoder(io.LimitReader(r, maxBytes))
 	var tagName string
 	for {
 		t, err := dec.Token()
