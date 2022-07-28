@@ -145,7 +145,12 @@ func HTMLReadability(r io.Reader) []byte {
 		return nil
 	}
 
-	useClasses := strings.SplitN(HTMLReadabilityOptionsValues.ReadabilityUseClasses, ",", 10)
+	var useClasses []string
+	if HTMLReadabilityOptionsValues.ReadabilityUseClasses == "" {
+		useClasses = []string{"good", "neargood"}
+	} else {
+		useClasses = strings.SplitN(HTMLReadabilityOptionsValues.ReadabilityUseClasses, ",", 10)
+	}
 
 	output := ""
 	for _, paragraph := range paragraphSet {
