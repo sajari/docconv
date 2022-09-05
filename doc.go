@@ -36,6 +36,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 		doc, err := mscfb.New(f)
 		if err != nil {
 			log.Printf("ConvertDoc: could not read doc: %v", err)
+			return
 		}
 
 		props := msoleps.New()
