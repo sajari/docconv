@@ -1,4 +1,4 @@
-FROM golang:1.14 AS build
+FROM golang:1.19 AS build
 
 WORKDIR /go/src/github.com/sajari/docconv/docd
 COPY main.go .
@@ -25,4 +25,3 @@ EXPOSE 8888
 COPY --from=build /go/bin/docd /docd
 ENTRYPOINT ["/docd"]
 CMD ["--help"]
-
