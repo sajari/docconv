@@ -2,7 +2,7 @@ FROM golang:1.19 AS build
 
 WORKDIR /app
 COPY . ./
-RUN go build ./docd/...
+RUN go build -o /bin/docd ./docd
 
 ################################################################################
 
@@ -21,6 +21,6 @@ RUN apt-get update \
 
 EXPOSE 8888
 
-COPY --from=build /app/docd /docd
+COPY --from=build /bin/docd /docd
 ENTRYPOINT ["/docd"]
 CMD ["--help"]
