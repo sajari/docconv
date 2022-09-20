@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"cloud.google.com/go/errorreporting"
 
@@ -40,6 +41,12 @@ func main() {
 
 	var er internal.ErrorReporter = &internal.NopErrorReporter{}
 	if *errorReporting {
+		if *errorReportingGCPProjectID == "" {
+			*errorReportingGCPProjectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
+		}
+		if *errorReportingAppEngineService == "" {
+			*errorReportingAppEngineService = os.Getenv("GAE_SERVICE")
+		}
 		var err error
 		er, err = errorreporting.NewClient(context.Background(), *errorReportingGCPProjectID, errorreporting.Config{
 			ServiceName: *errorReportingAppEngineService,
