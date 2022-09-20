@@ -1,9 +1,8 @@
 FROM golang:1.19 AS build
 
-WORKDIR /go/src/github.com/sajari/docconv/docd
-COPY main.go .
-RUN go get -v ./
-RUN go build .
+WORKDIR /app
+COPY . ./
+RUN go build ./docd/...
 
 ################################################################################
 
@@ -22,6 +21,6 @@ RUN apt-get update \
 
 EXPOSE 8888
 
-COPY --from=build /go/bin/docd /docd
+COPY --from=build /app/docd /docd
 ENTRYPOINT ["/docd"]
 CMD ["--help"]
