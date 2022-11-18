@@ -149,11 +149,11 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 
 	imageConvertResult, imageConvertErr := ConvertPDFImages(f.Name())
 	if imageConvertErr != nil {
-		log.Println(imageConvertErr)
+		//log.Println(imageConvertErr)
 		return bodyResult.body, metaResult.meta, nil
 	}
 	if imageConvertResult.err != nil {
-		log.Println(imageConvertResult.err)
+		//log.Println(imageConvertResult.err)
 		return bodyResult.body, metaResult.meta, nil
 	}
 
