@@ -36,6 +36,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 		doc, err := mscfb.New(f)
 		if err != nil {
 			log.Printf("ConvertDoc: could not read doc: %v", err)
+			mc <- meta
 			return
 		}
 
@@ -75,10 +76,12 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	go func() {
 
 		// Save output to a file
+		var buf bytes.Buffer
 		outputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
 		if err != nil {
 			// TODO: Remove this.
 			log.Println("TempFile Out:", err)
+			bc <- buf.String()
 			return
 		}
 		defer os.Remove(outputFile.Name())
@@ -89,7 +92,6 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 			log.Println("wvText:", err)
 		}
 
-		var buf bytes.Buffer
 		_, err = buf.ReadFrom(outputFile)
 		if err != nil {
 			// TODO: Remove this.
