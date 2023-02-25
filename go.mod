@@ -20,6 +20,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/richardlehane/mscfb v1.0.3
 	github.com/richardlehane/msoleps v1.0.3
-	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420
+	golang.org/x/net v0.7.0
 	google.golang.org/protobuf v1.28.0
 )
