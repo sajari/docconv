@@ -15,9 +15,9 @@ If you haven't setup Go before, you first need to [install Go](https://golang.or
 
 To fetch and build the code:
 
-    $ go get code.sajari.com/docconv/...
+    $ go install code.sajari.com/docconv/docd@latest
 
-This will also build the command line tool `docd` into `$GOPATH/bin`. Make sure that `$GOPATH/bin` is in your `PATH` environment variable.
+See `go help install` for details on the installation location of the installed `docd` executable. Make sure that the full path to the executable is in your `PATH` environment variable.
 
 ## Dependencies
 
