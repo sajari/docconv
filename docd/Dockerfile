@@ -1,4 +1,4 @@
-FROM golang:1.19 AS build
+FROM golang:1.20 AS build
 
 WORKDIR /app
 COPY . ./
@@ -10,13 +10,13 @@ FROM debian:11-slim AS docd
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        lynx \
-        poppler-utils \
-        tidy \
-        unrtf \
-        wv \
-        zip \
+    ca-certificates \
+    lynx \
+    poppler-utils \
+    tidy \
+    unrtf \
+    wv \
+    zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
