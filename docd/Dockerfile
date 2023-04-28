@@ -1,8 +1,11 @@
 FROM golang:1.21 AS build
 
 WORKDIR /app
-COPY . ./
-RUN go build -o /bin/docd ./docd
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN go build -o /usr/local/bin/app
 
 ################################################################################
 
@@ -24,6 +27,5 @@ RUN update-ca-certificates
 
 EXPOSE 8888
 
-COPY --from=build /bin/docd /docd
-ENTRYPOINT ["/docd"]
-CMD ["--help"]
+COPY --from=build /usr/local/bin/app /usr/local/bin/app
+CMD ["app"]
