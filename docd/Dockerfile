@@ -1,4 +1,4 @@
-FROM golang:1.21 AS build
+FROM --platform=linux/amd64 golang:1.20 AS builder
 
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -9,7 +9,7 @@ RUN go build -o /usr/local/bin/app
 
 ################################################################################
 
-FROM debian:12-slim AS docd
+FROM --platform=linux/amd64 debian:11-slim 
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -27,5 +27,5 @@ RUN update-ca-certificates
 
 EXPOSE 8888
 
-COPY --from=build /usr/local/bin/app /usr/local/bin/app
+COPY --from=builder /usr/local/bin/app /usr/local/bin/app
 CMD ["app"]
