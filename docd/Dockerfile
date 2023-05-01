@@ -5,9 +5,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN go build -o /usr/local/bin/app
-
-################################################################################
+RUN go build -o /usr/local/bin/docd
 
 FROM debian:11-slim 
 
@@ -27,8 +25,8 @@ RUN update-ca-certificates
 
 EXPOSE 8888
 
-COPY --from=builder /usr/local/bin/app /usr/local/bin/app
+COPY --from=builder /usr/local/bin/docd /usr/local/bin/docd
 
 ENV PATH /usr/local/bin:$PATH
 
-CMD ["app"]
+ENTRYPOINT ["/usr/local/bin/docd"]
