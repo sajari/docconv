@@ -28,4 +28,7 @@ RUN update-ca-certificates
 EXPOSE 8888
 
 COPY --from=builder /usr/local/bin/app /usr/local/bin/app
+
+ENV PATH /usr/local/bin:$PATH
+
 CMD ["app"]
