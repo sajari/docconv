@@ -27,6 +27,8 @@ EXPOSE 8888
 
 COPY --from=builder /usr/local/bin/docd /usr/local/bin/docd
 
+RUN chmod a+x /usr/local/bin/docd
+
 ENV PATH /usr/local/bin:$PATH
 
 ENTRYPOINT ["/usr/local/bin/docd"]
