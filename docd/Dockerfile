@@ -1,5 +1,5 @@
 # Builder stage
-FROM --platform=linux/amd64 golang:1.20.3 AS builder
+FROM golang:1.20.3 AS builder
 
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -9,7 +9,7 @@ COPY . .
 RUN go build -o /usr/local/bin/docd
 
 # Final stage
-FROM --platform=linux/amd64 debian:11
+FROM debian:11
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
