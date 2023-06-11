@@ -18,6 +18,8 @@ platforms: &platforms
 alpine: &alpine
   - "3.14"
   - "3.15"
+  - "3.16"
+  - "3.17"
 
 jobs:
   build_and_push:
