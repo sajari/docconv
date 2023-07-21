@@ -9,7 +9,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
@@ -119,7 +118,7 @@ func TestFramingFormat(t *testing.T) {
 	if _, err := NewWriter(buf).Write(src); err != nil {
 		t.Fatalf("Write: encoding: %v", err)
 	}
-	dst, err := ioutil.ReadAll(NewReader(buf))
+	dst, err := io.ReadAll(NewReader(buf))
 	if err != nil {
 		t.Fatalf("ReadAll: decoding: %v", err)
 	}
@@ -149,7 +148,7 @@ func TestReaderReset(t *testing.T) {
 			continue
 		}
 		r.Reset(strings.NewReader(s))
-		got, err := ioutil.ReadAll(r)
+		got, err := io.ReadAll(r)
 		switch s {
 		case encoded:
 			if err != nil {
@@ -186,7 +185,7 @@ func TestWriterReset(t *testing.T) {
 			failed = true
 			continue
 		}
-		got, err := ioutil.ReadAll(NewReader(buf))
+		got, err := io.ReadAll(NewReader(buf))
 		if err != nil {
 			t.Errorf("#%d: ReadAll: %v", i, err)
 			failed = true
@@ -229,7 +228,7 @@ func benchEncode(b *testing.B, src []byte) {
 }
 
 func readFile(b testing.TB, filename string) []byte {
-	src, err := ioutil.ReadFile(filename)
+	src, err := os.ReadFile(filename)
 	if err != nil {
 		b.Fatalf("failed reading %s: %s", filename, err)
 	}

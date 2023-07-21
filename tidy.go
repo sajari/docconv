@@ -2,7 +2,6 @@ package docconv
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 )
@@ -11,7 +10,7 @@ import (
 // Errors & warnings are deliberately suppressed as underlying tools
 // throw warnings very easily.
 func Tidy(r io.Reader, xmlIn bool) ([]byte, error) {
-	f, err := ioutil.TempFile(os.TempDir(), "docconv")
+	f, err := os.CreateTemp(os.TempDir(), "docconv")
 	if err != nil {
 		return nil, err
 	}

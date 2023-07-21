@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -28,7 +27,7 @@ func ConvertPptx(r io.Reader) (string, map[string]string, error) {
 		size = si.Size()
 		ra = f
 	} else {
-		b, err := ioutil.ReadAll(r)
+		b, err := io.ReadAll(r)
 		if err != nil {
 			return "", nil, nil
 		}

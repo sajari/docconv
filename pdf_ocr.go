@@ -6,7 +6,6 @@ package docconv
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -39,7 +38,7 @@ func cleanupTemp(tmpDir string) {
 func ConvertPDFImages(path string) (BodyResult, error) {
 	bodyResult := BodyResult{}
 
-	tmp, err := ioutil.TempDir(os.TempDir(), "tmp-imgs-")
+	tmp, err := os.MkdirTemp(os.TempDir(), "tmp-imgs-")
 	if err != nil {
 		bodyResult.err = err
 		return bodyResult, err
