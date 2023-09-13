@@ -1,4 +1,4 @@
-FROM golang:1.20 AS build
+FROM golang:1.21 AS build
 
 WORKDIR /app
 COPY . ./
@@ -6,7 +6,7 @@ RUN go build -o /bin/docd ./docd
 
 ################################################################################
 
-FROM debian:11-slim AS docd
+FROM debian:12-slim AS docd
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
