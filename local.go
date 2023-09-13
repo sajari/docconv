@@ -3,7 +3,6 @@ package docconv
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -25,7 +24,7 @@ func NewLocalFile(r io.Reader) (*LocalFile, error) {
 		}, nil
 	}
 
-	f, err := ioutil.TempFile(os.TempDir(), "docconv")
+	f, err := os.CreateTemp(os.TempDir(), "docconv")
 	if err != nil {
 		return nil, fmt.Errorf("error creating temporary file: %v", err)
 	}

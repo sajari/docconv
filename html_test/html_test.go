@@ -3,7 +3,7 @@ package html_test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -39,7 +39,7 @@ This is a full sentence.
 			})
 			docconv.HTMLReadabilityOptionsValues.ReadabilityUseClasses = tt.readabilityUseClasses
 
-			data, err := ioutil.ReadFile("testdata/test.html")
+			data, err := os.ReadFile("testdata/test.html")
 			must(t, err)
 			got, _, err := docconv.ConvertHTML(bytes.NewReader(data), true)
 			must(t, err)

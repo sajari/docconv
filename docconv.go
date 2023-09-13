@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -98,7 +97,7 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 
 	case "text/plain":
 		var b []byte
-		b, err = ioutil.ReadAll(r)
+		b, err = io.ReadAll(r)
 		body = string(b)
 	}
 

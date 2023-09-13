@@ -7,7 +7,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"google.golang.org/protobuf/proto"
@@ -21,7 +20,7 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 
-	b, err := ioutil.ReadAll(io.LimitReader(r, maxBytes))
+	b, err := io.ReadAll(io.LimitReader(r, maxBytes))
 	if err != nil {
 		return "", nil, fmt.Errorf("error reading data: %v", err)
 	}
@@ -57,7 +56,7 @@ func ConvertPages(r io.Reader) (string, map[string]string, error) {
 			// Ignore error.
 			// NOTE: This error was unchecked. Need to revisit this to see if it
 			// should be acted on.
-			archiveInfoData, _ := ioutil.ReadAll(io.LimitReader(bReader, archiveLength))
+			archiveInfoData, _ := io.ReadAll(io.LimitReader(bReader, archiveLength))
 
 			archiveInfo := &TSP.ArchiveInfo{}
 			err = proto.Unmarshal(archiveInfoData, archiveInfo)

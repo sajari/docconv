@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -77,7 +76,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 
 		// Save output to a file
 		var buf bytes.Buffer
-		outputFile, err := ioutil.TempFile("/tmp", "sajari-convert-")
+		outputFile, err := os.CreateTemp("/tmp", "sajari-convert-")
 		if err != nil {
 			// TODO: Remove this.
 			log.Println("TempFile Out:", err)

@@ -2,7 +2,7 @@ package rtf_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 
@@ -10,7 +10,7 @@ import (
 )
 
 func TestConvertRTF(t *testing.T) {
-	data, err := ioutil.ReadFile("testdata/test.rtf")
+	data, err := os.ReadFile("testdata/test.rtf")
 	if err != nil {
 		t.Fatalf("got error %v, want nil", err)
 	}
