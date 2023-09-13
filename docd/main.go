@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 
 	"cloud.google.com/go/errorreporting"
 
@@ -92,6 +93,7 @@ func serve(er internal.ErrorReporter, cs *convertServer) {
 	r.HandleFunc("/convert", cs.convert)
 
 	// Start webserver
+	log.Println("Go version", runtime.Version())
 	log.Println("Setting log level to", *logLevel)
 	log.Println("Starting docconv on", *listenAddr)
 	log.Fatal(http.ListenAndServe(*listenAddr, internal.RecoveryHandler(er)(r)))
