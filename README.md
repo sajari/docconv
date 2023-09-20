@@ -28,6 +28,11 @@ Example install of dependencies (not all systems):
     $ sudo apt-get install poppler-utils wv unrtf tidy
     $ go get github.com/JalfResi/justext
 
+On macOS:
+
+    $ brew install poppler-qt5 wv unrtf tidy-html5
+    $ go get github.com/JalfResi/justext
+
 ### Optional dependencies
 
 To add image support to the `docconv` library you first need to [install and build gosseract](https://github.com/otiai10/gosseract/tree/v2.2.4).
