@@ -75,10 +75,10 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 		body, meta, err = ConvertODT(r)
 
 	case "application/vnd.apple.pages", "application/x-iwork-pages-sffpages":
-		body, meta, err = ConvertPages(r)
+		body, meta, err = ConvertPages(r, readability)
 
 	case "application/pdf":
-		body, meta, err = ConvertPDF(r)
+		body, meta, err = ConvertPDF(r, readability)
 
 	case "application/rtf", "application/x-rtf", "text/rtf", "text/richtext":
 		body, meta, err = ConvertRTF(r)

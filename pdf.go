@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-func ConvertPDF(r io.Reader) (string, map[string]string, error) {
+func ConvertPDF(r io.Reader, readability bool) (string, map[string]string, error) {
 
 	f, err := NewLocalFile(r)
 	if err != nil {
@@ -15,7 +15,7 @@ func ConvertPDF(r io.Reader) (string, map[string]string, error) {
 	}
 	defer f.Done()
 
-	bodyResult, metaResult, convertErr := ConvertPDFText(f.Name())
+	bodyResult, metaResult, convertErr := ConvertPDFText(f.Name(), readability)
 	if convertErr != nil {
 		return "", nil, convertErr
 	}
