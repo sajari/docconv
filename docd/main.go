@@ -4,17 +4,20 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"runtime"
 
+	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/errorreporting"
 
 	"github.com/gorilla/mux"
 
 	"code.sajari.com/docconv"
 	"code.sajari.com/docconv/docd/internal"
+	"code.sajari.com/docconv/docd/internal/cloudtrace"
+	"code.sajari.com/docconv/docd/internal/debug"
 )
 
 var (
@@ -22,11 +25,13 @@ var (
 
 	inputPath = flag.String("input", "", "The file path to convert and exit; no server")
 
+	jsonCloudLogging = flag.Bool("json-cloud-logging", false, "Whether or not to enable JSON Cloud Logging")
+
+	cloudTraceGCPProjectID = flag.String("cloud-trace-gcp-project-id", "", "The GCP project to use for Cloud Trace")
+
 	errorReporting                 = flag.Bool("error-reporting", false, "Whether or not to enable GCP Error Reporting")
 	errorReportingGCPProjectID     = flag.String("error-reporting-gcp-project-id", "", "The GCP project to use for Error Reporting")
 	errorReportingAppEngineService = flag.String("error-reporting-app-engine-service", "", "The App Engine service to use for Error Reporting")
-
-	logLevel = flag.Uint("log-level", 0, "The verbosity of the log")
 
 	readabilityLengthLow          = flag.Int("readability-length-low", 70, "Sets the readability length low")
 	readabilityLengthHigh         = flag.Int("readability-length-high", 200, "Sets the readability length high")
@@ -40,6 +45,28 @@ var (
 func main() {
 	flag.Parse()
 
+	l := slog.New(debug.NewDebugHandler(slog.Default().Handler()))
+
+	if *jsonCloudLogging {
+		gcpProjectID := *cloudTraceGCPProjectID
+		if gcpProjectID == "" {
+			gcpProjectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
+		}
+		if gcpProjectID == "" {
+			l.Debug("GOOGLE_CLOUD_PROJECT env var not provided, looking up internal metadata service")
+			var err error
+			gcpProjectID, err = metadata.ProjectID()
+			if err != nil {
+				l.Error("Could not autodetect GCP project ID", "error", err)
+				os.Exit(1)
+			}
+		}
+
+		l = slog.New(debug.NewDebugHandler(cloudtrace.NewCloudLoggingHandler(gcpProjectID, slog.LevelInfo)))
+		slog.SetDefault(l)
+		l.Info("Cloud Trace GCP project ID", "projectID", gcpProjectID)
+	}
+
 	var er internal.ErrorReporter = &internal.NopErrorReporter{}
 	if *errorReporting {
 		if *errorReportingGCPProjectID == "" {
@@ -52,15 +79,17 @@ func main() {
 		er, err = errorreporting.NewClient(context.Background(), *errorReportingGCPProjectID, errorreporting.Config{
 			ServiceName: *errorReportingAppEngineService,
 			OnError: func(err error) {
-				log.Printf("Could not report error to Error Reporting service: %v", err)
+				l.Error("Could not report error to Error Reporting service", "error", err)
 			},
 		})
 		if err != nil {
-			log.Fatalf("Could not create Error Reporting client: %v", err)
+			l.Error("Could not create Error Reporting client", "error", err)
+			os.Exit(1)
 		}
 	}
 
 	cs := &convertServer{
+		l:  l,
 		er: er,
 	}
 
@@ -78,23 +107,29 @@ func main() {
 	if *inputPath != "" {
 		resp, err := docconv.ConvertPath(*inputPath)
 		if err != nil {
-			log.Printf("error converting file '%v': %v", *inputPath, err)
+			l.Error("Could not convert file", "error", err, "path", *inputPath)
+			os.Exit(1)
 		}
 		fmt.Print(string(resp.Body))
 		return
 	}
 
-	serve(er, cs)
+	serve(l, er, cs)
 }
 
 // Start the conversion web service
-func serve(er internal.ErrorReporter, cs *convertServer) {
+func serve(l *slog.Logger, er internal.ErrorReporter, cs *convertServer) {
 	r := mux.NewRouter()
 	r.HandleFunc("/convert", cs.convert)
 
-	// Start webserver
-	log.Println("Go version", runtime.Version())
-	log.Println("Setting log level to", *logLevel)
-	log.Println("Starting docconv on", *listenAddr)
-	log.Fatal(http.ListenAndServe(*listenAddr, internal.RecoveryHandler(er)(r)))
+	h := internal.RecoveryHandler(l, er)(r)
+	h = &debug.HTTPHandler{Handler: h}
+	h = &cloudtrace.HTTPHandler{Handler: h}
+
+	l.Info("Go version " + runtime.Version())
+
+	l.Info(fmt.Sprintf("HTTP server listening on %q...", *listenAddr))
+	if err := http.ListenAndServe(*listenAddr, h); err != nil {
+		l.Error("HTTP server ListenAndServe", "error", err)
+	}
 }

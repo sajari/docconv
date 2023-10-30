@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -17,6 +17,7 @@ import (
 )
 
 type convertServer struct {
+	l  *slog.Logger
 	er internal.ErrorReporter
 }
 
@@ -27,9 +28,7 @@ func (s *convertServer) convert(w http.ResponseWriter, r *http.Request) {
 	var readability bool
 	if r.FormValue("readability") == "1" {
 		readability = true
-		if *logLevel >= 2 {
-			log.Println("Readability is on")
-		}
+		s.l.DebugContext(ctx, "Readability is on")
 	}
 
 	path := r.FormValue("path")
@@ -73,9 +72,7 @@ func (s *convertServer) convert(w http.ResponseWriter, r *http.Request) {
 		mimeType = docconv.MimeTypeByExtension(info.Filename)
 	}
 
-	if *logLevel >= 1 {
-		log.Printf("Received file: %v (%v)", info.Filename, mimeType)
-	}
+	s.l.InfoContext(ctx, "Received file", "filename", info.Filename, "mimeType", mimeType)
 
 	data, err := docconv.Convert(file, mimeType, readability)
 	if err != nil {
@@ -91,7 +88,7 @@ func (s *convertServer) clientError(ctx context.Context, w http.ResponseWriter, 
 		Error: fmt.Sprintf(pattern, args...),
 	})
 
-	log.Printf(pattern, args...)
+	s.l.InfoContext(ctx, fmt.Sprintf(pattern, args...))
 }
 
 func (s *convertServer) serverError(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
@@ -104,7 +101,7 @@ func (s *convertServer) serverError(ctx context.Context, w http.ResponseWriter, 
 	}
 	s.er.Report(e)
 
-	log.Printf("%v", err)
+	s.l.ErrorContext(ctx, err.Error(), "error", err)
 }
 
 func (s *convertServer) respond(ctx context.Context, w http.ResponseWriter, r *http.Request, code int, resp interface{}) {

@@ -3,7 +3,7 @@ package internal
 import (
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"runtime/debug"
 
@@ -11,15 +11,16 @@ import (
 )
 
 type recoveryHandler struct {
+	l       *slog.Logger
 	er      ErrorReporter
 	handler http.Handler
 }
 
 // RecoveryHandler is HTTP middleware that recovers from a panic, writes a
 // 500, reports the panic, logs the panic and continues to the next handler.
-func RecoveryHandler(er ErrorReporter) func(h http.Handler) http.Handler {
+func RecoveryHandler(l *slog.Logger, er ErrorReporter) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
-		return &recoveryHandler{er: er, handler: h}
+		return &recoveryHandler{l: l, er: er, handler: h}
 	}
 }
 
@@ -45,8 +46,7 @@ func (h recoveryHandler) handle(r *http.Request, err error) {
 	}
 	h.er.Report(e)
 
-	log.Println(err)
-	log.Printf("%s", stack)
+	h.l.ErrorContext(r.Context(), err.Error(), "error", err, "stack", string(stack))
 }
 
 // recovered represents the return value from a call to recover.
