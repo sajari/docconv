@@ -1,8 +1,9 @@
 module code.sajari.com/docconv
 
-go 1.20
+go 1.21
 
 require (
+	cloud.google.com/go/compute v0.1.0
 	cloud.google.com/go/errorreporting v0.2.0
 	github.com/JalfResi/justext v0.0.0-20170829062021-c0282dea7198
 	github.com/advancedlogic/GoOse v0.0.0-20191112112754-e742535969c1
@@ -17,7 +18,6 @@ require (
 
 require (
 	cloud.google.com/go v0.100.2 // indirect
-	cloud.google.com/go/compute v0.1.0 // indirect
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1 // indirect
