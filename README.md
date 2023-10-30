@@ -7,26 +7,39 @@
 
 A Go wrapper library to convert PDF, DOC, DOCX, XML, HTML, RTF, ODT, Pages documents and images (see optional dependencies below) to plain text.
 
-> **Note for returning users:** the Go import path for this package changed to `code.sajari.com/docconv`.
-
 ## Installation
 
 If you haven't setup Go before, you first need to [install Go](https://golang.org/doc/install).
 
 To fetch and build the code:
 
-    $ go install code.sajari.com/docconv/docd@latest
+```console
+$ go install code.sajari.com/docconv/docd@latest
+```
 
 See `go help install` for details on the installation location of the installed `docd` executable. Make sure that the full path to the executable is in your `PATH` environment variable.
 
 ## Dependencies
 
-tidy, wv, popplerutils, unrtf, https://github.com/JalfResi/justext
+- tidy
+- wv
+- popplerutils
+- unrtf
+- https://github.com/JalfResi/justext
 
-Example install of dependencies (not all systems):
+### Debian-based Linux
 
-    $ sudo apt-get install poppler-utils wv unrtf tidy
-    $ go get github.com/JalfResi/justext
+```console
+$ sudo apt-get install poppler-utils wv unrtf tidy
+$ go get github.com/JalfResi/justext
+```
+
+### macOS
+
+```console
+$ brew install poppler-qt5 wv unrtf tidy-html5
+$ go get github.com/JalfResi/justext
+```
 
 ### Optional dependencies
 
@@ -34,11 +47,15 @@ To add image support to the `docconv` library you first need to [install and bui
 
 Now you can add `-tags ocr` to any `go` command when building/fetching/testing `docconv` to include support for processing images:
 
-    $ go get -tags ocr code.sajari.com/docconv/...
+```console
+$ go get -tags ocr code.sajari.com/docconv/...
+```
 
 This may complain on macOS, which you can fix by installing [tesseract](https://tesseract-ocr.github.io) via brew:
 
-    $ brew install tesseract
+```console
+$ brew install tesseract
+```
 
 ## docd tool
 
@@ -55,16 +72,18 @@ The `docd` tool runs as either:
 
     Optionally you can build it yourself:
 
-    ```
-    cd docd
-    docker build -t docd .
+    ```console
+    $ cd docd
+    $ docker build -t docd .
     ```
 
 3.  via the command line.
 
     Documents can be sent as an argument, e.g.
 
-        $ docd -input document.pdf
+    ```console
+    $ docd -input document.pdf
+    ```
 
 ### Optional flags
 
@@ -79,8 +98,10 @@ The `docd` tool runs as either:
 
 ### How to start the service
 
-    $ # This runs on port 8000
-    $ docd -addr :8000
+```console
+$ # This runs on port 8000
+$ docd -addr :8000
+```
 
 ## Example usage (code)
 
@@ -135,6 +156,6 @@ func main() {
 
 Alternatively, via a `curl`:
 
-```
-curl -s -F input=your-file.pdf http://localhost:8888/convert
+```console
+$ curl -s -F input=@your-file.pdf http://localhost:8888/convert
 ```
