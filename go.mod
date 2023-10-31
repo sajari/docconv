@@ -1,4 +1,4 @@
-module code.sajari.com/docconv
+module code.sajari.com/docconv/v2
 
 go 1.21
 

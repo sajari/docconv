@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.sajari.com/docconv"
+	"code.sajari.com/docconv/v2"
 )
 
 func TestConvertPptx(t *testing.T) {

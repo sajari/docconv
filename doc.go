@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -26,7 +25,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	go func() {
 		defer func() {
 			if e := recover(); e != nil {
-				log.Printf("panic when reading doc format: %v", e)
+				// TODO: Propagate error.
 			}
 		}()
 
@@ -34,7 +33,7 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 
 		doc, err := mscfb.New(f)
 		if err != nil {
-			log.Printf("ConvertDoc: could not read doc: %v", err)
+			// TODO: Propagate error.
 			mc <- meta
 			return
 		}
@@ -42,8 +41,8 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 		props := msoleps.New()
 		for entry, err := doc.Next(); err == nil; entry, err = doc.Next() {
 			if msoleps.IsMSOLEPS(entry.Initial) {
-				if oerr := props.Reset(doc); oerr != nil {
-					log.Printf("ConvertDoc: could not reset props: %v", oerr)
+				if err := props.Reset(doc); err != nil {
+					// TODO: Propagate error.
 					break
 				}
 
@@ -73,13 +72,10 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 	// Document body
 	bc := make(chan string, 1)
 	go func() {
-
 		// Save output to a file
 		var buf bytes.Buffer
 		outputFile, err := os.CreateTemp("/tmp", "sajari-convert-")
 		if err != nil {
-			// TODO: Remove this.
-			log.Println("TempFile Out:", err)
 			bc <- buf.String()
 			return
 		}
@@ -87,14 +83,12 @@ func ConvertDoc(r io.Reader) (string, map[string]string, error) {
 
 		err = exec.Command("wvText", f.Name(), outputFile.Name()).Run()
 		if err != nil {
-			// TODO: Remove this.
-			log.Println("wvText:", err)
+			// TODO: Propagate error.
 		}
 
 		_, err = buf.ReadFrom(outputFile)
 		if err != nil {
-			// TODO: Remove this.
-			log.Println("wvText:", err)
+			// TODO: Propagate error.
 		}
 
 		bc <- buf.String()

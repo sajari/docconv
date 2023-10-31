@@ -1,4 +1,4 @@
-// +build !ocr
+//go:build !ocr
 
 package docconv
 

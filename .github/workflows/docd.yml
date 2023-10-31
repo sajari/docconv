@@ -20,7 +20,7 @@ jobs:
         with:
           images: sajari/docd
           labels: |
-            org.opencontainers.image.description=A tool which exposes code.sajari.com/docconv as a service
+            org.opencontainers.image.description=A tool which exposes code.sajari.com/docconv/v2 as a service
             org.opencontainers.image.title=docd
           tags: |
             type=semver,pattern={{version}}
