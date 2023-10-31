@@ -1,11 +1,10 @@
-// +build !appengine
+//go:build !appengine
 
 package docconv
 
 import (
 	"bytes"
 	"io"
-	"log"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -25,18 +24,23 @@ func ConvertHTML(r io.Reader, readability bool) (string, map[string]string, erro
 
 	cleanXML, err := Tidy(buf, false)
 	if err != nil {
-		log.Println("Tidy:", err)
 		// Tidy failed, so we now manually tokenize instead
 		clean := cleanHTML(buf, true)
 		cleanXML = []byte(clean)
-		// TODO: remove this log
-		log.Println("Cleaned HTML using Golang tokenizer")
 	}
 
 	if readability {
-		cleanXML = HTMLReadability(bytes.NewReader(cleanXML))
+		var err error
+		cleanXML, err = HTMLReadability(bytes.NewReader(cleanXML))
+		if err != nil {
+			return "", nil, err
+		}
 	}
-	return HTMLToText(bytes.NewReader(cleanXML)), meta, nil
+	text, err := HTMLToText(bytes.NewReader(cleanXML))
+	if err != nil {
+		return "", nil, err
+	}
+	return text, meta, nil
 }
 
 var acceptedHTMLTags = [...]string{
@@ -127,7 +131,7 @@ type HTMLReadabilityOptions struct {
 var HTMLReadabilityOptionsValues HTMLReadabilityOptions
 
 // HTMLReadability extracts the readable text in an HTML document
-func HTMLReadability(r io.Reader) []byte {
+func HTMLReadability(r io.Reader) ([]byte, error) {
 	jr := justext.NewReader(r)
 
 	// TODO: Improve this!
@@ -141,8 +145,7 @@ func HTMLReadability(r io.Reader) []byte {
 
 	paragraphSet, err := jr.ReadAll()
 	if err != nil {
-		log.Println("Justext:", err)
-		return nil
+		return nil, err
 	}
 
 	useClasses := strings.SplitN(HTMLReadabilityOptionsValues.ReadabilityUseClasses, ",", 10)
@@ -156,13 +159,12 @@ func HTMLReadability(r io.Reader) []byte {
 		}
 	}
 
-	return []byte(output)
+	return []byte(output), nil
 }
 
 // HTMLToText converts HTML to plain text.
-func HTMLToText(input io.Reader) string {
-	text, _ := XMLToText(input, []string{"br", "p", "h1", "h2", "h3", "h4"}, []string{}, false)
-	return text
+func HTMLToText(input io.Reader) (string, error) {
+	return XMLToText(input, []string{"br", "p", "h1", "h2", "h3", "h4"}, []string{}, false)
 }
 
 var readabilityStopList = map[string]bool{"and": true, "the": true, "a": true, "about": true, "above": true, "across": true, "after": true, "afterwards": true, "again": true, "against": true, "all": true, "almost": true, "alone": true,

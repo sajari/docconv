@@ -1,4 +1,4 @@
-// +build !ocr
+//go:build !ocr
 
 package docconv
 
@@ -8,7 +8,6 @@ import (
 )
 
 func ConvertPDF(r io.Reader) (string, map[string]string, error) {
-
 	f, err := NewLocalFile(r)
 	if err != nil {
 		return "", nil, fmt.Errorf("error creating local file: %v", err)

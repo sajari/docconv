@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.sajari.com/docconv"
+	"code.sajari.com/docconv/v2"
 )
 
 func TestConvertRTF(t *testing.T) {
