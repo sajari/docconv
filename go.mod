@@ -12,7 +12,7 @@ require (
 	github.com/otiai10/gosseract/v2 v2.2.4
 	github.com/richardlehane/mscfb v1.0.3
 	github.com/richardlehane/msoleps v1.0.3
-	golang.org/x/net v0.7.0
+	golang.org/x/net v0.17.0
 	google.golang.org/protobuf v1.28.0
 )
 
@@ -36,8 +36,8 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/api v0.67.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220207164111-0872dc986b00 // indirect
