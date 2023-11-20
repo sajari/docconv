@@ -7,7 +7,7 @@ resources:
   memory_gb: 1.2
 
 manual_scaling:
-  instances: 1
+  instances: 2
 
 handlers:
   - url: /.*
