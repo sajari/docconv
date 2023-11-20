@@ -4,11 +4,11 @@ env: flex
 service: docd
 
 resources:
-  memory_gb: .6
+  memory_gb: 1.2
 
 manual_scaling:
   instances: 1
 
 handlers:
-- url: /.*
-  script: _go_app
+  - url: /.*
+    script: _go_app
