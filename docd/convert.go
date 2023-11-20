@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"os"
+	"syscall"
 
 	"cloud.google.com/go/errorreporting"
 
@@ -114,6 +116,12 @@ func (s *convertServer) respond(ctx context.Context, w http.ResponseWriter, r *h
 	w.WriteHeader(code)
 	n, err := io.Copy(w, buf)
 	if err != nil {
+		// Avoid panicking on broken pipe errors.
+		// See https://gosamples.dev/broken-pipe/
+		if errors.Is(err, syscall.EPIPE) {
+			s.l.DebugContext(ctx, err.Error(), "error", err)
+			return
+		}
 		panic(fmt.Errorf("could not write to response (failed after %d bytes): %w", n, err))
 	}
 }
