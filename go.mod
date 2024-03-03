@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/otiai10/gosseract/v2 v2.2.4
 	github.com/richardlehane/mscfb v1.0.3
-	github.com/richardlehane/msoleps v1.0.3
+	github.com/richardlehane/msoleps v1.0.4-0.20231124170528-c8ca5a164365
 	golang.org/x/net v0.17.0
 	google.golang.org/protobuf v1.30.0
 )
@@ -44,5 +44,3 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.56.3 // indirect
 )
-
-replace github.com/richardlehane/msoleps v1.0.3 => github.com/sajari/msoleps v0.0.0-20231120031048-d0092b82abea
