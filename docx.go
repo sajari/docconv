@@ -54,7 +54,7 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 
 	zipFiles := mapZipFiles(zr.File)
 
-	contentTypeDefinition, err := getContentTypeDefinition(zipFiles["[Content_Types].xml"])
+	contentTypeDefinition, err := getContentTypeDefinition(zipFiles["[content_types].xml"])
 	if err != nil {
 		return "", nil, err
 	}
@@ -62,7 +62,7 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textHeader, textBody, textFooter string
 	for _, override := range contentTypeDefinition.Overrides {
-		f := zipFiles[override.PartName]
+		f := zipFiles[strings.ToLower(override.PartName)]
 
 		switch {
 		case override.ContentType == "application/vnd.openxmlformats-package.core-properties+xml":
@@ -128,8 +128,9 @@ func getContentTypeDefinition(zf *zip.File) (*contentTypeDefinition, error) {
 func mapZipFiles(files []*zip.File) map[string]*zip.File {
 	filesMap := make(map[string]*zip.File, 2*len(files))
 	for _, f := range files {
-		filesMap[f.Name] = f
-		filesMap["/"+f.Name] = f
+		lName := strings.ToLower(f.Name)
+		filesMap[lName] = f
+		filesMap["/"+lName] = f
 	}
 	return filesMap
 }
