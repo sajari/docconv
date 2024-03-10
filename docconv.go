@@ -45,7 +45,7 @@ func MimeTypeByExtension(filename string) string {
 	case ".png":
 		return "image/png"
 	case ".tif":
-		return "image/tif"
+		fallthrough
 	case ".tiff":
 		return "image/tiff"
 	case ".txt":
@@ -92,7 +92,7 @@ func Convert(r io.Reader, mimeType string, readability bool) (*Response, error) 
 	case "text/xml", "application/xml":
 		body, meta, err = ConvertXML(r)
 
-	case "image/jpeg", "image/png", "image/tif", "image/tiff":
+	case "image/jpeg", "image/png", "image/tiff":
 		body, meta, err = ConvertImage(r)
 
 	case "text/plain":
