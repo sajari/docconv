@@ -13,7 +13,7 @@ require (
 	github.com/richardlehane/mscfb v1.0.3
 	github.com/richardlehane/msoleps v1.0.4-0.20231124170528-c8ca5a164365
 	golang.org/x/net v0.17.0
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
