@@ -5,6 +5,8 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+
+	"golang.org/x/net/html/charset"
 )
 
 // ConvertXML converts an XML file to text.
@@ -27,6 +29,7 @@ func XMLToText(r io.Reader, breaks []string, skip []string, strict bool) (string
 
 	dec := xml.NewDecoder(io.LimitReader(r, maxBytes))
 	dec.Strict = strict
+	dec.CharsetReader = charset.NewReaderLabel
 	for {
 		t, err := dec.Token()
 		if err != nil {
